@@ -378,19 +378,60 @@ def drift_placebo(data, genre="arxiv"):
 
 # ----------------------------------------------------------------------------------------- v3: generator vintage
 PRE2022_DATA = ("raid-gpt4", "raid-chatgpt")  # training data predate ChatGPT's release (GPT-4 report: Sep 2021)
+# Open models whose pretraining data predate ChatGPT, run locally on the same prompts (added after review round 2;
+# kept out of every other analysis): Llama 2 chat (pretraining cutoff Sep 2022) and Vicuna (Llama + ShareGPT).
+OLD = ("llama2:7b", "vicuna:7b")
+# RAID chat outputs often summarise the paper instead of writing its abstract ("In the paper titled ...")
+SUMMARY = re.compile(r"\btitled\b|\bthe authors\b|^\s*(in )?the (paper|article|study)\b", re.I)
+
+
+def load_old(data, llm):
+    """Append the pre-ChatGPT-data open models (separate file, separate feature cache)."""
+    f = Path(data) / "llm_arxiv_old.jsonl"
+    if not f.exists():
+        return llm
+    o = pd.read_json(f, lines=True)
+    o["id"] = o.src_id + "|" + o.model + "|" + o.prompt
+    o["id"] = o.id + "|" + o.groupby("id").cumcount().astype(str)
+    mso.cached_features(o, Path(data) / "feat_llm_arxiv_old.jsonl")
+    return pd.concat([llm, o], ignore_index=True)
 WORD = re.compile(r"[a-z]+")
 
 
+PROMPT_WORDS = {"title", "titled", "abstract", "paper", "academic", "authors"}  # echo the prompt, not style
+
+
 def mined_markers(llm_texts, human_texts, k=20, min_df=0.05):
-    """Words most over-represented in LLM output vs pre-ChatGPT human abstracts (smoothed log-odds of document
-    frequency), so the lexical comparison uses markers of the SAME generators that define the style region."""
+    """Words most over-represented in LLM output vs the human abstracts its prompts were built from (smoothed
+    log-odds of document frequency). Topic-matched, so the lexical comparison uses markers of the SAME generators
+    that define the style region rather than topic words of the prompt set."""
     def df(texts):
         c = pd.Series([w for t in texts for w in set(WORD.findall(t.lower()))]).value_counts()
         return c / len(texts)
     a, b = df(llm_texts), df(human_texts)
-    words = a[a >= min_df].index
+    words = a[(a >= min_df) & ~a.index.isin(PROMPT_WORDS)].index
     lo = np.log((a[words] + 1e-3) / (b.reindex(words).fillna(0) + 1e-3))
     return list(lo.sort_values(ascending=False).index[:k])
+
+
+def source_texts(data, human):
+    """id -> human source text for every generation: our arXiv sample plus RAID's own human abstracts."""
+    pool = dict(zip(human.id, human.text))
+    raid = Path(data) / "raid_arxiv_human.jsonl"
+    if raid.exists():
+        r = pd.read_json(raid, lines=True)
+        pool |= dict(zip(r.src_id, r.text)) | dict(zip(r.id, r.text))
+    return pool
+
+
+def marker_series(sub, s0, pool):
+    """Monthly share of scored abstracts using >=1 of the set's topic-matched mined markers."""
+    src = [pool[i] for i in sub.src_id.unique() if i in pool]
+    assert len(src) >= 0.9 * sub.src_id.nunique(), f"only {len(src)} of {sub.src_id.nunique()} sources found"
+    words = mined_markers(sub.text.tolist(), src)
+    pat = re.compile(r"\b(" + "|".join(map(re.escape, words)) + r")\b", re.I)
+    mk = s0.text.map(lambda t: bool(pat.search(t))).astype(int)
+    return words, len(src), mk
 
 
 def nonparam_gap(m, start="2025-01", end="2025-06"):
@@ -403,36 +444,59 @@ def nonparam_gap(m, start="2025-01", end="2025-06"):
     return float((win.mso - np.polyval(b, tw)).mean())
 
 
-def vintage(data):
-    """Per-generator-vintage regions on a matched task: each local/2026 generator on title-only prompts (P1), RAID
-    generators (title-based) as they are, plus a region from generators whose training data predate ChatGPT."""
-    human, llm = mso.load(data, "arxiv")
-    train_h = human[(human.pool == "train") & (human.date < CUTOFF)].text.sample(3000, random_state=mso.SEED).tolist()
-    s0 = human[human.pool == "score"].copy()
+def vintage_sets(llm):
     chat = llm[llm.model.map(CHAT)]
     p1 = chat[(chat.prompt == "P1") | chat.model.str.startswith("raid-")]
     sets = {f"single:{g}": p1[p1.model == g] for g in sorted(p1.model.unique())}
-    sets |= {"pre2022data": chat[chat.model.isin(PRE2022_DATA)],
-             "raid_all": chat[chat.model.str.startswith("raid-")],
-             "local_p1": p1[~p1.model.str.startswith("raid-") & (p1.model != FRONTIER)],
+    old, raid_pre = chat[chat.model.isin(OLD)], chat[chat.model.isin(PRE2022_DATA)]
+    new = chat[~chat.model.isin(OLD)]  # every set below except the pre-ChatGPT-data ones is as before
+    sets |= {"pre2022data": raid_pre,
+             "pre2022data_abstract_register": raid_pre[~raid_pre.text.str.contains(SUMMARY)],
+             "raid_all": new[new.model.str.startswith("raid-")],
+             "local_p1": p1[~p1.model.str.startswith("raid-") & (p1.model != FRONTIER) & ~p1.model.isin(OLD)],
              "frontier_p1": p1[p1.model == FRONTIER],
-             "all_no_revision": chat[chat.prompt != "P2"],
-             "all": chat}
+             "all_no_revision": new[new.prompt != "P2"],
+             "all": new}
+    if len(old):
+        sets |= {"old_open_p1": old[old.prompt == "P1"], "old_open_all": old,
+                 "pre2022data_matched": pd.concat([old[old.prompt == "P1"], raid_pre[~raid_pre.text.str.contains(SUMMARY)]])}
+    return sets
+
+
+def vintage(data, markers_only=False):
+    """Per-generator-vintage regions on a matched task: each local/2026 generator on title-only prompts (P1), RAID
+    generators (title-based) as they are, plus a region from generators whose training data predate ChatGPT.
+    markers_only: recompute the marker columns and keep the (expensive) style regions from the last full run."""
+    human, llm = mso.load(data, "arxiv")
+    llm = load_old(data, llm)
+    pool = source_texts(data, human)
+    s0 = human[human.pool == "score"].copy()
+    old = pd.read_csv(OUT / "arxiv_vintage.csv").set_index("group") if markers_only else None
+    old_its = json.loads((OUT / "arxiv_vintage_its.json").read_text()) if markers_only else {}
     rows, its = [], {}
-    for name, sub in sets.items():
-        score, _ = region(human, sub, f"arxiv_v_{name.replace(':', '_')}", lomo_runs=False)
-        s = s0.assign(in_region=(score(list(s0.f)) >= 0.5).astype(int))
-        words = mined_markers(sub.text.tolist(), train_h)
-        pat = re.compile(r"\b(" + "|".join(map(re.escape, words)) + r")\b", re.I)
-        s["mk"] = s.text.map(lambda t: bool(pat.search(t))).astype(int)
-        m, mm = monthly(s), monthly(s, "mk")
-        r, rm = segmented(m), segmented(mm)
+    for name, sub in vintage_sets(llm).items():
+        s = s0.copy()
+        words, n_src, s["mk"] = marker_series(sub, s0, pool)
+        mm = monthly(s, "mk")
+        rm = segmented(mm)
+        if markers_only:
+            row = old.loc[name].to_dict() | {"group": name}
+            r = old_its[name]["style"]  # ponytail: markers_only needs every set in the last full run
+        else:
+            score, _ = region(human, sub, f"arxiv_v_{name.replace(':', '_')}", lomo_runs=False)
+            s["in_region"] = (score(list(s.f)) >= 0.5).astype(int)
+            m = monthly(s)
+            r = segmented(m)
+            yr = s.groupby(s.date.dt.year).in_region.mean()
+            row = {"group": name, "n_llm": len(sub), "gap": r["excess"], "gap_lo": r["excess_lo"],
+                   "gap_hi": r["excess_hi"], "gap_nonparam": nonparam_gap(m),
+                   **{f"y{y}": float(v) for y, v in yr.items()}}
+        yr_m = s.groupby(s.date.dt.year).mk.mean()
+        row |= {"marker_gap": rm["excess"], "marker_gap_lo": rm["excess_lo"], "marker_gap_hi": rm["excess_hi"],
+                "marker_n_sources": n_src, "summary_register_share": float(sub.text.str.contains(SUMMARY).mean()),
+                **{f"m{y}": float(v) for y, v in yr_m.items()}}
+        rows.append(row)
         its[name] = {"style": r, "markers": rm, "marker_words": words}
-        yr = s.groupby(s.date.dt.year)[["in_region", "mk"]].mean()
-        rows.append({"group": name, "n_llm": len(sub), "gap": r["excess"], "gap_lo": r["excess_lo"],
-                     "gap_hi": r["excess_hi"], "gap_nonparam": nonparam_gap(m),
-                     "marker_gap": rm["excess"], **{f"y{y}": float(v) for y, v in yr.in_region.items()},
-                     **{f"m{y}": float(v) for y, v in yr.mk.items()}})
     save("arxiv_vintage", pd.DataFrame(rows))
     save("arxiv_vintage_its", its)
 
@@ -441,7 +505,7 @@ def placebo_grid(m, start="2016-06", end="2021-12", eval_months=12):
     """Every 2 months: fake break; share of fake breaks whose 'gap' (eval_months later) has p < 0.05."""
     pre = m[m.month < T0]
     out = []
-    for f in pd.period_range(start, end, freq="2M"):
+    for f in pd.period_range(start, end, freq="M")[::2]:
         r = segmented(pre, t0=f, eval_at=min(f + eval_months, T0 - 1))
         out.append({"break": str(f), "gap": r["excess"], "p": r["excess_p"]})
     g = pd.DataFrame(out)
@@ -493,6 +557,93 @@ def robustness_v3(data):
     smp = s.groupby(s.date.dt.year, group_keys=False).apply(lambda d: d.sample(n=min(1200, len(d)), random_state=mso.SEED))
     smp = smp.assign(f=features.extract([" ".join(t.split()[:150]) for t in smp.text]))
     dispersion(smp, "arxiv_len150")
+
+
+def _pre_fit(m, start=None, end=None, deg=1):
+    pre = m[m.month < T0]
+    pre = pre[(pre.month >= pd.Period(start, "M")) if start else slice(None)]
+    pre = pre[(pre.month <= pd.Period(end, "M")) if end else slice(None)]
+    t = np.array([(p - T0).n for p in pre.month])
+    return np.polyfit(t, pre.mso, deg, w=np.sqrt(pre.n))
+
+
+def gap_vs(m, b, start="2025-01", end="2025-06"):
+    """Mean observed share in [start, end] minus the extrapolated pre-ChatGPT trend b (nonparametric gap)."""
+    win = m[(m.month >= pd.Period(start, "M")) & (m.month <= pd.Period(end, "M"))]
+    return float((win.mso - np.polyval(b, [(p - T0).n for p in win.month])).mean())
+
+
+def block_bootstrap(m, n_boot=2000, block=12, seed=0):
+    """Moving-block residual bootstrap of the ITS trend gap (keeps within-year autocorrelation)."""
+    rng = np.random.default_rng(seed)
+    t = np.array([(p - T0).n for p in m.month])
+    X = np.c_[np.ones_like(t), t, t >= 0, t * (t >= 0)].astype(float)
+    w = np.sqrt(m.n.values)
+    beta, *_ = np.linalg.lstsq(X * w[:, None], m.mso.values * w, rcond=None)
+    fitted, res = X @ beta, m.mso.values - X @ beta
+    e = (EVAL - T0).n
+    out = []
+    for _ in range(n_boot):
+        starts = rng.integers(0, len(res) - block + 1, size=len(res) // block + 1)
+        r = np.concatenate([res[s:s + block] for s in starts])[:len(res)]
+        b, *_ = np.linalg.lstsq(X * w[:, None], (fitted + r) * w, rcond=None)
+        out.append(b[2] + e * b[3])
+    return {"excess": float(beta[2] + e * beta[3]), "lo": float(np.percentile(out, 2.5)),
+            "hi": float(np.percentile(out, 97.5))}
+
+
+def robustness_v4(data):
+    """Pre-trend shape/window sensitivity, block bootstrap, drift placebos at several origins, relative/logit
+    scale for arXiv vs Hansard, implied LLM-prevalence (mixture identity), revision-exclusion rates."""
+    out = {}
+    for genre in ("arxiv", "hansard"):
+        m = pd.read_csv(OUT / f"{genre}_monthly.csv")
+        m["month"] = pd.PeriodIndex(m.month, freq="M")
+        lin = _pre_fit(m)
+        trend = float(np.polyval(lin, (EVAL - T0).n))
+        its = json.loads((OUT / f"{genre}_its.json").read_text())["all"]
+        lg = lambda q: np.log(q / (1 - q))
+        out[f"{genre}_pretrend"] = {
+            "linear_2015": gap_vs(m, lin), "quadratic_2015": gap_vs(m, _pre_fit(m, deg=2)),
+            "linear_2017": gap_vs(m, _pre_fit(m, start="2017-01")),
+            "linear_2019": gap_vs(m, _pre_fit(m, start="2019-01")),
+            "linear_to_2020": gap_vs(m, _pre_fit(m, end="2020-12")),  # pre-period without 2021-22 (N9)
+            "trend_at_eval": trend, "relative_gap": its["excess"] / trend,
+            "logit_gap": float(lg(trend + its["excess"]) - lg(trend))}
+        out[f"{genre}_block_bootstrap"] = block_bootstrap(m)
+    # drift placebos: instrument trained on human abstracts up to year Y only, fake break the following January
+    human, llm = mso.load(data, "arxiv")
+    for y in (2016, 2017):
+        h = human.copy()
+        h.loc[(h.pool == "train") & (h.date >= f"{y + 1}-01-01"), "pool"] = "unused"
+        score, _ = region(h, llm, f"arxiv_drift{y}", lomo_runs=False)
+        sc = h[(h.pool == "score") & (h.date < CUTOFF)].copy()
+        sc["in_region"] = (score(list(sc.f)) >= 0.5).astype(int)
+        out[f"drift_to_{y}"] = segmented(monthly(sc), t0=pd.Period(f"{y + 1}-01", "M"), eval_at=pd.Period("2022-06", "M"))
+    # implied prevalence: MSO_t = FPR + alpha (TPR - FPR)  =>  alpha = (MSO_t - FPR) / (TPR - FPR)
+    X, yv, groups, _ = mso.training_set(human, llm[llm.model.map(CHAT)])
+    _, p_cv = mso.cv_auc(X, yv, groups)
+    tpr_cv = float((p_cv[yv == 1] >= 0.5).mean())
+    tpr_lomo = float(pd.read_csv(OUT / "arxiv_lomo.csv").recall_on_unseen_model.mean())
+    base = pd.read_csv(OUT / "arxiv_baseline_pre2022.csv").set_index("group").mso
+    f = pd.read_csv(OUT / "arxiv_monthly_by_field.csv")
+    f["year"] = f.month.str[:4].astype(int)
+    f = f.assign(k=f.mso * f.n).groupby(["group", "year"])[["k", "n"]].sum()
+    out["implied"] = {"tpr_cv": tpr_cv, "fpr_cv": float((p_cv[yv == 0] >= 0.5).mean()), "tpr_lomo_mean": tpr_lomo}
+    for g in ("cs", "math", "stat", "econ"):
+        for y in (2023, 2024, 2025, 2026):
+            q = f.loc[(g, y)]
+            q = q.k / q.n
+            out["implied"][f"{g}_{y}_alpha_cv"] = (q - base[g]) / (tpr_cv - base[g])
+            out["implied"][f"{g}_{y}_alpha_lomo"] = (q - base[g]) / (tpr_lomo - base[g])
+    # N9: share of sampled pre-ChatGPT papers excluded because their latest version postdates ChatGPT
+    a = pd.read_json(Path(data) / "arxiv_v2" / "sample.jsonl", lines=True)
+    pub = pd.to_datetime(a.published).dt.tz_localize(None)
+    upd = pd.to_datetime(a.updated).dt.tz_localize(None)
+    pre = pub < CUTOFF
+    ex = (upd[pre] >= CUTOFF).groupby(pub[pre].dt.year).mean()
+    out["revision_exclusion_share"] = {f"y{k}": float(v) for k, v in ex.items()}
+    save("robustness_v4", out)
 
 
 def revision_overlap(data):
@@ -551,7 +702,7 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
-            "vintage": lambda: vintage(data), "robust3": lambda: robustness_v3(data),
+            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "robust3": lambda: robustness_v3(data),
             "overlap": lambda: revision_overlap(data),
             "control": control}
     for j in (jobs if which == "all" else [which]):
