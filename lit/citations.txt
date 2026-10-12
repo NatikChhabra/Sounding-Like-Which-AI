@@ -42,3 +42,12 @@ wu2025monoculture arxiv:2407.02209
 crossley2024persuade doi:10.1016/j.asw.2024.100865
 katz2025hansard doi:10.5281/zenodo.17351233
 gray2024 arxiv:2403.16887
+forman2008 doi:10.1007/s10618-008-0097-y
+khan2025 arxiv:2509.08306
+shaib2024 arxiv:2407.00211
+hans2024binoculars arxiv:2401.12070
+bao2024fastdetectgpt arxiv:2310.05130
+herbold2023 doi:10.1038/s41598-023-45644-9
+berbersardinha2024 doi:10.1016/j.acorp.2023.100083
+mizumoto2026 doi:10.1016/j.acorp.2026.100223
+chakraborty2024 arxiv:2304.04736
