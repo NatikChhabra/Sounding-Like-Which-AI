@@ -19,7 +19,8 @@ MAX_WORDS = 250  # every text is cut to its first 250 words so length can't driv
 
 _MD = [(re.compile(r"\*\*|__|`|^#+\s*", re.M), ""),
        (re.compile(r"(?<![\w*])\*(?=\S)([^*\n]+?)(?<=\S)\*(?![\w*])"), r"\1"),  # *italic*
-       (re.compile(r"^\s*(abstract|title|speech|essay)\s*:\s*", re.I | re.M), ""),
+       (re.compile(r"^\s*title\s*:.*$", re.I | re.M), ""),  # 'Title: ...' line echoes the prompt: drop it all
+       (re.compile(r"^\s*(abstract|speech|essay)\s*:\s*", re.I | re.M), ""),
        (re.compile(r"^\s*([-*•]|\d+[.)])\s+", re.M), "")]
 
 
@@ -144,6 +145,10 @@ if __name__ == "__main__":
     assert clean(h) == "We prove that X — a sharp bound — holds for X – X pairs.", clean(h)
     g3 = "**Abstract**  \nLong‑document work. We introduce *Sparse Attention* (SA), 2 * 3 = 6."
     assert clean(g3) == "Long-document work. We introduce Sparse Attention (SA), 2 * 3 = 6.", clean(g3)
+    t = "Title: Anomalous Excitations of Quantum Magnets\n\nAbstract:\n\nWe study magnets."
+    assert clean(t) == "We study magnets.", clean(t)
+    t2 = "**Title:** On Graphs\n\nWe study graphs."
+    assert clean(t2) == "We study graphs.", clean(t2)
     feats = extract([a, "The cat sat on the mat. It was happy, and so was I."], n_process=1)
     assert feats[0]["pun:—"] > 0 and feats[1]["fw:the"] > 0
     assert not any(k.startswith("fw:novel") for k in feats[0])  # content words excluded

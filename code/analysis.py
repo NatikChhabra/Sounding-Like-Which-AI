@@ -184,9 +184,14 @@ def essay_perplexity(data):
     s["band"] = pd.cut(s.grade, [0, 8, 10, 12], labels=["6-8", "9-10", "11-12"]).astype(str)
     f = smf.logit("flag ~ ell + C(title) + C(band)", data=s).fit(disp=0)
     ci = f.conf_int().loc["ell"]
+    fp = smf.logit("flag ~ ell + C(title) + C(band) + C(score)", data=s).fit(disp=0)  # + proficiency, as for style
+    cp = fp.conf_int().loc["ell"]
     save(f"essay_perplexity_instrument{T}", pd.DataFrame([ci_row(g, d.p) for g, d in [("all", s), *s.groupby("group")]]))
     save(f"essay_perplexity_adjusted{T}", {"odds_ratio": float(np.exp(f.params["ell"])), "or_lo": float(np.exp(ci[0])),
                                        "or_hi": float(np.exp(ci[1])), "p_value": float(f.pvalues["ell"]),
+                                       "odds_ratio_prof": float(np.exp(fp.params["ell"])),
+                                       "or_lo_prof": float(np.exp(cp[0])), "or_hi_prof": float(np.exp(cp[1])),
+                                       "prof_p": float(fp.pvalues["ell"]),
                                        "mean_logppl_ell": float(s[s.ell == 1].lp.mean()),
                                        "mean_logppl_nonell": float(s[s.ell == 0].lp.mean())})
     # Liang et al. (2023) original contrast, out of genre: TOEFL essays vs US 8th-grade essays

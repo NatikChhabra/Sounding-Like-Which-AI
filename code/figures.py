@@ -84,7 +84,7 @@ def fig_fields():
 
 def fig_learners():
     inst = [("Style features\n(primary)", "essay_mso_by_group"), ("Sentence\nembeddings", "essay_embedding_instrument"),
-            ("Perplexity\n(detector-style)", "essay_perplexity_instrument")]
+            ("Perplexity, GPT-2\n(detector-style)", "essay_perplexity_instrument_gpt2")]
     inst = [(n, pd.read_csv(RES / f"{f}.csv").set_index("group")) for n, f in inst if (RES / f"{f}.csv").exists()]
     fig, ax = plt.subplots(figsize=(3.1, 0.6 + 0.55 * len(inst)))
     for i, (name, df) in enumerate(inst[::-1]):

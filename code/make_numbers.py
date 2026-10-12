@@ -71,6 +71,13 @@ def main():
     feature_table()
 
 
+def missing(tex=RES.parent / "paper" / "main.tex"):
+    """\\R keys used in the paper but absent from numbers.tex (LaTeX stops at the first one)."""
+    have = set(re.findall(r"r@(.+?)\\endcsname", (RES / "numbers.tex").read_text(encoding="utf-8")))
+    used = set(re.findall(r"\\R\{([^}]*)\}", Path(tex).read_text(encoding="utf-8")))
+    return sorted(used - have)
+
+
 def tex_feature(f):
     """'pos:DET_NOUN_VERB' -> readable LaTeX label."""
     kind, name = f.split(":", 1)

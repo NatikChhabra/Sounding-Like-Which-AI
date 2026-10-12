@@ -97,7 +97,10 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
    words; placebo grids for both genres; event study; pre-trend shape and window sensitivity; block bootstrap;
    drift placebos at three origins; Holm correction across archives and a cs-minus-math contrast (H4);
    length-standardised baselines and length-fixed dispersion; GPT-2 perplexity to rule out training-data
-   contamination; revision-overlap check; implied prevalence via the mixture identity.
+   contamination; revision-overlap check; implied prevalence via the mixture identity. Cleaning fix found
+   while adding generators: lines of the form "Title: ..." in LLM outputs (mostly Mistral 7B; 13% of local arXiv
+   and 18% of LLM essay texts) had only their label removed, leaving the echoed title glued to the first
+   sentence; the whole line is now dropped and every analysis was re-run.
 10. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
 11. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
     (commit 50e2a17), not in this plan. The plan named cs.CL for one comparison; all of cs is used.
