@@ -185,6 +185,17 @@ def timeseries(data, genre, by_field=False):
         from scipy.stats import chi2_contingency
         chi2, pv, dof, _ = chi2_contingency(tab)
         tests["baseline_field_heterogeneity"] = {"chi2": chi2, "dof": dof, "p": pv}
+    # base (non-chat) RAID generators: does a region defined by chat models also capture them?
+    base_llm = llm[~llm.model.map(CHAT)]
+    if len(base_llm):
+        pb = score(list(base_llm.f))
+        rows = [{"group": m, "n": int((base_llm.model == m).sum()), "share_in_region": float((pb[base_llm.model.values == m] >= 0.5).mean())}
+                for m in sorted(base_llm.model.unique())]
+        chat = llm[llm.model.str.startswith("raid-") & llm.model.map(CHAT)]
+        pc = score(list(chat.f))
+        rows += [{"group": m, "n": int((chat.model == m).sum()), "share_in_region": float((pc[chat.model.values == m] >= 0.5).mean())}
+                 for m in sorted(chat.model.unique())]
+        save(f"{genre}_base_vs_chat", pd.DataFrame(rows))
     save(f"{genre}_baseline_pre2022", pd.DataFrame(base))
     save(f"{genre}_its", tests)
     return tests
