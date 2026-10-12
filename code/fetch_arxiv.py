@@ -24,7 +24,7 @@ def query(field, start, end):
                 return ET.fromstring(r.read())
         except (urllib.error.URLError, TimeoutError, ET.ParseError):
             time.sleep(15 * (attempt + 1))
-    raise RuntimeError(url)
+    return None  # caller skips the cell without marking it done; a rerun retries it
 
 
 def main(out):
@@ -43,6 +43,9 @@ def main(out):
             d0 = min(d0, max(1, last - WINDOW[field] + 1))
             d1 = min(last, d0 + WINDOW[field] - 1)
             root = query(field, f"{y}{m:02d}{d0:02d}", f"{y}{m:02d}{d1:02d}")
+            if root is None:
+                print(cell, "FAILED, will retry on rerun", flush=True)
+                continue
             n = 0
             for e in root.iterfind("a:entry", NS):
                 prim = e.find("x:primary_category", NS)
