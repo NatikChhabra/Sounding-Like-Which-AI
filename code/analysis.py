@@ -279,6 +279,7 @@ def timeseries(data, genre, by_field=False, tag="", drop_models=(), lomo_runs=Tr
         tests["length_adjusted"] = segmented(monthly(s, w="lw"))
         save(f"{name}_length_by_year", s.groupby(s.date.dt.year).n_words.median().reset_index()
              .rename(columns={"date": "group", "n_words": "median_words"}).assign(group=lambda d: d.group.astype(str)))
+    dispersion(s, name)
     save(f"{name}_marker_monthly", monthly(s, "marker"))
     tests["marker"] = segmented(monthly(s, "marker"))
     save(f"{name}_marker_vs_mso", {"corr_marker_inregion": float(pointbiserialr(s.marker, s.in_region).statistic),
@@ -293,6 +294,26 @@ def timeseries(data, genre, by_field=False, tag="", drop_models=(), lomo_runs=Tr
     save(f"{name}_baseline_pre2022", pd.DataFrame(base))
     save(f"{name}_its", tests)
     return tests
+
+
+def dispersion(s, name, per_year=1500):
+    """Homogenization check: per-year stylistic dispersion of human documents = mean Euclidean distance to
+    the year's centroid in the feature space standardized on pre-ChatGPT documents (same per-year n)."""
+    from sklearn.feature_extraction import DictVectorizer
+    smp = s.groupby(s.date.dt.year, group_keys=False).apply(
+        lambda d: d.sample(n=min(per_year, len(d)), random_state=mso.SEED))
+    vec = DictVectorizer(sparse=False)
+    X = np.nan_to_num(vec.fit_transform(list(smp.f)))
+    X = X[:, (X != 0).mean(0) >= 0.01]
+    pre = (smp.date < CUTOFF).values
+    mu, sd = X[pre].mean(0), X[pre].std(0) + 1e-9
+    Z = (X - mu) / sd
+    years = smp.date.dt.year.values
+    rows = []
+    for y in sorted(set(years)):
+        z = Z[years == y]
+        rows.append({"group": str(y), "n": len(z), "dispersion": float(np.linalg.norm(z - z.mean(0), axis=1).mean())})
+    save(f"{name}_dispersion", pd.DataFrame(rows))
 
 
 GENSETS = {  # which generators define the LLM region
