@@ -1,7 +1,8 @@
 """Keep RAID (Dugan et al. 2024, MIT) abstracts with no adversarial attack, all generators.
 
 Downloads the 10 HF parquet shards one at a time, filters, deletes each shard.
-Usage: python fetch_raid.py OUT.jsonl
+Usage: python fetch_raid.py OUT.jsonl [human]
+With "human", keeps only RAID's human abstracts (topic-matched sources of the generations) instead.
 """
 import json, subprocess, sys, tempfile
 from pathlib import Path
@@ -21,7 +22,7 @@ def download(url, path):
     raise RuntimeError(url)
 
 
-def main(out):
+def main(out, human=False):
     out = Path(out)
     done_f = out.with_suffix(".done")
     done = set(done_f.read_text().split()) if done_f.exists() else set()
@@ -34,8 +35,8 @@ def main(out):
             t = pq.read_table(tmp, columns=COLS)
             t = t.filter(pc.and_(pc.equal(t["domain"], "abstracts"), pc.equal(t["attack"], "none")))
             for r in t.to_pylist():
-                if r["model"] == "human":
-                    continue  # RAID's human abstracts aren't dated; we use our own arXiv sample
+                if (r["model"] == "human") != human:
+                    continue  # RAID's human abstracts aren't dated: used only as topic-matched marker baseline
                 f.write(json.dumps({
                     "id": "raid:" + r["id"], "src_id": "raid:" + str(r["source_id"]), "genre": "arxiv",
                     "model": "raid-" + r["model"], "prompt": f"raid-{r['decoding']}-rp{r['repetition_penalty']}",
@@ -48,4 +49,4 @@ def main(out):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1], len(sys.argv) > 2 and sys.argv[2] == "human")
