@@ -56,41 +56,53 @@ excluded. Marker-word frequencies are analysed separately, never as an MSO featu
 - Sensitivity: thresholds 0.4/0.5/0.6; embedding-based classifier; excluding any one LLM.
 - Wording rule: results are "consistent with" LLM influence; no causal claim.
 
-## Deviations from this plan (logged as they happen)
-Honesty note: this plan was committed to the project's git repository (commit ef4fa21, 2026-10-12) before any
-MSO value was computed. Git timestamps are self-reported, so this is weaker than a third-party registry.
-1. **Learner data.** ELLIPSE could not be downloaded (Git LFS); PERSUADE 2.0 (ELL vs non-ELL on identical
-   prompts) is the primary learner contrast instead. The public Liang et al. release contains TOEFL and US
-   *college* essays, not the 8th-grade essays described in their paper; it is used as a secondary,
-   out-of-genre check only.
-2. **arXiv sampling.** Full OAI-PMH harvesting was infeasible (~40 h), so abstracts were drawn as a
-   stratified random sample via the arXiv API: one random window per field-month, 8 fields, 2015-01 to 2026-09.
+## Deviations from this plan (in order; times from the git log)
+Honesty note: this plan was committed to the project's git repository (commit ef4fa21, 2026-10-12 07:53 IST)
+before any MSO value was computed. Git timestamps are self-reported, so this is weaker than a third-party registry.
+1. **arXiv sampling.** Full OAI-PMH harvesting was infeasible (~40 h), so abstracts were drawn as a
+   stratified random sample via the arXiv API: one random window per archive-month, 8 non-physics archives,
+   2015-01 to 2026-09. The first sampler kept only the first 400 results per window; it was replaced after
+   review round 1 by one that fetches every paper in the window and samples 200 at random. The overall series
+   therefore weights the eight archives about equally, not by submission volume. Because the API returns the
+   latest version, pre-ChatGPT papers whose latest version postdates ChatGPT are excluded.
+2. **Learner data.** ELLIPSE could not be downloaded (Git LFS); PERSUADE 2.0 (ELL vs non-ELL on identical
+   prompts) is the primary learner contrast. Liang et al.'s TOEFL and US college essays (Hugging Face release)
+   and their US 8th-grade essays (distributed in the authors' GitHub repository, found after review round 1)
+   are used only for an out-of-genre perplexity replication.
 3. **LLM side.** RAID abstracts are restricted to chat/instruction-tuned generators for the main region;
    base models are analysed separately.
 4. **Added diagnostics (not in the plan):** agreement between the two classifiers on which documents are in
-   the region (Cohen's kappa, Spearman), and recall on held-out (unseen) models.
-6. **Hansard identifiers (bug fix, before any Hansard result).** The corpus field `uniqueID` identifies the
+   the region (Cohen's kappa, Spearman), and recall on held-out (unseen) generators.
+5. **Hansard identifiers (bug fix, before any Hansard result).** The corpus field `uniqueID` identifies the
    speaker, not the speech. Speeches are now keyed by date + order, and cross-validation groups by speaker.
-   Some speakers' speeches were sampled more than once as generation seeds; all generations are kept.
-7. **More generators (added to strengthen the LLM side, before the final run).** Two further open-weight
-   families (Microsoft Phi-4 14B, IBM Granite 3.3 8B) with the same prompts and sampling rule, and one 2026
-   frontier model (Claude Opus 5.5) for arXiv abstracts, produced by sub-agent sessions answering the same
-   prompt instances (no temperature/seed control is available for it; disclosed as such). Each generator is
-   capped at 450 texts so no single source dominates the region.
-5. **Pilot run.** An essay analysis was run once on partial generations (3 of 5 models) to test the code.
-   No analysis choices were changed after seeing it. The same was done once for arXiv (RAID + ~30% of local
-   generations) to test the pipeline at scale; again no analysis choice was changed afterwards.
-
-8. **Review round 1 (2026-10-12) changes:** arXiv sampler replaced (v1 truncated large windows); LaTeX and
-   encoding normalisation; grouped calibration; per-generator cap; Claude, Phi-4 and Granite added to all genres;
-   generator-set, drift, math, topic, length, threshold and dash analyses; proficiency adjustment; perplexity
-   instrument; dispersion; self-test dropped. The 2026 model was added after a preliminary run without it
-   (decision logged in the conversation before the arXiv results; code committed in fd8a23b before results).
-9. **Review round 2 (2026-10-13) changes:** generator-vintage analysis on a matched title-only task and a region
-   from generators whose training data predate ChatGPT; vintage-matched mined marker words; placebo grids for
-   both genres; event study; Holm correction across fields and a cs-vs-math test; length-standardised baselines
-   and length-fixed dispersion; GPT-2 perplexity to rule out training-data contamination; revision-overlap check.
-10. **Outcome of H5:** not supported (opposite direction).
+   Generations made before the fix carry speaker-style source ids; they still group by speaker.
+6. **Pilot runs.** An essay analysis was run once on partial generations (3 of 5 models) to test the code;
+   no analysis choice was changed after it. An arXiv pilot (RAID plus about 30% of the local generations) tested
+   the pipeline at scale; see 7. A preliminary arXiv run (5 local models + RAID) was committed at 15:35 (f586d6c).
+7. **More generators (decided after the arXiv pilot; texts merged after the preliminary run).** Phi-4 14B and Granite 3.3 8B (the generation
+   script gained a model-list argument at 15:32, fd8a23b) and the 2026 model Claude Opus 5.5, whose prompt
+   batches were committed at 15:37 (c11d3ce), two minutes after the preliminary arXiv results. The decision
+   to add all three was stated in the working conversation after the arXiv pilot run on partial data (RAID plus
+   about 30% of the local generations) and before the preliminary run with all five local models. The git
+   record cannot show this, and the pilot may have informed the decision. The 2026 model's texts were produced by sub-agent sessions answering
+   50 prompt instances each, with no temperature or seed control. Phi-4 and Granite were described in paper v1
+   but first used in v2. Each generator is capped at 450 texts so no single source dominates the region.
+8. **Review round 1 (2026-10-12) changes:** arXiv sampler replaced (see 1); LaTeX and encoding normalisation;
+   grouped calibration; per-generator cap; Claude, Phi-4 and Granite added to all genres; generator-set, drift,
+   math, topic, length, threshold and dash analyses; proficiency adjustment; perplexity instrument;
+   dispersion; the self-test (section 6) dropped as circular; Hansard restricted to 2015-2025.
+9. **Review round 2 (2026-10-13) changes:** generator-vintage analysis on a matched title-only task; a region
+   from generators whose training data predate ChatGPT (RAID GPT-4 and ChatGPT, and two locally run open
+   models, Llama 2 chat and Vicuna, added for this purpose only); vintage-matched, topic-matched mined marker
+   words; placebo grids for both genres; event study; pre-trend shape and window sensitivity; block bootstrap;
+   drift placebos at three origins; Holm correction across archives and a cs-minus-math contrast (H4);
+   length-standardised baselines and length-fixed dispersion; GPT-2 perplexity to rule out training-data
+   contamination; revision-overlap check; implied prevalence via the mixture identity.
+10. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
+11. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
+    (commit 50e2a17), not in this plan. The plan named cs.CL for one comparison; all of cs is used.
+12. **Never frozen.** The plan was intended to be frozen with a DOI; it was not. "Pre-registered" is therefore
+    not used in the paper.
 
 ## 6. Self-test (dropped; see deviation 8)
 The paper's own text is scored by the same pipeline and compared with human-written cs.CL abstracts.

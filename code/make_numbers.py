@@ -18,11 +18,13 @@ def fmt(key, v):
         return v.replace("_", r"\_").replace("&", r"\&")
     if v is None or (isinstance(v, float) and math.isnan(v)):
         return "--"
-    if leaf == "p" or leaf.endswith("_p") or leaf == "p_value":
+    if leaf == "p" or leaf.endswith("_p") or leaf == "p_value" or ".field_holm." in key:
         return r"{<}0.001" if v < 0.001 else f"{v:.3f}"
     if leaf in ("n", "months", "dof", "ell_in_region", "median_words", "n_breaks") or leaf.startswith("n_") or "_n_" in leaf:
         return f"{int(v):,}"
-    if re.fullmatch(r"y\d{4}", leaf) or leaf in ("in_04", "in_06", "marker"):
+    if re.fullmatch(r"[ym]\d{4}", leaf) or leaf in ("in_04", "in_06", "marker") or "alpha" in leaf or \
+            leaf.startswith(("gap", "marker_gap", "linear_", "quadratic_", "trend_at", "diff", "resid",
+                             "median_abs", "max_abs", "tpr", "fpr", "median_retained")):
         return f"{100 * v:.1f}"
     if leaf.startswith(("or_", "odds", "coef", "ell_coef", "corr")):
         return f"{v:.2f}"
@@ -66,6 +68,28 @@ def main():
     lines += [rf"\expandafter\def\csname r@{k}\endcsname{{{v}}}" for k, v in sorted(out.items())]
     (RES / "numbers.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(len(out), "numbers")
+    feature_table()
+
+
+def tex_feature(f):
+    """'pos:DET_NOUN_VERB' -> readable LaTeX label."""
+    kind, name = f.split(":", 1)
+    name = {"mtld": "MTLD lexical diversity", "sent_mean": "sentence length (mean)",
+            "sent_sd": "sentence length (SD)", "word_len": "word length"}.get(name, name)
+    label = {"fw": "word", "pos": "POS trigram", "dep": "dependency", "pun": "punctuation", "s": ""}[kind]
+    name = name.replace("_", r"\_").replace('"', "''")
+    if kind in ("fw", "pun"):
+        name = r"\textit{" + name + "}" if kind == "fw" else r"\texttt{" + name.replace("-", "-{}") + "}"
+    return (label + " " + name).strip()
+
+
+def feature_table(k=10):
+    """Top-k LLM-typical and human-typical arXiv features (standardised logistic coefficients) as table rows."""
+    up = pd.read_csv(RES / "arxiv_features_llm_typical.csv").head(k)
+    down = pd.read_csv(RES / "arxiv_features_human_typical.csv").head(k)
+    rows = [f"{tex_feature(a)} & ${b:.2f}$ & {tex_feature(c)} & ${d:.2f}$ \\\\"
+            for a, b, c, d in zip(up.feature, up.coef, down.feature, down.coef)]
+    (RES / "feature_table.tex").write_text("\n".join(rows) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
@@ -74,4 +98,6 @@ if __name__ == "__main__":
     assert fmt("x.or_lo", 0.1656) == "0.17" and fmt("x.cv_auc_all", 0.98763) == "0.988"
     assert fmt("x.level_shift_p", 0.894) == "0.894" and fmt("x.level_shift", 0.0465) == "4.7"
     assert fmt("x.arxiv_n_fields", 8.0) == "8" and fmt("x.n_generators", 8.0) == "8" and fmt("x.y2025", 0.3644) == "36.4" and fmt("x.excess_p", 0.2) == "0.200"
+    assert fmt("robustness_v3.field_holm.cs", 0.0123) == "0.012" and fmt("x.m2016", 0.05) == "5.0"
+    assert fmt("x.cs_2024_alpha_cv", 0.12) == "12.0" and fmt("x.relative_gap", 2.31) == "2.31"
     main()
