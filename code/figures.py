@@ -22,30 +22,31 @@ plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.edgecolor": M
                      "legend.frameon": False, "pdf.fonttype": 42})
 
 
-def its_panel(ax, name, color, label, ylabel="MSO (% of human docs in LLM region)"):
+def its_panel(ax, name, color, label, ylabel="MSO (%)", legend=False):
     m = pd.read_csv(RES / f"{name}.csv")
     m["month"] = pd.PeriodIndex(m.month, freq="M")
     t = np.array([(p - T0).n for p in m.month])
     x = m.month.dt.to_timestamp()
-    ax.scatter(x, 100 * m.mso, s=6, color=color, alpha=0.45, linewidths=0, label=f"{label}, monthly")
+    ax.scatter(x, 100 * m.mso, s=6, color=color, alpha=0.45, linewidths=0, label="monthly value")
     pre = t < 0
     b = np.polyfit(t[pre], 100 * m.mso[pre], 1, w=np.sqrt(m.n[pre]))
     ax.plot(x, np.polyval(b, t), color=MUTED, lw=1, ls="--", label="pre-2022 trend, extrapolated")
     roll = (100 * m.mso).rolling(6, center=True, min_periods=3).mean()
     ax.plot(x, roll, color=color, lw=2, label="6-month mean")
     ax.axvline(T0.to_timestamp(), color=INK, lw=0.6)
-    ax.text(T0.to_timestamp(), ax.get_ylim()[1], " ChatGPT", color=INK, va="top", fontsize=7)
+    ax.text(T0.to_timestamp(), ax.get_ylim()[0], " ChatGPT", color=INK, va="bottom", fontsize=6.5)
     ax.set_ylabel(ylabel)
-    ax.legend(loc="upper left", fontsize=6)
+    if legend:
+        ax.legend(loc="upper left", fontsize=6)
 
 
 def fig_timeseries():
     fig, axes = plt.subplots(1, 3, figsize=(6.6, 2.3), sharex=True)
-    its_panel(axes[0], "arxiv_monthly", BLUE, "arXiv")
+    its_panel(axes[0], "arxiv_monthly", BLUE, "arXiv", legend=True)
     axes[0].set_title("(a) MSO, arXiv abstracts", fontsize=8, color=INK, loc="left")
     its_panel(axes[1], "hansard_monthly", ORANGE, "Hansard")
     axes[1].set_title("(b) MSO, parliamentary speech", fontsize=8, color=INK, loc="left")
-    its_panel(axes[2], "arxiv_marker_monthly", AQUA, "arXiv", ylabel="% of abstracts with a marker word")
+    its_panel(axes[2], "arxiv_marker_monthly", AQUA, "arXiv", ylabel="Abstracts with marker word (%)")
     axes[2].set_title("(c) Marker words, arXiv", fontsize=8, color=INK, loc="left")
     for ax in axes:
         ax.tick_params(axis="x", labelrotation=45, labelsize=6.5)
