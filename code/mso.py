@@ -33,21 +33,26 @@ def load(data, genre):
     if extra.exists():
         r = pd.read_json(extra, lines=True)
         llm = pd.concat([llm, r[["id", "src_id", "genre", "model", "prompt", "text"]]], ignore_index=True)
-    for df, name in ((human, "human"), (llm, "llm")):
-        cache = data / f"feat_{name}_{genre}.jsonl"
-        have = {}
-        if cache.exists():
-            for line in cache.open(encoding="utf-8"):
-                r = json.loads(line)
-                have[r["id"]] = r["f"]
-        todo = df[~df.id.isin(have)]
-        if len(todo):
-            with cache.open("a", encoding="utf-8") as f:
-                for i, ft in zip(todo.id, features.extract(todo.text.tolist())):
-                    have[i] = ft
-                    f.write(json.dumps({"id": i, "f": ft}) + "\n")
-        df["f"] = df.id.map(have)
+    cached_features(human, data / f"feat_human_{genre}.jsonl")
+    cached_features(llm, data / f"feat_llm_{genre}.jsonl")
     return human, llm
+
+
+def cached_features(df, cache):
+    """Adds column f; spaCy runs only on ids not already in the cache file."""
+    have = {}
+    if cache.exists():
+        for line in cache.open(encoding="utf-8"):
+            r = json.loads(line)
+            have[r["id"]] = r["f"]
+    todo = df[~df.id.isin(have)]
+    if len(todo):
+        with cache.open("a", encoding="utf-8") as f:
+            for i, ft in zip(todo.id, features.extract(todo.text.tolist())):
+                have[i] = ft
+                f.write(json.dumps({"id": i, "f": ft}) + "\n")
+    df["f"] = df.id.map(have)
+    return df
 
 
 def make_model(kind="logreg"):

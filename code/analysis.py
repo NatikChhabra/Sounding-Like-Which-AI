@@ -93,6 +93,94 @@ def essay(data):
                                       for g, d in lg.groupby("name")]))
 
 
+T0 = pd.Period("2022-12", "M")      # first month after ChatGPT's release (2022-11-30)
+EVAL = pd.Period("2025-06", "M")    # common evaluation month (Hansard ends 2025-07)
+
+
+def monthly(s, by=None):
+    keys = [s.date.dt.to_period("M")] + ([s[by]] if by else [])
+    m = s.groupby(keys).agg(n=("p", "size"), mso=("in_region", "mean")).reset_index()
+    return m.rename(columns={"date": "month"})
+
+
+def segmented(m, t0=T0, until=None):
+    """Interrupted time series on monthly MSO: level shift `post` + slope change `t_post` at t0.
+    Weighted by n (MSO is a proportion); Newey-West (HAC, 6 lags) errors."""
+    m = m[m.month <= until] if until is not None else m
+    d = pd.DataFrame({"y": m.mso.values, "w": m.n.values,
+                      "t": [(p - t0).n for p in m.month]})
+    d["post"] = (d.t >= 0).astype(int)
+    d["t_post"] = d.t * d.post
+    fit = smf.wls("y ~ t + post + t_post", data=d, weights=d.w).fit(cov_type="HAC", cov_kwds={"maxlags": 6})
+    h = (EVAL - t0).n
+    ex = fit.t_test(f"post + {h} * t_post")
+    lo, hi = np.asarray(ex.conf_int()).ravel()
+    return {"pre_slope_per_year": 12 * fit.params["t"], "pre_slope_p": fit.pvalues["t"],
+            "level_shift": fit.params["post"], "level_shift_p": fit.pvalues["post"],
+            "slope_change_per_year": 12 * fit.params["t_post"], "slope_change_p": fit.pvalues["t_post"],
+            f"excess_at_{EVAL}": float(np.asarray(ex.effect).ravel()[0]), "excess_lo": lo, "excess_hi": hi,
+            "excess_se": float(np.asarray(ex.sd).ravel()[0]), "months": len(d)}
+
+
+def placebo(m):
+    """Fake break dates inside the pre-LLM period; should show no excess."""
+    pre = m[m.month < T0]
+    out = []
+    for fake in ("2019-11", "2020-11"):
+        f = pd.Period(fake, "M")
+        d = pre.copy()
+        d2 = pd.DataFrame({"y": d.mso.values, "w": d.n.values, "t": [(p - f).n for p in d.month]})
+        d2["post"] = (d2.t >= 0).astype(int)
+        d2["t_post"] = d2.t * d2.post
+        fit = smf.wls("y ~ t + post + t_post", data=d2, weights=d2.w).fit(cov_type="HAC", cov_kwds={"maxlags": 6})
+        out.append({"fake_break": fake, "level_shift": fit.params["post"], "level_shift_p": fit.pvalues["post"],
+                    "slope_change_per_year": 12 * fit.params["t_post"], "slope_change_p": fit.pvalues["t_post"]})
+    return out
+
+
+def timeseries(data, genre, by_field=False):
+    human, llm = mso.load(data, genre)
+    score = region(human, llm, genre)
+    s = human[human.pool == "score"].copy()
+    s["p"] = score(list(s.f))
+    s["in_region"] = (s.p >= 0.5).astype(int)
+    m = monthly(s)
+    save(f"{genre}_monthly", m)
+    pre = s[s.date < "2022-11-30"]
+    base = [{"group": "all", "n": len(pre), **dict(zip(["mso", "lo", "hi"], mso.mso(pre.p)))}]
+    tests = {"all": {**segmented(m), "placebo": placebo(m)}}
+    if by_field:
+        mf = monthly(s, "group")
+        save(f"{genre}_monthly_by_field", mf)
+        for g, d in mf.groupby("group"):
+            tests[g] = segmented(d)
+        for g, d in pre.groupby("group"):
+            base.append({"group": g, "n": len(d), **dict(zip(["mso", "lo", "hi"], mso.mso(d.p)))})
+        # is the baseline structured (differs by field) rather than uniform noise?
+        tab = pd.crosstab(pre.group, pre.in_region)
+        from scipy.stats import chi2_contingency
+        chi2, pv, dof, _ = chi2_contingency(tab)
+        tests["baseline_field_heterogeneity"] = {"chi2": chi2, "dof": dof, "p": pv}
+    save(f"{genre}_baseline_pre2022", pd.DataFrame(base))
+    save(f"{genre}_its", tests)
+    return tests
+
+
+def control():
+    """H3: arXiv excess minus Hansard excess at the common evaluation month (independent samples)."""
+    a = json.loads((OUT / "arxiv_its.json").read_text())["all"]
+    h = json.loads((OUT / "hansard_its.json").read_text())["all"]
+    k = f"excess_at_{EVAL}"
+    diff = a[k] - h[k]
+    se = (a["excess_se"] ** 2 + h["excess_se"] ** 2) ** 0.5
+    from scipy.stats import norm
+    save("control_difference", {"arxiv_excess": a[k], "hansard_excess": h[k], "difference": diff,
+                                "lo": diff - 1.96 * se, "hi": diff + 1.96 * se, "p": 2 * norm.sf(abs(diff / se))})
+
+
 if __name__ == "__main__":
     data, which = sys.argv[1], sys.argv[2]
-    {"essay": essay}[which](data)
+    jobs = {"essay": lambda: essay(data), "arxiv": lambda: timeseries(data, "arxiv", by_field=True),
+            "hansard": lambda: timeseries(data, "hansard"), "control": control}
+    for j in (jobs if which == "all" else [which]):
+        jobs[j]()
