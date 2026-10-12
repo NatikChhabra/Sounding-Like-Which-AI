@@ -1,3 +1,9 @@
 .venv/
 __pycache__/
 *.pyc
+paper/*.pdf
+paper/*.aux
+paper/*.log
+paper/*.bbl
+paper/*.blg
+paper/*.out
