@@ -19,6 +19,7 @@ def get(url, accept=None):
 def doi_entry(key, doi):
     bib = get("https://doi.org/" + doi, "application/x-bibtex").strip()
     bib = re.sub(r"^@(\w+)\{[^,]*,", lambda m: f"@{m.group(1)}{{{key},", bib, count=1)
+    bib = re.sub(r"(?<!\\)&", r"\\&", bib)  # Crossref leaves bare & (e.g. series={C&C '24}); LaTeX needs \&
     title = re.search(r"title\s*=\s*\{(.+?)\},", bib, re.S)
     year = re.search(r"year\s*=\s*\{?(\d{4})", bib)
     return bib, (title.group(1) if title else "?"), (year.group(1) if year else "?"), "https://doi.org/" + doi

@@ -1,0 +1,267 @@
+\documentclass[11pt]{article}
+\usepackage[review]{acl}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\input{../results/numbers.tex}
+\newcommand{\TODO}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\mso}{\textsc{mso}}
+
+\title{Sounding Like AI Before AI: Machine-Style Overlap in Human Writing}
+
+\author{Anonymous submission}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Much of today's writing is said to ``sound like AI''. Prior work measures how much text was written or revised
+by large language models (LLMs); we ask a different question: how much \emph{human} writing occupies the same
+measurable stylistic region as LLM output, regardless of who wrote it, and how much of that overlap predates
+LLMs. We define \textbf{Machine-Style Overlap} (\mso{}), the share of a genre's human-written documents whose
+topic-robust style features are at least as typical of LLM output as of pre-LLM human writing, and show that
+its pre-LLM value is the human half of a Bayes error rather than detector noise. We estimate \mso{} in
+argumentative student essays, arXiv abstracts (2015--2026) and Australian parliamentary speech, using text from
+five local open-weight models and four commercial systems. \TODO{headline arXiv baseline and post-2022 excess}.
+In student essays, \R{essay_mso_by_group.all.mso}\% of pre-LLM essays already fall in the LLM region; essays by
+English-language learners are \emph{less} likely to do so than essays by their peers (adjusted odds ratio
+\R{essay_ell_adjusted.odds_ratio}), the opposite of the bias reported for perplexity-based detectors. Whether
+human text ``sounds like AI'' therefore depends on the instrument asking. This paper was written by an AI
+system and verified by its human author; we document that process in full.
+\end{abstract}
+
+\section{Introduction}
+
+Two observations about writing after November 2022 sit uneasily together. On one side, large corpus studies
+find clear traces of LLM-assisted writing in scientific abstracts, peer reviews, press releases and
+encyclopedia articles \citep{kobak2025, liang2024mapping, liang2024monitoring, liang2025widespread, brooks2024},
+and people have begun to use LLM-favoured words in unscripted speech \citep{yakura2024, anderson2025spoken}.
+On the other side, readers are poor at telling human from machine text \citep{clark2021, jakesch2023, casal2023},
+automated detectors can be evaded \citep{sadasivan2023, krishna2023, dugan2024raid}, and detectors flag
+human writing by non-native speakers as AI-generated at high rates \citep{liang2023detectors, park2026}.
+Together these findings suggest that the boundary between human and machine writing is thin, but they do not
+say how thin, for which kinds of writing, or since when.
+
+Existing measurements answer a \emph{prevalence} question: what fraction of a corpus was produced or modified
+by an LLM? This paper answers an \emph{overlap} question: what fraction of human-written text is stylistically
+indistinguishable from LLM output? The two differ in an informative place. Several prevalence studies report a
+small but non-zero ``LLM share'' before ChatGPT existed and treat it as estimator error to be subtracted
+\citep{liang2024mapping, lin2025, brooks2024}. We argue that this pre-LLM share is not noise. Under a
+fixed set of style features it is a property of the two text populations: the part of human writing that
+already sounded like AI before AI could write.
+
+We make four contributions.
+\begin{enumerate}
+\item We define \textbf{Machine-Style Overlap} (\mso{}) with a decision-theoretic interpretation: for pre-LLM
+text, it is the human-side half of the Bayes error of separating human from LLM style (\S\ref{sec:mso}).
+\item We estimate \mso{} with topic-robust stylometric features in three genres, using text from nine LLM
+families and three prompting styles, with two classifier families and leave-one-model-out regions
+(\S\ref{sec:data}--\ref{sec:method}).
+\item We test whether arXiv abstracts moved into the LLM region after November 2022 beyond their pre-2022 trend,
+against placebo break dates, a field-level dose contrast and a parliamentary-speech control
+(\S\ref{sec:results}). \TODO{one-line result}
+\item We show that the population most often falsely flagged by perplexity-based detectors, English-language
+learners, is the \emph{least} machine-like under style-based overlap, which locates the reported bias in the
+instrument rather than in the writing.
+\end{enumerate}
+
+\section{Related Work}
+
+\paragraph{Prevalence of LLM-assisted writing.}
+Excess-vocabulary methods compare observed word frequencies with a counterfactual extrapolated from pre-LLM
+years \citep{kobak2025, holzwarth2026, lee2026}; distributional methods fit a mixture of human and LLM word
+distributions \citep{liang2024mapping, liang2024monitoring, liang2025widespread, geng2024}; classifier- and
+detector-based studies label individual documents \citep{lin2025, brooks2024, sun2025}. All target the share
+of text produced with LLM help. The closest design to ours is \citet{bentley2026}, who build an LLM-associated
+style index for arXiv abstracts since 2010 from a small set of markers and test for a break after 2023; and
+\citet{chang2026}, who analyse a decade of convergence between human writing and machine patterns. We differ in
+the estimand: a distributional overlap in a multi-feature style space whose pre-LLM level is itself the object
+of study. Marker words are a moving target, since authors react to publicised markers \citep{geng2025}; we
+therefore exclude content words from the region definition entirely.
+
+\paragraph{Homogenization and human adoption.}
+Writing with instruction-tuned models reduces content diversity \citep{padmakumar2024, doshi2024,
+anderson2024homog}; LLM rewriting compresses stylistic variance \citep{sourati2025}; preference tuning reduces
+output diversity \citep{kirk2024, wu2025monoculture} and is a plausible source of LLM-overused words
+\citep{juzek2025}. Humans adopt LLM vocabulary in speech \citep{yakura2024, anderson2025spoken} and in academic
+writing \citep{geng2025, lin2025}. If LLM style partly reflects preferences human raters already held, some
+pre-LLM human writing should already sit inside the LLM region, which is what \mso{} measures.
+
+\paragraph{Stylistic differences between humans and LLMs.}
+Instruction-tuned LLMs differ systematically from humans on lexico-grammatical features \citep{reinhart2025,
+munozortiz2024}, but genre explains more stylistic variance than source \citep{rallapalli2026}, so any overlap
+measure must be genre-specific. Distribution-level comparisons such as MAUVE \citep{pillutla2021} and coverage
+frameworks \citep{yang2026coverage} evaluate models against human text; we reverse the direction and measure
+where human documents fall relative to an LLM region, over time.
+
+\paragraph{Detection and perception.}
+Untrained readers judge GPT-3 text at chance \citep{clark2021}; people rely on flawed cues
+\citep{jakesch2023}; linguists and scientific reviewers misclassify abstracts \citep{casal2023, gao2023}.
+Detectors are evadable \citep{sadasivan2023, krishna2023, dugan2024raid} and their false positives fall
+disproportionately on non-native writing \citep{liang2023detectors, park2026}. We use these published findings
+for claims about human perception; this study collects no human judgements.
+
+\section{Machine-Style Overlap}
+\label{sec:mso}
+
+Fix a genre $G$ and a feature map $\phi$ from documents to style vectors. Let $H_0$ be the distribution of
+$\phi(d)$ for human documents of genre $G$ written before LLM writing assistance was widely available (here,
+before 30 November 2022), and $L$ the distribution of $\phi(d)$ for LLM output in the same genre, a mixture
+over models and prompting styles with equal weights. For any population $S$ of human documents,
+\begin{equation}
+\mathrm{MSO}_G(S) = \Pr_{d\sim S}\big[\, p_L(\phi(d)) \ge p_{H_0}(\phi(d)) \,\big].
+\end{equation}
+A document is \emph{in the LLM region} if its style is at least as likely under LLM output as under pre-LLM
+human writing. With equal class priors, the Bayes posterior is
+$\eta(x) = p_L(x)/(p_L(x)+p_{H_0}(x))$ and $\mathrm{MSO}_G(S) = \Pr_S[\eta(\phi(d)) \ge 1/2]$.
+
+\paragraph{Pre-LLM overlap is a population property.}
+For $S = H_0$, \mso{} is the false-positive rate of the Bayes-optimal classifier, and the Bayes error is
+$\tfrac12\big(\mathrm{MSO}_G(H_0) + \Pr_L[\eta < \tfrac12]\big)$. The baseline is therefore the human half of an
+irreducible error under $\phi$: it is zero only if human and LLM styles are perfectly separable, and it rises
+towards $\tfrac12$ as the two distributions coincide. Prevalence studies that subtract the pre-period share as
+``misclassification'' remove exactly this quantity.
+
+\paragraph{Overlap after 2022.}
+For later human populations $S_t$, $\mathrm{MSO}_G(S_t)$ measures how much of the genre's writing at time $t$
+falls in a region defined relative to \emph{pre-LLM} human writing. It is agnostic to authorship by design:
+an increase is consistent with undisclosed LLM use, with humans adopting LLM style, or with both, and we do not
+attempt to separate them.
+
+\paragraph{Estimation.}
+We estimate $\eta$ with calibrated classifiers trained on balanced samples of pre-LLM human and LLM documents.
+A finite-sample classifier is not Bayes-optimal, so we report two model families and leave-one-LLM-out
+variants and treat their spread as part of the uncertainty.
+
+\section{Data}
+\label{sec:data}
+
+\paragraph{Human text.}
+\emph{Essays}: PERSUADE~2.0 \citep{crossley2024persuade}, argumentative essays by US students in grades 6--12 on
+15 prompts, written before 2020, with English-language-learner (ELL) status for each writer.
+\emph{arXiv abstracts}: a stratified random sample drawn through the arXiv API: for each of 8 fields (by
+primary category) and each month from January 2015 to September 2026, all papers in one randomly placed window
+of consecutive submission days, with window length scaled to field size; \TODO{N} abstracts after filtering.
+\emph{Parliamentary speech}: the Australian Hansard database \citep{katz2025hansard}, restricted to spoken
+speeches (excluding interjections and written questions), up to 150 randomly sampled per month from January
+2015 to July 2025. Spoken parliamentary speech is our less-exposed control genre.
+In every genre, half of the pre-cutoff documents (the \emph{train pool}) are used to train the classifier and
+to seed LLM prompts; \mso{} is measured only on the remaining documents.
+
+\paragraph{LLM text.}
+We generated text locally with five open-weight models through Ollama (v0.40.3): Llama~3.1~8B, Qwen3~8B,
+Gemma~3~12B, Mistral~7B and gpt-oss~20B, at temperature 0.8 with fixed seeds. Each model received three prompt
+styles per genre: \emph{P1} write the text from a title or topic; \emph{P2} improve the wording of a human
+draft (LLM-assisted revision); \emph{P3} write the text and ``avoid typical AI phrasing'', the instruction a
+writer evading detection would give. Prompts were seeded only from train-pool documents, 150 per model and
+prompt. For abstracts we add the unattacked chat-model generations in RAID \citep{dugan2024raid}, covering
+GPT-4, ChatGPT and instruction-tuned Cohere, Llama, Mistral and MPT models.
+
+\section{Method}
+\label{sec:method}
+
+\paragraph{Cleaning.}
+All texts, human and LLM alike, are normalised identically: chat wrappers (``Here's the essay:''), markdown,
+headings and trailing notes are removed; curly quotes, non-breaking hyphens and non-breaking spaces are
+mapped to ASCII; every text is truncated to its first 250 words. Without this step, formatting artefacts alone
+separate LLM output from human text.
+
+\paragraph{Features.}
+Features are deliberately topic-robust: rates per token of closed-class words (adpositions, auxiliaries,
+conjunctions, determiners, particles, pronouns), coarse part-of-speech trigrams, dependency labels and
+punctuation marks, plus mean and standard deviation of sentence length, mean word length and MTLD lexical
+diversity \citep{mccarthy2010}, using spaCy 3.8 (\texttt{en\_core\_web\_sm}). No content words are used.
+Features present in fewer than 1\% of training documents are dropped.
+
+\paragraph{Classifiers.}
+The primary instrument is L2-regularised logistic regression ($C{=}0.1$) on standardised features with
+isotonic calibration (5-fold); the second is gradient-boosted trees, calibrated the same way. Classes are
+balanced by subsampling, so a calibrated probability of $0.5$ corresponds to a likelihood ratio of one.
+Cross-validation is grouped so that a revised text and its human source never fall in different folds. We
+report AUC by model and prompt, \mso{} with 2{,}000-sample bootstrap intervals, recall on held-out models, and
+agreement between the two instruments.
+
+\paragraph{Time series.}
+For arXiv and Hansard we compute monthly \mso{} and fit a segmented regression with a level shift and a slope
+change at December 2022, weighted by monthly sample size, with Newey--West errors (6 lags). The pre-registered
+quantity is the \emph{excess}, the gap between the fitted post-2022 series and the extrapolated pre-2022 trend,
+evaluated at June 2025 (the last month covered by both genres). Placebo breaks are placed at November 2019 and
+November 2020 within the pre-LLM data.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Human and LLM essays are separable, but not completely}
+Pre-LLM student essays and LLM essays are highly separable in style space (cross-validated AUC
+\R{essay_instrument.cv_auc_all}); the hardest case is LLM revision of a human draft (P2). Even so,
+\R{essay_mso_by_group.all.mso}\% (95\% CI \R{essay_mso_by_group.all.lo}--\R{essay_mso_by_group.all.hi}) of
+held-out pre-LLM essays fall in the LLM region. Removing any one generator changes \mso{} only within
+\R{essay_lomo.qwen3:8b.mso_scored_humans}--\R{essay_lomo.gemma3:12b.mso_scored_humans}\%, and the region
+generalises to unseen models (recall \R{essay_lomo.qwen3:8b.recall_on_unseen_model}--%
+\R{essay_lomo.gemma3:12b.recall_on_unseen_model}\%).
+\TODO{feature table: LLM-typical = higher MTLD, em dashes, longer words; human-typical = sentence-length variance, contractions}
+
+\subsection{Baseline overlap in arXiv abstracts (H1)}
+\TODO{arXiv baseline by field, heterogeneity test}
+
+\subsection{Did abstracts move into the region after 2022? (H2--H4)}
+\TODO{ITS results, placebo, field dose, Hansard control, figure}
+
+\subsection{Learners are the least machine-like writers (H5)}
+Essays by English-language learners are less likely to fall in the LLM region than essays by their peers:
+\R{essay_mso_by_group.ELL.mso}\% versus \R{essay_mso_by_group.non-ELL.mso}\%. Adjusting for essay prompt and
+grade, the odds ratio is \R{essay_ell_adjusted.odds_ratio} (95\% CI
+\R{essay_ell_adjusted.or_lo}--\R{essay_ell_adjusted.or_hi}, $p=\R{essay_ell_adjusted.p_value}$).
+Perplexity-based detectors flag non-native writing because it is predictable \citep{liang2023detectors}; the
+style region is defined by richer vocabulary, longer words and more uniform sentences, which learners use less.
+The same text can thus be ``AI-like'' to one instrument and ``human-like'' to another.
+
+\subsection{Overlap is genre-specific}
+Applied to essays outside its training genre (the public human essays of \citealp{liang2023detectors}),
+the essay instrument places \R{essay_liang.Real TOEFL.mso}\% of TOEFL essays and
+\R{essay_liang.Real College Essays.mso}\% of US college essays in the region, close to chance, which is why
+\mso{} must be estimated within a genre.
+
+\subsection{Instrument agreement}
+The two classifier families agree closely on overall \mso{} (\R{essay_instrument.mso_logreg}\% vs
+\R{essay_instrument.mso_gbm}\%) and their document scores are correlated (Spearman
+\R{essay_instrument.spearman_scores_logreg_vs_gbm}), but they agree only moderately on \emph{which} documents
+cross the threshold (Cohen's $\kappa=\R{essay_instrument.kappa_logreg_vs_gbm}$). Population-level \mso{} is
+therefore more stable than any single document's label, a point that bears directly on the use of detectors to
+judge individual writers.
+
+\section{Discussion}
+\TODO{what sounds like AI; feedback loop as hypothesis; implications for detection in education and law}
+
+\section*{Limitations}
+\mso{} depends on the feature map: a document can be inside the region under style features and outside it
+under perplexity, as the learner result shows. Our generators are mostly small open-weight models run locally;
+commercial models enter only through RAID abstracts. Post-2022 ``human'' documents may themselves be partly
+LLM-written, so \mso{} cannot separate LLM use from human adoption of LLM style, and no causal claim is made.
+The arXiv sample is a stratified random sample, not the full archive. PERSUADE essays predate LLMs, so the
+learner analysis is cross-sectional. Australian parliamentary speech is less exposed to LLM writing but not
+unexposed: speeches can be drafted with LLM help.
+
+\section*{Ethics Statement}
+The study uses only public datasets under their licences (arXiv metadata CC0; Australian Hansard CC~BY~4.0;
+PERSUADE~2.0 CC~BY-NC-SA~4.0; RAID and the \citealp{liang2023detectors} data, MIT) and collects no data from
+people; no human participants were involved. The learner analysis compares groups, never individuals, and we
+caution against using any overlap or detector score to judge an individual writer.
+
+\section*{AI Authorship and Disclosure}
+This paper, including its code, analysis design and prose, was produced by an AI system (Claude, Anthropic)
+in an agentic coding environment, at the human author's request, as part of the study's subject matter. The
+human author defined the research goal, ran the code, checked every citation against its source, and is
+accountable for the content. Every human edit to the AI-written text is a separate commit labelled
+\texttt{HUMAN-EDIT} in the public repository. No AI system is listed as an author.
+
+\bibliography{references}
+
+\end{document}
