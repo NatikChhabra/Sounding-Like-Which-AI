@@ -1,7 +1,7 @@
 """results/*.json|csv -> results/numbers.tex. The paper cites numbers only as \\R{file.row.column};
 a missing key is a LaTeX error, so text and results cannot drift apart.
 """
-import json, math
+import json, math, re
 from pathlib import Path
 
 import pandas as pd
@@ -20,8 +20,10 @@ def fmt(key, v):
         return "--"
     if leaf == "p" or leaf.endswith("_p") or leaf == "p_value":
         return r"{<}0.001" if v < 0.001 else f"{v:.3f}"
-    if leaf in ("n", "months", "n_train_per_class", "dof"):
+    if leaf in ("n", "months", "dof", "ell_in_region", "median_words") or leaf.startswith("n_") or leaf.endswith("_n_docs"):
         return f"{int(v):,}"
+    if re.fullmatch(r"y\d{4}", leaf) or leaf in ("in_04", "in_06", "marker"):
+        return f"{100 * v:.1f}"
     if leaf.startswith(("or_", "odds", "coef", "ell_coef", "corr")):
         return f"{v:.2f}"
     if "auc" in leaf:
@@ -71,4 +73,5 @@ if __name__ == "__main__":
     assert fmt("x.odds_ratio", 0.356) == "0.36" and fmt("x.n", 7424) == "7,424"
     assert fmt("x.or_lo", 0.1656) == "0.17" and fmt("x.cv_auc_all", 0.98763) == "0.988"
     assert fmt("x.level_shift_p", 0.894) == "0.894" and fmt("x.level_shift", 0.0465) == "4.7"
+    assert fmt("x.n_generators", 8.0) == "8" and fmt("x.y2025", 0.3644) == "36.4" and fmt("x.excess_p", 0.2) == "0.200"
     main()
