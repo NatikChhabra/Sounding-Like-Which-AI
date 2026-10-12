@@ -72,6 +72,31 @@ PROPER = {"Wikipedia", "Australian", "English", "Hansard", "Parliamentary", "Deb
           "Binoculars", "Coevolution"}
 
 
+# Titles whose fetched form loses capitals after "?" or a braced colon under acl_natbib, or has Unicode quotes
+# (wording checked against the source records; lit/verification/batch7_bib.md)
+TITLES = {
+    "juzek2025": r"Why Does {C}hat{GPT} ``Delve'' So Much? {E}xploring the Sources of Lexical Overrepresentation in Large Language Models",
+    "khan2026": r"Who Gets Seen in the Age of {AI}? {A}doption Patterns of Large Language Models in Scholarly Writing and Citation Outcomes",
+    "reinhart2025": r"Do {LLMs} Write Like Humans? {V}ariation in Grammatical and Rhetorical Styles",
+    "sun2025": r"Are We in the {AI}-Generated Text World Already? {Q}uantifying and Monitoring {AIGT} on Social Media",
+    "gray2024": r"{ChatGPT} ``Contamination'': {E}stimating the Prevalence of {LLMs} in the Scholarly Literature",
+    "chang2026": r"Human Writing and Machine Patterns: {A}nalyzing a Decade of Convergence",
+    "mccarthy2010": r"{MTLD}, vocd-{D}, and {HD-D}: {A} Validation Study of Sophisticated Approaches to Lexical Diversity Assessment",
+    "dugan2024raid": r"{RAID}: {A} Shared Benchmark for Robust Evaluation of Machine-Generated Text Detectors",
+    "geng2025": r"{Human-LLM} Coevolution: {E}vidence from Academic Writing",
+    "bao2024fastdetectgpt": r"{Fast-DetectGPT}: {E}fficient Zero-Shot Detection of Machine-Generated Text via Conditional Probability Curvature",
+    "pillutla2021": r"{MAUVE}: {M}easuring the Gap Between Neural Text and Human Text using Divergence Frontiers",
+    "clark2021": r"All That{'}s {`}{H}uman{'} Is Not Gold: {E}valuating Human Evaluation of Generated Text",
+}
+
+
+def retitle(key, bib):
+    if key not in TITLES:
+        return bib
+    return re.sub(r"(?<![a-z])title\s*=\s*\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\},",
+                  lambda m: "title = {" + TITLES[key] + "},", bib, count=1)
+
+
 def tidy(bib):
     """ACL's style lower-cases titles: brace acronyms (>=2 capitals, e.g. ChatGPT, LLMs, AI) and proper nouns so
     they survive; give page ranges a LaTeX en dash."""
@@ -95,7 +120,7 @@ def main(src):
         try:
             bib, title, year, url = {"doi": doi_entry, "arxiv": arxiv_entry, "bib": bib_entry,
                                      "manual": manual_entry}[kind](key, val)
-            bibs.append(tidy(bib))
+            bibs.append(tidy(retitle(key, bib)))
             rows.append(f"- [ ] `{key}` ({year}) [{title}]({url})")
         except Exception as ex:  # unresolvable = must not be cited
             rows.append(f"- [ ] `{key}` **FAILED TO RESOLVE ({ident}): {ex}** — do not cite until fixed")
