@@ -195,7 +195,7 @@ In every genre half of the pre-ChatGPT documents (the \emph{train pool}) train t
 prompts; \mso{} is measured only on the remaining documents.
 
 \paragraph{Reference generators.}
-Table~\ref{tab:gens} lists them. Ten models were run locally on three prompt styles, 150 prompts each:
+Table~\ref{tab:gens} lists them. Local models answered three prompt styles, 150 prompts each:
 \emph{P1} write the text from a title or topic; \emph{P2} improve the wording of a human draft (LLM-assisted
 revision); \emph{P3} write the text and ``avoid typical AI phrasing''. Prompts were seeded only from train-pool
 documents; local models used temperature 0.8 and fixed seeds. The 2026 model (Claude Opus~5.5) answered the same
@@ -203,39 +203,46 @@ prompt instances through sub-agent sessions of 50 prompts each, without control 
 system that drafted this paper (see AI Use). For abstracts we add the RAID generations without adversarial attack
 \citep{dugan2024raid}, written from titles of arXiv papers by six 2023 chat models and, for one analysis, five
 base models. The main instrument uses the 14 generators available before review (each capped at 450 training
-texts); Llama~2-Chat~7B and Vicuna~7B were added only for the vintage analysis. Hansard and essays use the eight
-generators in the lower part of the table.
+texts). Five further open models were added after review for the vintage analysis only: two whose pretraining
+data predate ChatGPT and three released in 2026, which give the 2026 comparison a second source with logged
+decoding and pair with 2025 models of the same families. Hansard and essays use the seven local models and the
+2026 model.
 
 \begin{table}[t]
 \centering\small
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llc@{}}
+\begin{tabular}{@{}lcc@{}}
 \toprule
-Generator & Released & Pretraining data \\
+Generator & Released & Data cutoff \
 \midrule
-\multicolumn{3}{@{}l}{\emph{RAID (abstracts only)}} \\
-GPT-4 (gpt-4-0613) & 2023 & to Sep 2021$^a$ \\
-Llama-2-70B-chat & 2023 & to Sep 2022$^b$ \\
-ChatGPT (gpt-3.5-turbo-0613) & 2023 & (2021)$^c$ \\
-Mistral-7B-Instruct v0.1, MPT-30B-chat, & 2023 & n/a \\
-\quad Cohere command (chat) & & \\
+\multicolumn{3}{@{}l}{\emph{RAID, 2023 chat models (abstracts only)}} \
+GPT-4 (gpt-4-0613) & 2023 & Sep 2021$^a$ \
+Llama-2-70B-chat & 2023 & Sep 2022$^b$ \
+ChatGPT (gpt-3.5-turbo-0613) & 2023 & (2021)$^c$ \
+Mistral-7B-Instruct v0.1; MPT-30B-chat; & 2023 & \
+\quad Cohere command & & \
 \midrule
-\multicolumn{3}{@{}l}{\emph{Local, for the vintage analysis only}} \\
-Llama-2-Chat 7B & 2023 & to Sep 2022$^b$ \\
-Vicuna 7B v1.5 & 2023 & Llama~2$^{b,d}$ \\
+\multicolumn{3}{@{}l}{\emph{Local; main instrument, all genres}} \
+Mistral 7B Instruct v0.3 & 2024-05 & \
+Llama 3.1 8B & 2024-07 & Dec 2023 \
+Phi-4 14B & 2024-12 & Jun 2024 \
+Gemma 3 12B & 2025-03 & Aug 2024 \
+Granite 3.3 8B; Qwen3 8B & 2025-04 & \
+gpt-oss 20B & 2025-08 & \
+Claude Opus 5.5 (``2026 model'') & 2026 & \
 \midrule
-\multicolumn{3}{@{}l}{\emph{Local, all genres}} \\
-Mistral 7B Instruct v0.3 & 2024 & n/a \\
-Llama 3.1 8B; Phi-4 14B & 2024 & n/a \\
-Gemma 3 12B; Qwen3 8B; & 2025 & n/a \\
-\quad Granite 3.3 8B; gpt-oss 20B & & \\
-Claude Opus 5.5 (``2026 model'') & 2026 & n/a \\
+\multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \
+Llama-2-Chat 7B; Vicuna 7B v1.5$^d$ & 2023-07 & Sep 2022$^b$ \
+Qwen3.5 9B & 2026-02 & \
+Gemma 4 12B & 2026-05 & Jan 2025 \
+Granite 4.2 8B & 2026-08 & \
 \bottomrule
 \end{tabular}
-\caption{Reference generators. $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in
-secondary sources, so ChatGPT enters the pre-ChatGPT-data region only as a sensitivity check; $^d$fine-tuned on
-user-shared ChatGPT conversations \citep{zheng2023judging}. Model reports: \citet{jiang2023mistral,
-grattafiori2024llama3, abdin2024phi4, gemma2025gemma3, yang2025qwen3, openai2025gptoss}.}
+\caption{Reference generators, with release month and pretraining-data cutoff where the developer states one.
+$^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in secondary sources, so ChatGPT
+enters the pre-ChatGPT-data region only as a sensitivity check; $^d$Llama~2 fine-tuned on user-shared ChatGPT
+conversations \citep{zheng2023judging}. Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card,
+yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.}
 \label{tab:gens}
 \end{table}
 
@@ -244,7 +251,7 @@ grattafiori2024llama3, abdin2024phi4, gemma2025gemma3, yang2025qwen3, openai2025
 
 \paragraph{Cleaning.}
 All texts, human and LLM, pass through the same normalisation: chat wrappers (``Here's the abstract:''),
-markdown, headings and trailing notes are removed; curly quotes, non-breaking hyphens and spaces, and
+lines that echo the prompt's title, markdown, headings and trailing notes are removed; curly quotes, non-breaking hyphens and spaces, and
 mis-decoded Windows-1252 characters are mapped to plain equivalents; LaTeX math becomes a placeholder token,
 LaTeX dashes (\texttt{-{}-}, \texttt{-{}-{}-}) become typographic en and em dashes, and formatting commands keep
 only their content. The LaTeX step matters because human arXiv abstracts write dashes as \texttt{-{}-} while
@@ -421,7 +428,43 @@ of release. Overlap fell against every generator except the two newest.}
 
 \subsection{Learner essays (H5, not supported)}
 \label{sec:learners}
-\TODO{write after GPT-2 perplexity}
+Our analysis plan predicted that essays by English-language learners would show \emph{higher} \mso{}. They show
+lower: \R{essay_mso_by_group.ELL.mso}\% versus \R{essay_mso_by_group.non-ELL.mso}\%
+(\R{essay_ell_counts.ell_in_region} of \R{essay_ell_counts.n_ell} learner essays in the region; odds ratio
+adjusted for prompt and grade \R{essay_ell_adjusted.odds_ratio}, CI
+\R{essay_ell_adjusted.or_lo}--\R{essay_ell_adjusted.or_hi}; lower, and significant at $p<0.05$, in all
+\R{essay_seed_stability.n_seeds} training draws). Most of the difference is proficiency: adding the holistic
+essay score reduces the odds ratio to \R{essay_ell_adjusted.odds_ratio_prof} (CI
+\R{essay_ell_adjusted.or_lo_prof}--\R{essay_ell_adjusted.or_hi_prof}) and the continuous classifier margin from
+$\R{essay_ell_continuous.ell_coef_sd}$ to $\R{essay_ell_continuous.ell_coef_sd_prof}$ standard deviations (CI
+$\R{essay_ell_continuous.coef_lo_prof}$ to $\R{essay_ell_continuous.coef_hi_prof}$). In essays the LLM region is
+largely a region of fluent, lexically diverse writing. The other instruments agree in direction
+(Figure~\ref{fig:learners}): sentence embeddings (\R{essay_embedding_instrument.ELL.mso}\% vs
+\R{essay_embedding_instrument.non-ELL.mso}\%) and perplexity under GPT-2
+(\R{essay_perplexity_instrument_gpt2.ELL.mso}\% vs \R{essay_perplexity_instrument_gpt2.non-ELL.mso}\%; odds ratio
+\R{essay_perplexity_adjusted_gpt2.odds_ratio}, and \R{essay_perplexity_adjusted_gpt2.odds_ratio_prof}, CI
+\R{essay_perplexity_adjusted_gpt2.or_lo_prof}--\R{essay_perplexity_adjusted_gpt2.or_hi_prof}, after adjusting
+for proficiency), because these learners' essays are \emph{less} predictable (mean token log-perplexity
+\R{essay_perplexity_adjusted_gpt2.mean_logppl_ell} vs \R{essay_perplexity_adjusted_gpt2.mean_logppl_nonell}).
+The same GPT-2 instrument reproduces the bias reported by \citet{liang2023detectors} on their data: it flags
+\R{essay_liang_perplexity_gpt2.Real TOEFL.mso}\% of TOEFL essays by non-native test-takers, which are highly
+predictable (\R{essay_liang_perplexity_gpt2.Real TOEFL.mean_logppl}), but
+\R{essay_liang_perplexity_gpt2.Real US 8th grade.mso}\% of US 8th-grade essays
+(\R{essay_liang_perplexity_gpt2.Real US 8th grade.mean_logppl}); Qwen2.5-0.5B gives the same pattern
+(\R{essay_liang_perplexity.Real TOEFL.mso}\% vs \R{essay_liang_perplexity.Real US 8th grade.mso}\%). GPT-2 was
+trained before either collection was public, so the contrast does not come from memorised essays. In these data
+a perplexity instrument penalises predictable writing: the TOEFL essays are predictable and these school
+learners' essays are not, so which learners such a detector flags depends on the population, consistent with
+detectors that showed no bias in a large writing assessment \citep{jiang2024}. The TOEFL and 8th-grade sets also
+differ in genre, prompt, age and length.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\columnwidth]{figures/learners.pdf}
+\caption{Share of held-out pre-ChatGPT student essays flagged by three instruments, by ELL status (ELL n=\R{essay_mso_by_group.ELL.n},
+non-ELL n=\R{essay_mso_by_group.non-ELL.n}; lines: 95\% bootstrap intervals). The instruments differ in level but agree in direction.}
+\label{fig:learners}
+\end{figure}
 
 \section{Discussion}
 \TODO{write}
@@ -534,7 +577,7 @@ normalisation, grouped calibration, generator-set, drift, math, topic, length an
 adjustment, the perplexity instrument and the dispersion measure. (5)~Added after the second review: the vintage
 analysis with Llama-2-Chat~7B and Vicuna~7B, mined marker words, the placebo grid, pre-trend variants, block
 bootstrap, further drift origins, Holm correction and the cs--mathematics contrast, length-fixed dispersion and
-GPT-2 perplexity. (6)~The self-test of the paper's own text and the plan's arXiv embedding instrument were
+GPT-2 perplexity; a cleaning fix (whole ``Title:'' lines in LLM outputs are now dropped, not only their label), after which every analysis was re-run. (6)~The self-test of the paper's own text and the plan's arXiv embedding instrument were
 dropped. (7)~The plan named cs.CL for one comparison; all of cs is used. The June 2025 evaluation month was fixed
 in code, not in the plan. Hansard was restricted to 2015--2025. H5 was not supported.
 
