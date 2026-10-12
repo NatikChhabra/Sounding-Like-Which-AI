@@ -85,6 +85,30 @@ def essay(data):
     save("essay_ell_adjusted", {"odds_ratio": float(np.exp(fit.params["ell"])),
                                 "or_lo": float(np.exp(ci[0])), "or_hi": float(np.exp(ci[1])),
                                 "p_value": float(fit.pvalues["ell"]), "n": int(fit.nobs)})
+    # robustness 1: does the ELL contrast survive other thresholds?
+    save("essay_thresholds", pd.DataFrame([
+        {"group": f"{g}@{t}", "n": len(d), "mso": float((d.p >= t).mean())}
+        for t in (0.4, 0.5, 0.6) for g, d in [("all", s), *s.groupby("group")]]))
+    # robustness 2: a different instrument (sentence embeddings). Essays share prompts across groups,
+    # so topic cannot drive the ELL contrast here; for arXiv it could, so we use it for essays only.
+    from sentence_transformers import SentenceTransformer
+    from sklearn.model_selection import train_test_split
+    enc = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device="cpu")
+    emb = lambda texts: enc.encode([features.clean(t) for t in texts], batch_size=64, show_progress_bar=False)
+    L = llm[llm.model.map(CHAT)]
+    H = human[human.pool == "train"].sample(n=len(L), random_state=mso.SEED)
+    X = np.vstack([emb(H.text.tolist()), emb(L.text.tolist())])
+    y = np.r_[np.zeros(len(H)), np.ones(len(L))]
+    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=mso.SEED, stratify=y)
+    from sklearn.calibration import CalibratedClassifierCV
+    from sklearn.linear_model import LogisticRegression
+    clf = CalibratedClassifierCV(LogisticRegression(C=1.0, max_iter=3000), method="isotonic", cv=5).fit(Xtr, ytr)
+    pe = clf.predict_proba(emb(s.text.tolist()))[:, 1]
+    rows = [{"group": "all", "n": len(s), **dict(zip(["mso", "lo", "hi"], mso.mso(pe)))}]
+    rows += [{"group": g, "n": int((s.group == g).sum()), **dict(zip(["mso", "lo", "hi"], mso.mso(pe[s.group == g])))}
+             for g in ("ELL", "non-ELL")]
+    save("essay_embedding_instrument", pd.DataFrame(rows))
+    save("essay_embedding_auc", {"heldout_auc": roc_auc_score(yte, clf.predict_proba(Xte)[:, 1])})
     # secondary: Liang et al. 2023 human essays (TOEFL vs US college essays), out-of-domain
     lg = pd.read_json(Path(data) / "learner/liang_toefl_all_data.json")
     lg = lg[(lg.kind == "Human-Written") & lg.name.isin(["Real TOEFL", "Real College Essays"])]
