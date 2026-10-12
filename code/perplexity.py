@@ -11,7 +11,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import features
 
-MODEL = "Qwen/Qwen2.5-0.5B"
+import os
+
+# Qwen2.5-0.5B by default; PPL_MODEL=gpt2 uses GPT-2 small (2019), trained before PERSUADE or the TOEFL essays
+# were public, so it cannot have seen them.
+MODEL = os.environ.get("PPL_MODEL", "Qwen/Qwen2.5-0.5B")
+TAG = "" if MODEL.startswith("Qwen") else "_" + MODEL.split("/")[-1]
 
 
 def scorer():
@@ -37,7 +42,7 @@ def main(data):
     llm["id"] = llm.src_id + "|" + llm.model + "|" + llm.prompt
     llm["id"] = llm.id + "|" + llm.groupby("id").cumcount().astype(str)  # same ids as mso.load
     docs = pd.concat([human[["id", "text"]], llm[["id", "text"]]], ignore_index=True)
-    out = data / "ppl_essay.jsonl"
+    out = data / f"ppl_essay{TAG}.jsonl"
     done = set(pd.read_json(out, lines=True).id) if out.exists() else set()
     docs = docs[~docs.id.isin(done)]
     torch.set_num_threads(6)
@@ -47,7 +52,7 @@ def main(data):
         for i, (did, text) in enumerate(zip(docs.id, docs.text)):
             ids = tok(features.clean(text), return_tensors="pt", truncation=True, max_length=512).input_ids
             if ids.shape[1] < 5:
-                continue
+                continue  # GPT-2's context is 1024 tokens; 250 words fit well within 512
             loss = lm(ids, labels=ids).loss.item()  # mean negative log-likelihood per token
             f.write(json.dumps({"id": did, "logppl": loss}) + "\n")
             if i % 500 == 0:

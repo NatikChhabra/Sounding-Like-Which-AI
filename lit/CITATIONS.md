@@ -54,3 +54,7 @@ Each entry was resolved automatically from its DOI or arXiv id. Before submissio
 - [ ] `berbersardinha2024` (2024) [AI-generated vs human-authored texts: A multidimensional comparison](https://doi.org/10.1016/j.acorp.2023.100083)
 - [ ] `chakraborty2024` (2024) [Position: On the Possibilities of {AI}-Generated Text Detection](https://proceedings.mlr.press/v235/chakraborty24a.html)
 - [ ] `katz2023scidata` (2023) [Digitization of the Australian Parliamentary Debates, 1998–2022](https://doi.org/10.1038/s41597-023-02464-w)
+- [ ] `kusumegi2026` (2026) [Scientific production in the era of Large Language Models](https://arxiv.org/abs/2601.13187)
+- [ ] `jiang2024` (2024) [Detecting ChatGPT-generated essays in a large-scale writing assessment: Is there a bias against non-native English speakers?](https://doi.org/10.1016/j.compedu.2024.105070)
+- [ ] `openai2023gpt4` (2023) [GPT-4 Technical Report](https://arxiv.org/abs/2303.08774)
+- [ ] `askitas2025` (2025) [The Behavioral Signature of {GenAI} in Scientific Communication](https://docs.iza.org/dp18062.pdf)

@@ -41,6 +41,18 @@ def bib_entry(key, url):
     return bib, (title.group(1) if title else "?"), (year.group(1) if year else "?"), url.rsplit(".bib", 1)[0]
 
 
+def manual_entry(key, _):
+    """Entry from lit/manual.bib (only for works without DOI/arXiv id; fields checked on the official listing)."""
+    text = (ROOT / "lit/manual.bib").read_text(encoding="utf-8")
+    m = re.search(r"(@\w+\{" + re.escape(key) + r",.*?\n\})", text, re.S)
+    if not m:
+        raise ValueError(f"{key} not in lit/manual.bib")
+    bib = m.group(1)
+    title = re.search(r"(?<![a-z])title\s*=\s*\{(.+?)\},", bib).group(1)
+    url = re.search(r"url\s*=\s*\{(.+?)\}", bib).group(1)
+    return bib, title, re.search(r"year\s*=\s*\{(\d{4})", bib).group(1), url
+
+
 def arxiv_entry(key, aid):
     e = ET.fromstring(get("http://export.arxiv.org/api/query?" + urllib.parse.urlencode({"id_list": aid})))
     e = e.find("a:entry", NS)
@@ -81,7 +93,8 @@ def main(src):
         key, ident = line.split()[:2]
         kind, val = ident.split(":", 1)
         try:
-            bib, title, year, url = {"doi": doi_entry, "arxiv": arxiv_entry, "bib": bib_entry}[kind](key, val)
+            bib, title, year, url = {"doi": doi_entry, "arxiv": arxiv_entry, "bib": bib_entry,
+                                     "manual": manual_entry}[kind](key, val)
             bibs.append(tidy(bib))
             rows.append(f"- [ ] `{key}` ({year}) [{title}]({url})")
         except Exception as ex:  # unresolvable = must not be cited

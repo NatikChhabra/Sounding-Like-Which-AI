@@ -1,6 +1,9 @@
 # Pre-registration: Machine-Style Overlap in human writing, 2015–2026
 
-Status: DRAFT (to be frozen with a Zenodo DOI before the full data run). Written by Claude (AI); verified by the author.
+Status: analysis plan committed to this repository on 2026-10-12 (commit ef4fa21) before any result was computed.
+It was never registered with a third party and was not frozen with a DOI as originally intended. Sections 1-6 are
+kept as committed (one retracted sentence is marked); all later changes are listed under "Deviations". Written by
+Claude (AI) at the author's request; approved by the author.
 
 ## 1. Construct
 
@@ -12,8 +15,9 @@ whose style is at least as typical of LLM output as of human writing:
 where H0 is the pre-ChatGPT human distribution (documents dated before 2022-11-30), L is LLM output for the
 same genre and topics, and x is a vector of topic-robust style features. With balanced priors this is the
 share of human documents that a calibrated Bayes classifier assigns P(LLM | x) >= 0.5. We estimate it with
-calibrated classifiers, which give a conservative estimate (a weaker classifier separates less and so reports
-more overlap). MSO(G, pre-2022) is the **baseline overlap**: how much human writing already "sounded like AI"
+calibrated classifiers. [RETRACTED after review: "which give a conservative estimate (a weaker classifier
+separates less and so reports more overlap)" is false; a finite classifier's flag rate is neither an upper nor a
+lower bound on the Bayes quantity.] MSO(G, pre-2022) is the **baseline overlap**: how much human writing already "sounded like AI"
 before AI writing was widely available.
 
 Term search (lit/03_term_search.md) found no prior use of "machine-style overlap". Closest related constructs:
@@ -77,5 +81,16 @@ MSO value was computed. Git timestamps are self-reported, so this is weaker than
    No analysis choices were changed after seeing it. The same was done once for arXiv (RAID + ~30% of local
    generations) to test the pipeline at scale; again no analysis choice was changed afterwards.
 
-## 6. Self-test
+8. **Review round 1 (2026-10-12) changes:** arXiv sampler replaced (v1 truncated large windows); LaTeX and
+   encoding normalisation; grouped calibration; per-generator cap; Claude, Phi-4 and Granite added to all genres;
+   generator-set, drift, math, topic, length, threshold and dash analyses; proficiency adjustment; perplexity
+   instrument; dispersion; self-test dropped. The 2026 model was added after a preliminary run without it
+   (decision logged in the conversation before the arXiv results; code committed in fd8a23b before results).
+9. **Review round 2 (2026-10-13) changes:** generator-vintage analysis on a matched title-only task and a region
+   from generators whose training data predate ChatGPT; vintage-matched mined marker words; placebo grids for
+   both genres; event study; Holm correction across fields and a cs-vs-math test; length-standardised baselines
+   and length-fixed dispersion; GPT-2 perplexity to rule out training-data contamination; revision-overlap check.
+10. **Outcome of H5:** not supported (opposite direction).
+
+## 6. Self-test (dropped; see deviation 8)
 The paper's own text is scored by the same pipeline and compared with human-written cs.CL abstracts.
