@@ -65,6 +65,9 @@ MSO value was computed. Git timestamps are self-reported, so this is weaker than
    base models are analysed separately.
 4. **Added diagnostics (not in the plan):** agreement between the two classifiers on which documents are in
    the region (Cohen's kappa, Spearman), and recall on held-out (unseen) models.
+6. **Hansard identifiers (bug fix, before any Hansard result).** The corpus field `uniqueID` identifies the
+   speaker, not the speech. Speeches are now keyed by date + order, and cross-validation groups by speaker.
+   Some speakers' speeches were sampled more than once as generation seeds; all generations are kept.
 5. **Pilot run.** An essay analysis was run once on partial generations (3 of 5 models) to test the code.
    No analysis choices were changed after seeing it.
 

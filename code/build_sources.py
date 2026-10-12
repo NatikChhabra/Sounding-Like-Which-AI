@@ -41,7 +41,7 @@ def arxiv(d):
 
 def hansard(d, per_month=150, seed=0):
     h = pd.read_parquet(d / "hansard_au/corpus_1998_to_2025.parquet",
-                        columns=["date", "body", "uniqueID", "interject", "q_in_writing", "partyAbbrev"])
+                        columns=["date", "body", "uniqueID", "order", "interject", "q_in_writing", "partyAbbrev"])
     h = h[(h.interject.astype(str) != "1") & (h.q_in_writing.astype(str) != "1")]  # spoken speeches only
     h["date"] = pd.to_datetime(h.date)
     h = h[(h.date >= "2015-01-01") & (h.body.str.split().str.len() >= 50)]
@@ -49,15 +49,21 @@ def hansard(d, per_month=150, seed=0):
         lambda g: g.sample(n=min(per_month, len(g)), random_state=seed))
     # no debate titles in this corpus: the opening sentence stands in as the topic cue for prompts
     first = h.body.str.split(r"(?<=[.?!])\s", n=1, regex=True).str[0].str.split().str[:30].str.join(" ")
+    # uniqueID in this corpus identifies the SPEAKER, not the speech: the speech id is date + order,
+    # and the speaker becomes `grp` so cross-validation never splits one speaker across folds.
+    sid = "hansard:" + h.date.dt.strftime("%Y-%m-%d") + ":" + h.order.astype(str)
     return split(pd.DataFrame({
-        "id": "hansard:" + h.uniqueID.astype(str), "genre": "hansard", "title": first,
-        "text": h.body, "date": h.date, "group": h.partyAbbrev.astype(str)}))
+        "id": sid, "genre": "hansard", "title": first, "text": h.body, "date": h.date,
+        "group": h.partyAbbrev.astype(str), "grp": ("hansard:" + h.uniqueID.astype(str)).where(h.uniqueID.notna(), sid)}))
 
 
 if __name__ == "__main__":
     genre, d = sys.argv[1], Path(sys.argv[2])
     df = {"essay": essay, "arxiv": arxiv, "hansard": hansard}[genre](d)
     df = df[df.text.str.split().str.len() >= 50]  # too-short texts carry little style signal
+    assert df.id.is_unique, "document ids must be unique (feature cache is keyed by id)"
+    if "grp" not in df:
+        df["grp"] = df.id
     df.to_parquet(d / f"human_{genre}.parquet", index=False)
     df[df.pool == "train"].to_parquet(d / f"seed_{genre}.parquet", index=False)
     print(genre, len(df), "docs;", (df.pool == "train").sum(), "train pool")
