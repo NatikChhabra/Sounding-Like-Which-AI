@@ -1,0 +1,31 @@
+{
+  "all": {
+    "pre_slope_per_year": 0.001487636107487184,
+    "pre_slope_p": 0.1967449998444618,
+    "level_shift": 0.0007133897142721276,
+    "level_shift_p": 0.9251836999430811,
+    "slope_change_per_year": 0.0054462102107772255,
+    "slope_change_p": 0.04938123127679567,
+    "excess_at_2025-06": 0.01432891524121519,
+    "excess_lo": -0.0019640390799269703,
+    "excess_hi": 0.03062186956235735,
+    "excess_se": 0.00831288454770542,
+    "months": 92,
+    "placebo": [
+      {
+        "fake_break": "2019-11",
+        "level_shift": -0.00822610344606601,
+        "level_shift_p": 0.42385717156051816,
+        "slope_change_per_year": -0.0018665593901899867,
+        "slope_change_p": 0.7388612075476223
+      },
+      {
+        "fake_break": "2020-11",
+        "level_shift": -0.0165543446404867,
+        "level_shift_p": 0.059773367329373675,
+        "slope_change_per_year": 0.003176694955785881,
+        "slope_change_p": 0.644358323060651
+      }
+    ]
+  }
+}
