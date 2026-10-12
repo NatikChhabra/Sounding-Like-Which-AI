@@ -39,9 +39,19 @@ def arxiv(d):
         "date": pd.to_datetime(a.published).dt.tz_localize(None), "group": a.field}))
 
 
-def hansard(d):
-    h = pd.read_parquet(d / "hansard_au/corpus_1998_to_2025.parquet")
-    raise NotImplementedError(f"map columns first: {list(h.columns)}")
+def hansard(d, per_month=150, seed=0):
+    h = pd.read_parquet(d / "hansard_au/corpus_1998_to_2025.parquet",
+                        columns=["date", "body", "uniqueID", "interject", "q_in_writing", "partyAbbrev"])
+    h = h[(h.interject.astype(str) != "1") & (h.q_in_writing.astype(str) != "1")]  # spoken speeches only
+    h["date"] = pd.to_datetime(h.date)
+    h = h[(h.date >= "2015-01-01") & (h.body.str.split().str.len() >= 50)]
+    h = h.groupby(h.date.dt.to_period("M"), group_keys=False).apply(
+        lambda g: g.sample(n=min(per_month, len(g)), random_state=seed))
+    # no debate titles in this corpus: the opening sentence stands in as the topic cue for prompts
+    first = h.body.str.split(r"(?<=[.?!])\s", n=1, regex=True).str[0].str.split().str[:30].str.join(" ")
+    return split(pd.DataFrame({
+        "id": "hansard:" + h.uniqueID.astype(str), "genre": "hansard", "title": first,
+        "text": h.body, "date": h.date, "group": h.partyAbbrev.astype(str)}))
 
 
 if __name__ == "__main__":
