@@ -21,11 +21,12 @@ PROMPTS = {
               "busy researcher would; avoid typical AI phrasing. Output only the abstract.",
     },
     "hansard": {
-        "P1": "Write a speech by a member of the Australian Parliament in a debate on \"{title}\". About {n} words. "
-              "Output only the speech.",
+        "P1": "Write a speech by a member of the Australian Parliament on the topic raised by this remark: "
+              "\"{title}\". About {n} words. Do not reuse the remark's wording. Output only the speech.",
         "P2": "Improve the wording of this parliamentary speech. Keep the content. Output only the revised speech.\n\n{text}",
-        "P3": "Write a speech by a member of the Australian Parliament in a debate on \"{title}\". About {n} words. "
-              "Make it sound like a real spoken speech, not AI writing. Output only the speech.",
+        "P3": "Write a speech by a member of the Australian Parliament on the topic raised by this remark: "
+              "\"{title}\". About {n} words. Do not reuse the remark's wording. Make it sound like a real spoken "
+              "speech, not AI writing. Output only the speech.",
     },
     "essay": {
         "P1": "Write an argumentative essay by a US high-school student responding to this prompt: \"{title}\". "
