@@ -2,7 +2,7 @@
 
 Input: a parquet of source docs with columns id, genre, title, text (pre-2022 human only).
 Output: appends JSON lines {src_id, genre, model, prompt, text} -- resumable (skips done pairs).
-Usage: python generate.py SOURCES.parquet OUT.jsonl [n_per_cell]
+Usage: python generate.py SOURCES.parquet OUT.jsonl [n_per_cell] [model,model,...]
 """
 import json, sys, urllib.request, zlib
 from pathlib import Path
@@ -50,7 +50,7 @@ def chat(model, prompt, seed):
         return json.loads(r.read())["message"]["content"].strip()
 
 
-def main(src, out, n_per_cell=200):
+def main(src, out, n_per_cell=200, models=MODELS):
     src = pd.read_parquet(src)
     out = Path(out)
     done = set()
@@ -59,7 +59,7 @@ def main(src, out, n_per_cell=200):
             r = json.loads(line)
             done.add((r["src_id"], r["model"], r["prompt"]))
     with out.open("a", encoding="utf-8") as f:
-        for model in MODELS:  # model-outer loop so each model loads into VRAM once
+        for model in models:  # model-outer loop so each model loads into VRAM once
             for pk in ("P1", "P2", "P3"):
                 # each (model, prompt) cell gets its own disjoint-ish random draw of sources
                 cell = src.sample(n=min(n_per_cell, len(src)), random_state=zlib.crc32(f"{model}{pk}".encode()))
@@ -76,4 +76,5 @@ def main(src, out, n_per_cell=200):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 200)
+    main(sys.argv[1], sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 200,
+         sys.argv[4].split(",") if len(sys.argv) > 4 else MODELS)
