@@ -24,5 +24,20 @@ pre-2022 trend predicts (vs. a less-exposed control corpus)?
 - [ ] 8. Release: GitHub + Zenodo DOI + HF dataset + preprint (OSF/arXiv)
 - [ ] 9. Submit along the venue ladder, then profile extras
 
+## Timeline (deadlines verified on official pages, 2026-10-12; all AoE)
+| Date | Milestone |
+|---|---|
+| ~Oct 14 | Data + generations complete; first MSO results |
+| Oct 20 | Pre-registration frozen (Zenodo DOI) before confirmatory runs; full draft v1 |
+| **Nov 6** | EACL 2027 SRW **free pre-submission mentorship** draft (https://2027.eacl.org/calls/srw/) |
+| Dec 5 | Mentor feedback back; revise |
+| **Dec 15** | EACL 2027 SRW submission (Athens, 9-14 Mar 2027); undergrad/grad only, so ask chairs re: pre-university first |
+| **Jan 4 2027** | ACL 2027 main via ARR, **theme track "Homogenization and knowledge collapse in LLMs"** (Kyoto, Aug 2027) |
+| after submit | arXiv cs.CL preprint (needs endorser), GitHub + Zenodo DOI, HF dataset |
+| fallback | ACL 2027 SRW / workshops (Apr 2027), Journal of Quantitative Linguistics ($0 route) |
+
+Dual-submission check needed: EACL SRW (notif. Jan 5) overlaps ARR Jan 4; use SRW non-archival or pick one.
+ACL policy discourages AI-generated "new ideas + new text"; disclosure itself is not grounds for desk reject.
+
 ## Things only the student can do
 Create accounts (ORCID, OSF, arXiv, Zenodo, HF), get arXiv endorsement, sign/submit forms, verify citations.
