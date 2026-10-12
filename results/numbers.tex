@@ -1,18 +1,191 @@
 \newcommand{\R}[1]{\ifcsname r@#1\endcsname\csname r@#1\endcsname\else\errmessage{Missing result #1}\fi}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:advmod.coef\endcsname{-0.48}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:advmod.feature\endcsname{dep:advmod}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:amod.coef\endcsname{-0.60}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:amod.feature\endcsname{dep:amod}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:case.coef\endcsname{-0.59}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:case.feature\endcsname{dep:case}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:compound.coef\endcsname{-0.61}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:compound.feature\endcsname{dep:compound}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:dobj.coef\endcsname{-0.57}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:dobj.feature\endcsname{dep:dobj}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:pobj.coef\endcsname{-0.54}
+\expandafter\def\csname r@arxiv_features_human_typical.dep:pobj.feature\endcsname{dep:pobj}
+\expandafter\def\csname r@arxiv_features_human_typical.fw:of.coef\endcsname{-0.61}
+\expandafter\def\csname r@arxiv_features_human_typical.fw:of.feature\endcsname{fw:of}
+\expandafter\def\csname r@arxiv_features_human_typical.fw:we.coef\endcsname{-0.79}
+\expandafter\def\csname r@arxiv_features_human_typical.fw:we.feature\endcsname{fw:we}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:ADP_DET_ADJ.coef\endcsname{-0.81}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:ADP_DET_ADJ.feature\endcsname{pos:ADP\_DET\_ADJ}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:ADP_DET_NOUN.coef\endcsname{-0.53}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:ADP_DET_NOUN.feature\endcsname{pos:ADP\_DET\_NOUN}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:PRON_VERB_DET.coef\endcsname{-0.51}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:PRON_VERB_DET.feature\endcsname{pos:PRON\_VERB\_DET}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:VERB_ADP_DET.coef\endcsname{-0.47}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:VERB_ADP_DET.feature\endcsname{pos:VERB\_ADP\_DET}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:VERB_DET_ADJ.coef\endcsname{-0.69}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:VERB_DET_ADJ.feature\endcsname{pos:VERB\_DET\_ADJ}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:VERB_DET_NOUN.coef\endcsname{-0.58}
+\expandafter\def\csname r@arxiv_features_human_typical.pos:VERB_DET_NOUN.feature\endcsname{pos:VERB\_DET\_NOUN}
+\expandafter\def\csname r@arxiv_features_human_typical.s:sent_sd.coef\endcsname{-0.45}
+\expandafter\def\csname r@arxiv_features_human_typical.s:sent_sd.feature\endcsname{s:sent\_sd}
+\expandafter\def\csname r@arxiv_features_llm_typical.dep:det.coef\endcsname{1.40}
+\expandafter\def\csname r@arxiv_features_llm_typical.dep:det.feature\endcsname{dep:det}
+\expandafter\def\csname r@arxiv_features_llm_typical.fw:the.coef\endcsname{0.49}
+\expandafter\def\csname r@arxiv_features_llm_typical.fw:the.feature\endcsname{fw:the}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:DET_ADJ_NOUN.coef\endcsname{0.77}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:DET_ADJ_NOUN.feature\endcsname{pos:DET\_ADJ\_NOUN}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:DET_NOUN_ADP.coef\endcsname{0.87}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:DET_NOUN_ADP.feature\endcsname{pos:DET\_NOUN\_ADP}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:DET_NOUN_AUX.coef\endcsname{0.39}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:DET_NOUN_AUX.feature\endcsname{pos:DET\_NOUN\_AUX}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:DET_NOUN_VERB.coef\endcsname{0.80}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:DET_NOUN_VERB.feature\endcsname{pos:DET\_NOUN\_VERB}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:NOUN_ADP_ADJ.coef\endcsname{0.39}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:NOUN_ADP_ADJ.feature\endcsname{pos:NOUN\_ADP\_ADJ}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:NOUN_ADP_NOUN.coef\endcsname{0.42}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:NOUN_ADP_NOUN.feature\endcsname{pos:NOUN\_ADP\_NOUN}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:NOUN_PUNCT_PRON.coef\endcsname{0.50}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:NOUN_PUNCT_PRON.feature\endcsname{pos:NOUN\_PUNCT\_PRON}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:PRON_NOUN_VERB.coef\endcsname{0.57}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:PRON_NOUN_VERB.feature\endcsname{pos:PRON\_NOUN\_VERB}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:PUNCT_PRON_VERB.coef\endcsname{1.02}
+\expandafter\def\csname r@arxiv_features_llm_typical.pos:PUNCT_PRON_VERB.feature\endcsname{pos:PUNCT\_PRON\_VERB}
+\expandafter\def\csname r@arxiv_features_llm_typical.pun:".coef\endcsname{0.38}
+\expandafter\def\csname r@arxiv_features_llm_typical.pun:".feature\endcsname{pun:"}
+\expandafter\def\csname r@arxiv_features_llm_typical.pun:,.coef\endcsname{0.55}
+\expandafter\def\csname r@arxiv_features_llm_typical.pun:,.feature\endcsname{pun:,}
+\expandafter\def\csname r@arxiv_features_llm_typical.pun:-.coef\endcsname{0.63}
+\expandafter\def\csname r@arxiv_features_llm_typical.pun:-.feature\endcsname{pun:-}
+\expandafter\def\csname r@arxiv_features_llm_typical.s:mtld.coef\endcsname{2.04}
+\expandafter\def\csname r@arxiv_features_llm_typical.s:mtld.feature\endcsname{s:mtld}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P1.auc\endcsname{0.963}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P1.model\endcsname{llama3.1:8b}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P1.n\endcsname{150}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P1.prompt\endcsname{P1}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P2.auc\endcsname{0.878}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P2.model\endcsname{llama3.1:8b}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P2.n\endcsname{150}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P2.prompt\endcsname{P2}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P3.auc\endcsname{0.976}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P3.model\endcsname{llama3.1:8b}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P3.n\endcsname{150}
+\expandafter\def\csname r@arxiv_separability.llama3.1:8b/P3.prompt\endcsname{P3}
+\expandafter\def\csname r@arxiv_separability.qwen3:8b/P1.auc\endcsname{0.995}
+\expandafter\def\csname r@arxiv_separability.qwen3:8b/P1.model\endcsname{qwen3:8b}
+\expandafter\def\csname r@arxiv_separability.qwen3:8b/P1.n\endcsname{150}
+\expandafter\def\csname r@arxiv_separability.qwen3:8b/P1.prompt\endcsname{P1}
+\expandafter\def\csname r@arxiv_separability.qwen3:8b/P2.auc\endcsname{0.619}
+\expandafter\def\csname r@arxiv_separability.qwen3:8b/P2.model\endcsname{qwen3:8b}
+\expandafter\def\csname r@arxiv_separability.qwen3:8b/P2.n\endcsname{114}
+\expandafter\def\csname r@arxiv_separability.qwen3:8b/P2.prompt\endcsname{P2}
+\expandafter\def\csname r@arxiv_separability.raid-chatgpt/raid-greedy-rpno.auc\endcsname{0.997}
+\expandafter\def\csname r@arxiv_separability.raid-chatgpt/raid-greedy-rpno.model\endcsname{raid-chatgpt}
+\expandafter\def\csname r@arxiv_separability.raid-chatgpt/raid-greedy-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-chatgpt/raid-greedy-rpno.prompt\endcsname{raid-greedy-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-chatgpt/raid-sampling-rpno.auc\endcsname{0.993}
+\expandafter\def\csname r@arxiv_separability.raid-chatgpt/raid-sampling-rpno.model\endcsname{raid-chatgpt}
+\expandafter\def\csname r@arxiv_separability.raid-chatgpt/raid-sampling-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-chatgpt/raid-sampling-rpno.prompt\endcsname{raid-sampling-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-cohere-chat/raid-greedy-rpno.auc\endcsname{0.942}
+\expandafter\def\csname r@arxiv_separability.raid-cohere-chat/raid-greedy-rpno.model\endcsname{raid-cohere-chat}
+\expandafter\def\csname r@arxiv_separability.raid-cohere-chat/raid-greedy-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-cohere-chat/raid-greedy-rpno.prompt\endcsname{raid-greedy-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-cohere-chat/raid-sampling-rpno.auc\endcsname{0.936}
+\expandafter\def\csname r@arxiv_separability.raid-cohere-chat/raid-sampling-rpno.model\endcsname{raid-cohere-chat}
+\expandafter\def\csname r@arxiv_separability.raid-cohere-chat/raid-sampling-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-cohere-chat/raid-sampling-rpno.prompt\endcsname{raid-sampling-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-gpt4/raid-greedy-rpno.auc\endcsname{0.999}
+\expandafter\def\csname r@arxiv_separability.raid-gpt4/raid-greedy-rpno.model\endcsname{raid-gpt4}
+\expandafter\def\csname r@arxiv_separability.raid-gpt4/raid-greedy-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-gpt4/raid-greedy-rpno.prompt\endcsname{raid-greedy-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-gpt4/raid-sampling-rpno.auc\endcsname{0.991}
+\expandafter\def\csname r@arxiv_separability.raid-gpt4/raid-sampling-rpno.model\endcsname{raid-gpt4}
+\expandafter\def\csname r@arxiv_separability.raid-gpt4/raid-sampling-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-gpt4/raid-sampling-rpno.prompt\endcsname{raid-sampling-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-greedy-rpno.auc\endcsname{0.996}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-greedy-rpno.model\endcsname{raid-llama-chat}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-greedy-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-greedy-rpno.prompt\endcsname{raid-greedy-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-greedy-rpyes.auc\endcsname{0.997}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-greedy-rpyes.model\endcsname{raid-llama-chat}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-greedy-rpyes.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-greedy-rpyes.prompt\endcsname{raid-greedy-rpyes}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-sampling-rpno.auc\endcsname{0.995}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-sampling-rpno.model\endcsname{raid-llama-chat}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-sampling-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-sampling-rpno.prompt\endcsname{raid-sampling-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-sampling-rpyes.auc\endcsname{0.995}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-sampling-rpyes.model\endcsname{raid-llama-chat}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-sampling-rpyes.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-llama-chat/raid-sampling-rpyes.prompt\endcsname{raid-sampling-rpyes}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-greedy-rpno.auc\endcsname{0.995}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-greedy-rpno.model\endcsname{raid-mistral-chat}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-greedy-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-greedy-rpno.prompt\endcsname{raid-greedy-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-greedy-rpyes.auc\endcsname{0.995}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-greedy-rpyes.model\endcsname{raid-mistral-chat}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-greedy-rpyes.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-greedy-rpyes.prompt\endcsname{raid-greedy-rpyes}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-sampling-rpno.auc\endcsname{0.986}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-sampling-rpno.model\endcsname{raid-mistral-chat}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-sampling-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-sampling-rpno.prompt\endcsname{raid-sampling-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-sampling-rpyes.auc\endcsname{0.976}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-sampling-rpyes.model\endcsname{raid-mistral-chat}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-sampling-rpyes.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-mistral-chat/raid-sampling-rpyes.prompt\endcsname{raid-sampling-rpyes}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-greedy-rpno.auc\endcsname{0.998}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-greedy-rpno.model\endcsname{raid-mpt-chat}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-greedy-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-greedy-rpno.prompt\endcsname{raid-greedy-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-greedy-rpyes.auc\endcsname{0.998}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-greedy-rpyes.model\endcsname{raid-mpt-chat}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-greedy-rpyes.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-greedy-rpyes.prompt\endcsname{raid-greedy-rpyes}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-sampling-rpno.auc\endcsname{0.997}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-sampling-rpno.model\endcsname{raid-mpt-chat}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-sampling-rpno.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-sampling-rpno.prompt\endcsname{raid-sampling-rpno}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-sampling-rpyes.auc\endcsname{0.994}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-sampling-rpyes.model\endcsname{raid-mpt-chat}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-sampling-rpyes.n\endcsname{1,766}
+\expandafter\def\csname r@arxiv_separability.raid-mpt-chat/raid-sampling-rpyes.prompt\endcsname{raid-sampling-rpyes}
 \expandafter\def\csname r@essay_ell_adjusted.n\endcsname{7,424}
-\expandafter\def\csname r@essay_ell_adjusted.odds_ratio\endcsname{0.36}
-\expandafter\def\csname r@essay_ell_adjusted.or_hi\endcsname{0.77}
-\expandafter\def\csname r@essay_ell_adjusted.or_lo\endcsname{0.17}
-\expandafter\def\csname r@essay_ell_adjusted.p_value\endcsname{0.008}
+\expandafter\def\csname r@essay_ell_adjusted.odds_ratio\endcsname{0.48}
+\expandafter\def\csname r@essay_ell_adjusted.or_hi\endcsname{0.99}
+\expandafter\def\csname r@essay_ell_adjusted.or_lo\endcsname{0.23}
+\expandafter\def\csname r@essay_ell_adjusted.p_value\endcsname{0.045}
+\expandafter\def\csname r@essay_ell_continuous.coef_hi\endcsname{-29.1}
+\expandafter\def\csname r@essay_ell_continuous.coef_lo\endcsname{-32.0}
+\expandafter\def\csname r@essay_ell_continuous.ell_coef_sd\endcsname{-0.31}
+\expandafter\def\csname r@essay_ell_continuous.n\endcsname{7,424}
+\expandafter\def\csname r@essay_ell_continuous.p_value\endcsname{{<}0.001}
+\expandafter\def\csname r@essay_embedding_auc.heldout_auc\endcsname{0.967}
+\expandafter\def\csname r@essay_embedding_instrument.ELL.group\endcsname{ELL}
+\expandafter\def\csname r@essay_embedding_instrument.ELL.hi\endcsname{6.2}
+\expandafter\def\csname r@essay_embedding_instrument.ELL.lo\endcsname{3.2}
+\expandafter\def\csname r@essay_embedding_instrument.ELL.mso\endcsname{4.7}
+\expandafter\def\csname r@essay_embedding_instrument.ELL.n\endcsname{666}
+\expandafter\def\csname r@essay_embedding_instrument.all.group\endcsname{all}
+\expandafter\def\csname r@essay_embedding_instrument.all.hi\endcsname{8.2}
+\expandafter\def\csname r@essay_embedding_instrument.all.lo\endcsname{7.0}
+\expandafter\def\csname r@essay_embedding_instrument.all.mso\endcsname{7.6}
+\expandafter\def\csname r@essay_embedding_instrument.all.n\endcsname{7,424}
+\expandafter\def\csname r@essay_embedding_instrument.non-ELL.group\endcsname{non-ELL}
+\expandafter\def\csname r@essay_embedding_instrument.non-ELL.hi\endcsname{8.5}
+\expandafter\def\csname r@essay_embedding_instrument.non-ELL.lo\endcsname{7.2}
+\expandafter\def\csname r@essay_embedding_instrument.non-ELL.mso\endcsname{7.9}
+\expandafter\def\csname r@essay_embedding_instrument.non-ELL.n\endcsname{6,758}
 \expandafter\def\csname r@essay_features_human_typical.fw:although.coef\endcsname{-0.20}
 \expandafter\def\csname r@essay_features_human_typical.fw:although.feature\endcsname{fw:although}
 \expandafter\def\csname r@essay_features_human_typical.fw:nt.coef\endcsname{-0.26}
 \expandafter\def\csname r@essay_features_human_typical.fw:nt.feature\endcsname{fw:nt}
 \expandafter\def\csname r@essay_features_human_typical.pos:ADP_DET_NOUN.coef\endcsname{-0.19}
 \expandafter\def\csname r@essay_features_human_typical.pos:ADP_DET_NOUN.feature\endcsname{pos:ADP\_DET\_NOUN}
-\expandafter\def\csname r@essay_features_human_typical.pos:ADP_NOUN_SCONJ.coef\endcsname{-0.20}
+\expandafter\def\csname r@essay_features_human_typical.pos:ADP_NOUN_SCONJ.coef\endcsname{-0.21}
 \expandafter\def\csname r@essay_features_human_typical.pos:ADP_NOUN_SCONJ.feature\endcsname{pos:ADP\_NOUN\_SCONJ}
-\expandafter\def\csname r@essay_features_human_typical.pos:ADV_ADV_PRON.coef\endcsname{-0.18}
+\expandafter\def\csname r@essay_features_human_typical.pos:ADV_ADV_PRON.coef\endcsname{-0.17}
 \expandafter\def\csname r@essay_features_human_typical.pos:ADV_ADV_PRON.feature\endcsname{pos:ADV\_ADV\_PRON}
 \expandafter\def\csname r@essay_features_human_typical.pos:ADV_AUX_ADP.coef\endcsname{-0.18}
 \expandafter\def\csname r@essay_features_human_typical.pos:ADV_AUX_ADP.feature\endcsname{pos:ADV\_AUX\_ADP}
@@ -24,97 +197,97 @@
 \expandafter\def\csname r@essay_features_human_typical.pos:NOUN_NOUN_PRON.feature\endcsname{pos:NOUN\_NOUN\_PRON}
 \expandafter\def\csname r@essay_features_human_typical.pos:NOUN_PRON_AUX.coef\endcsname{-0.20}
 \expandafter\def\csname r@essay_features_human_typical.pos:NOUN_PRON_AUX.feature\endcsname{pos:NOUN\_PRON\_AUX}
-\expandafter\def\csname r@essay_features_human_typical.pos:PRON_SCONJ_PRON.coef\endcsname{-0.18}
+\expandafter\def\csname r@essay_features_human_typical.pos:PRON_SCONJ_PRON.coef\endcsname{-0.19}
 \expandafter\def\csname r@essay_features_human_typical.pos:PRON_SCONJ_PRON.feature\endcsname{pos:PRON\_SCONJ\_PRON}
 \expandafter\def\csname r@essay_features_human_typical.pos:PUNCT_ADV_PRON.coef\endcsname{-0.19}
 \expandafter\def\csname r@essay_features_human_typical.pos:PUNCT_ADV_PRON.feature\endcsname{pos:PUNCT\_ADV\_PRON}
-\expandafter\def\csname r@essay_features_human_typical.pos:PUNCT_PUNCT_PUNCT.coef\endcsname{-0.19}
+\expandafter\def\csname r@essay_features_human_typical.pos:PUNCT_PUNCT_PUNCT.coef\endcsname{-0.18}
 \expandafter\def\csname r@essay_features_human_typical.pos:PUNCT_PUNCT_PUNCT.feature\endcsname{pos:PUNCT\_PUNCT\_PUNCT}
-\expandafter\def\csname r@essay_features_human_typical.pos:PUNCT_SCONJ_PUNCT.coef\endcsname{-0.18}
+\expandafter\def\csname r@essay_features_human_typical.pos:PUNCT_SCONJ_PUNCT.coef\endcsname{-0.17}
 \expandafter\def\csname r@essay_features_human_typical.pos:PUNCT_SCONJ_PUNCT.feature\endcsname{pos:PUNCT\_SCONJ\_PUNCT}
 \expandafter\def\csname r@essay_features_human_typical.s:sent_sd.coef\endcsname{-0.33}
 \expandafter\def\csname r@essay_features_human_typical.s:sent_sd.feature\endcsname{s:sent\_sd}
 \expandafter\def\csname r@essay_features_llm_typical.dep:punct.coef\endcsname{0.24}
 \expandafter\def\csname r@essay_features_llm_typical.dep:punct.feature\endcsname{dep:punct}
-\expandafter\def\csname r@essay_features_llm_typical.fw:'re.coef\endcsname{0.32}
+\expandafter\def\csname r@essay_features_llm_typical.fw:'re.coef\endcsname{0.31}
 \expandafter\def\csname r@essay_features_llm_typical.fw:'re.feature\endcsname{fw:'re}
 \expandafter\def\csname r@essay_features_llm_typical.fw:'s.coef\endcsname{0.33}
 \expandafter\def\csname r@essay_features_llm_typical.fw:'s.feature\endcsname{fw:'s}
-\expandafter\def\csname r@essay_features_llm_typical.fw:while.coef\endcsname{0.22}
-\expandafter\def\csname r@essay_features_llm_typical.fw:while.feature\endcsname{fw:while}
-\expandafter\def\csname r@essay_features_llm_typical.fw:who.coef\endcsname{0.34}
+\expandafter\def\csname r@essay_features_llm_typical.fw:who.coef\endcsname{0.33}
 \expandafter\def\csname r@essay_features_llm_typical.fw:who.feature\endcsname{fw:who}
 \expandafter\def\csname r@essay_features_llm_typical.pos:ADJ_NOUN_PUNCT.coef\endcsname{0.25}
 \expandafter\def\csname r@essay_features_llm_typical.pos:ADJ_NOUN_PUNCT.feature\endcsname{pos:ADJ\_NOUN\_PUNCT}
-\expandafter\def\csname r@essay_features_llm_typical.pos:NOUN_PUNCT_PRON.coef\endcsname{0.27}
+\expandafter\def\csname r@essay_features_llm_typical.pos:NOUN_PUNCT_PRON.coef\endcsname{0.28}
 \expandafter\def\csname r@essay_features_llm_typical.pos:NOUN_PUNCT_PRON.feature\endcsname{pos:NOUN\_PUNCT\_PRON}
 \expandafter\def\csname r@essay_features_llm_typical.pos:NOUN_PUNCT_VERB.coef\endcsname{0.23}
 \expandafter\def\csname r@essay_features_llm_typical.pos:NOUN_PUNCT_VERB.feature\endcsname{pos:NOUN\_PUNCT\_VERB}
-\expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_ADV_PUNCT.coef\endcsname{0.26}
+\expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_ADV_PUNCT.coef\endcsname{0.27}
 \expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_ADV_PUNCT.feature\endcsname{pos:PUNCT\_ADV\_PUNCT}
 \expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_PRON_AUX.coef\endcsname{0.30}
 \expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_PRON_AUX.feature\endcsname{pos:PUNCT\_PRON\_AUX}
 \expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_VERB_PRON.coef\endcsname{0.24}
 \expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_VERB_PRON.feature\endcsname{pos:PUNCT\_VERB\_PRON}
+\expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_VERB_SCONJ.coef\endcsname{0.22}
+\expandafter\def\csname r@essay_features_llm_typical.pos:PUNCT_VERB_SCONJ.feature\endcsname{pos:PUNCT\_VERB\_SCONJ}
 \expandafter\def\csname r@essay_features_llm_typical.pun:,.coef\endcsname{0.32}
 \expandafter\def\csname r@essay_features_llm_typical.pun:,.feature\endcsname{pun:,}
-\expandafter\def\csname r@essay_features_llm_typical.pun:—.coef\endcsname{0.45}
+\expandafter\def\csname r@essay_features_llm_typical.pun:—.coef\endcsname{0.46}
 \expandafter\def\csname r@essay_features_llm_typical.pun:—.feature\endcsname{pun:—}
 \expandafter\def\csname r@essay_features_llm_typical.s:mtld.coef\endcsname{0.46}
 \expandafter\def\csname r@essay_features_llm_typical.s:mtld.feature\endcsname{s:mtld}
 \expandafter\def\csname r@essay_features_llm_typical.s:word_len.coef\endcsname{0.40}
 \expandafter\def\csname r@essay_features_llm_typical.s:word_len.feature\endcsname{s:word\_len}
-\expandafter\def\csname r@essay_instrument.cv_auc_all\endcsname{0.988}
-\expandafter\def\csname r@essay_instrument.kappa_logreg_vs_gbm\endcsname{0.29}
+\expandafter\def\csname r@essay_instrument.cv_auc_all\endcsname{0.987}
+\expandafter\def\csname r@essay_instrument.kappa_logreg_vs_gbm\endcsname{0.28}
 \expandafter\def\csname r@essay_instrument.mso_gbm\endcsname{2.2}
-\expandafter\def\csname r@essay_instrument.mso_logreg\endcsname{3.5}
+\expandafter\def\csname r@essay_instrument.mso_logreg\endcsname{3.2}
 \expandafter\def\csname r@essay_instrument.n_train_per_class\endcsname{2,250}
-\expandafter\def\csname r@essay_instrument.share_flagged_by_both\endcsname{0.9}
-\expandafter\def\csname r@essay_instrument.spearman_scores_logreg_vs_gbm\endcsname{0.66}
+\expandafter\def\csname r@essay_instrument.share_flagged_by_both\endcsname{0.8}
+\expandafter\def\csname r@essay_instrument.spearman_scores_logreg_vs_gbm\endcsname{0.67}
 \expandafter\def\csname r@essay_liang.Real College Essays.group\endcsname{Real College Essays}
-\expandafter\def\csname r@essay_liang.Real College Essays.hi\endcsname{65.7}
-\expandafter\def\csname r@essay_liang.Real College Essays.lo\endcsname{42.9}
-\expandafter\def\csname r@essay_liang.Real College Essays.mso\endcsname{54.3}
+\expandafter\def\csname r@essay_liang.Real College Essays.hi\endcsname{62.9}
+\expandafter\def\csname r@essay_liang.Real College Essays.lo\endcsname{40.0}
+\expandafter\def\csname r@essay_liang.Real College Essays.mso\endcsname{51.4}
 \expandafter\def\csname r@essay_liang.Real College Essays.n\endcsname{70}
 \expandafter\def\csname r@essay_liang.Real TOEFL.group\endcsname{Real TOEFL}
-\expandafter\def\csname r@essay_liang.Real TOEFL.hi\endcsname{45.1}
+\expandafter\def\csname r@essay_liang.Real TOEFL.hi\endcsname{44.0}
 \expandafter\def\csname r@essay_liang.Real TOEFL.lo\endcsname{25.3}
-\expandafter\def\csname r@essay_liang.Real TOEFL.mso\endcsname{35.2}
+\expandafter\def\csname r@essay_liang.Real TOEFL.mso\endcsname{34.1}
 \expandafter\def\csname r@essay_liang.Real TOEFL.n\endcsname{91}
 \expandafter\def\csname r@essay_lomo.gemma3:12b.held_out_model\endcsname{gemma3:12b}
-\expandafter\def\csname r@essay_lomo.gemma3:12b.mso_scored_humans\endcsname{4.1}
-\expandafter\def\csname r@essay_lomo.gemma3:12b.recall_on_unseen_model\endcsname{98.2}
+\expandafter\def\csname r@essay_lomo.gemma3:12b.mso_scored_humans\endcsname{3.8}
+\expandafter\def\csname r@essay_lomo.gemma3:12b.recall_on_unseen_model\endcsname{98.7}
 \expandafter\def\csname r@essay_lomo.gpt-oss:20b.held_out_model\endcsname{gpt-oss:20b}
-\expandafter\def\csname r@essay_lomo.gpt-oss:20b.mso_scored_humans\endcsname{3.4}
-\expandafter\def\csname r@essay_lomo.gpt-oss:20b.recall_on_unseen_model\endcsname{96.9}
+\expandafter\def\csname r@essay_lomo.gpt-oss:20b.mso_scored_humans\endcsname{3.7}
+\expandafter\def\csname r@essay_lomo.gpt-oss:20b.recall_on_unseen_model\endcsname{96.7}
 \expandafter\def\csname r@essay_lomo.llama3.1:8b.held_out_model\endcsname{llama3.1:8b}
-\expandafter\def\csname r@essay_lomo.llama3.1:8b.mso_scored_humans\endcsname{3.8}
-\expandafter\def\csname r@essay_lomo.llama3.1:8b.recall_on_unseen_model\endcsname{90.4}
+\expandafter\def\csname r@essay_lomo.llama3.1:8b.mso_scored_humans\endcsname{3.3}
+\expandafter\def\csname r@essay_lomo.llama3.1:8b.recall_on_unseen_model\endcsname{89.6}
 \expandafter\def\csname r@essay_lomo.mistral:7b.held_out_model\endcsname{mistral:7b}
-\expandafter\def\csname r@essay_lomo.mistral:7b.mso_scored_humans\endcsname{3.7}
-\expandafter\def\csname r@essay_lomo.mistral:7b.recall_on_unseen_model\endcsname{95.8}
+\expandafter\def\csname r@essay_lomo.mistral:7b.mso_scored_humans\endcsname{3.4}
+\expandafter\def\csname r@essay_lomo.mistral:7b.recall_on_unseen_model\endcsname{95.1}
 \expandafter\def\csname r@essay_lomo.qwen3:8b.held_out_model\endcsname{qwen3:8b}
-\expandafter\def\csname r@essay_lomo.qwen3:8b.mso_scored_humans\endcsname{1.7}
-\expandafter\def\csname r@essay_lomo.qwen3:8b.recall_on_unseen_model\endcsname{72.9}
+\expandafter\def\csname r@essay_lomo.qwen3:8b.mso_scored_humans\endcsname{1.5}
+\expandafter\def\csname r@essay_lomo.qwen3:8b.recall_on_unseen_model\endcsname{72.2}
 \expandafter\def\csname r@essay_mso_by_group.ELL.group\endcsname{ELL}
-\expandafter\def\csname r@essay_mso_by_group.ELL.hi\endcsname{1.8}
-\expandafter\def\csname r@essay_mso_by_group.ELL.lo\endcsname{0.3}
-\expandafter\def\csname r@essay_mso_by_group.ELL.mso\endcsname{1.1}
+\expandafter\def\csname r@essay_mso_by_group.ELL.hi\endcsname{2.1}
+\expandafter\def\csname r@essay_mso_by_group.ELL.lo\endcsname{0.5}
+\expandafter\def\csname r@essay_mso_by_group.ELL.mso\endcsname{1.2}
 \expandafter\def\csname r@essay_mso_by_group.ELL.n\endcsname{666}
 \expandafter\def\csname r@essay_mso_by_group.all.group\endcsname{all}
-\expandafter\def\csname r@essay_mso_by_group.all.hi\endcsname{3.9}
-\expandafter\def\csname r@essay_mso_by_group.all.lo\endcsname{3.1}
-\expandafter\def\csname r@essay_mso_by_group.all.mso\endcsname{3.5}
+\expandafter\def\csname r@essay_mso_by_group.all.hi\endcsname{3.6}
+\expandafter\def\csname r@essay_mso_by_group.all.lo\endcsname{2.8}
+\expandafter\def\csname r@essay_mso_by_group.all.mso\endcsname{3.2}
 \expandafter\def\csname r@essay_mso_by_group.all.n\endcsname{7,424}
 \expandafter\def\csname r@essay_mso_by_group.grade 10.0.group\endcsname{grade 10.0}
-\expandafter\def\csname r@essay_mso_by_group.grade 10.0.hi\endcsname{3.2}
-\expandafter\def\csname r@essay_mso_by_group.grade 10.0.lo\endcsname{1.9}
-\expandafter\def\csname r@essay_mso_by_group.grade 10.0.mso\endcsname{2.5}
+\expandafter\def\csname r@essay_mso_by_group.grade 10.0.hi\endcsname{2.9}
+\expandafter\def\csname r@essay_mso_by_group.grade 10.0.lo\endcsname{1.6}
+\expandafter\def\csname r@essay_mso_by_group.grade 10.0.mso\endcsname{2.2}
 \expandafter\def\csname r@essay_mso_by_group.grade 10.0.n\endcsname{2,373}
 \expandafter\def\csname r@essay_mso_by_group.grade 11.0.group\endcsname{grade 11.0}
-\expandafter\def\csname r@essay_mso_by_group.grade 11.0.hi\endcsname{8.7}
-\expandafter\def\csname r@essay_mso_by_group.grade 11.0.lo\endcsname{5.4}
-\expandafter\def\csname r@essay_mso_by_group.grade 11.0.mso\endcsname{6.9}
+\expandafter\def\csname r@essay_mso_by_group.grade 11.0.hi\endcsname{7.8}
+\expandafter\def\csname r@essay_mso_by_group.grade 11.0.lo\endcsname{4.7}
+\expandafter\def\csname r@essay_mso_by_group.grade 11.0.mso\endcsname{6.1}
 \expandafter\def\csname r@essay_mso_by_group.grade 11.0.n\endcsname{921}
 \expandafter\def\csname r@essay_mso_by_group.grade 12.0.group\endcsname{grade 12.0}
 \expandafter\def\csname r@essay_mso_by_group.grade 12.0.hi\endcsname{0.0}
@@ -122,30 +295,45 @@
 \expandafter\def\csname r@essay_mso_by_group.grade 12.0.mso\endcsname{0.0}
 \expandafter\def\csname r@essay_mso_by_group.grade 12.0.n\endcsname{119}
 \expandafter\def\csname r@essay_mso_by_group.grade 6.0.group\endcsname{grade 6.0}
-\expandafter\def\csname r@essay_mso_by_group.grade 6.0.hi\endcsname{6.0}
-\expandafter\def\csname r@essay_mso_by_group.grade 6.0.lo\endcsname{1.9}
-\expandafter\def\csname r@essay_mso_by_group.grade 6.0.mso\endcsname{3.8}
+\expandafter\def\csname r@essay_mso_by_group.grade 6.0.hi\endcsname{5.7}
+\expandafter\def\csname r@essay_mso_by_group.grade 6.0.lo\endcsname{1.6}
+\expandafter\def\csname r@essay_mso_by_group.grade 6.0.mso\endcsname{3.5}
 \expandafter\def\csname r@essay_mso_by_group.grade 6.0.n\endcsname{317}
 \expandafter\def\csname r@essay_mso_by_group.grade 8.0.group\endcsname{grade 8.0}
-\expandafter\def\csname r@essay_mso_by_group.grade 8.0.hi\endcsname{3.7}
-\expandafter\def\csname r@essay_mso_by_group.grade 8.0.lo\endcsname{2.4}
-\expandafter\def\csname r@essay_mso_by_group.grade 8.0.mso\endcsname{3.0}
+\expandafter\def\csname r@essay_mso_by_group.grade 8.0.hi\endcsname{3.5}
+\expandafter\def\csname r@essay_mso_by_group.grade 8.0.lo\endcsname{2.3}
+\expandafter\def\csname r@essay_mso_by_group.grade 8.0.mso\endcsname{2.9}
 \expandafter\def\csname r@essay_mso_by_group.grade 8.0.n\endcsname{2,797}
 \expandafter\def\csname r@essay_mso_by_group.grade 9.0.group\endcsname{grade 9.0}
-\expandafter\def\csname r@essay_mso_by_group.grade 9.0.hi\endcsname{5.8}
-\expandafter\def\csname r@essay_mso_by_group.grade 9.0.lo\endcsname{3.1}
-\expandafter\def\csname r@essay_mso_by_group.grade 9.0.mso\endcsname{4.5}
+\expandafter\def\csname r@essay_mso_by_group.grade 9.0.hi\endcsname{5.6}
+\expandafter\def\csname r@essay_mso_by_group.grade 9.0.lo\endcsname{2.9}
+\expandafter\def\csname r@essay_mso_by_group.grade 9.0.mso\endcsname{4.2}
 \expandafter\def\csname r@essay_mso_by_group.grade 9.0.n\endcsname{897}
 \expandafter\def\csname r@essay_mso_by_group.non-ELL.group\endcsname{non-ELL}
-\expandafter\def\csname r@essay_mso_by_group.non-ELL.hi\endcsname{4.2}
-\expandafter\def\csname r@essay_mso_by_group.non-ELL.lo\endcsname{3.3}
-\expandafter\def\csname r@essay_mso_by_group.non-ELL.mso\endcsname{3.8}
+\expandafter\def\csname r@essay_mso_by_group.non-ELL.hi\endcsname{3.9}
+\expandafter\def\csname r@essay_mso_by_group.non-ELL.lo\endcsname{3.0}
+\expandafter\def\csname r@essay_mso_by_group.non-ELL.mso\endcsname{3.4}
 \expandafter\def\csname r@essay_mso_by_group.non-ELL.n\endcsname{6,758}
+\expandafter\def\csname r@essay_seed_stability.mso_all_max\endcsname{3.8}
+\expandafter\def\csname r@essay_seed_stability.mso_all_median\endcsname{3.3}
+\expandafter\def\csname r@essay_seed_stability.mso_all_min\endcsname{3.0}
+\expandafter\def\csname r@essay_seed_stability.mso_ell_max\endcsname{2.3}
+\expandafter\def\csname r@essay_seed_stability.mso_ell_median\endcsname{1.7}
+\expandafter\def\csname r@essay_seed_stability.mso_ell_min\endcsname{1.2}
+\expandafter\def\csname r@essay_seed_stability.mso_nonell_max\endcsname{4.0}
+\expandafter\def\csname r@essay_seed_stability.mso_nonell_median\endcsname{3.4}
+\expandafter\def\csname r@essay_seed_stability.mso_nonell_min\endcsname{3.2}
+\expandafter\def\csname r@essay_seed_stability.n_seeds\endcsname{10.00}
+\expandafter\def\csname r@essay_seed_stability.odds_ratio_max\endcsname{0.87}
+\expandafter\def\csname r@essay_seed_stability.odds_ratio_median\endcsname{0.56}
+\expandafter\def\csname r@essay_seed_stability.odds_ratio_min\endcsname{0.42}
+\expandafter\def\csname r@essay_seed_stability.share_seeds_ell_lower\endcsname{100.0}
+\expandafter\def\csname r@essay_seed_stability.share_seeds_p_below_05\endcsname{30.0}
 \expandafter\def\csname r@essay_separability.gemma3:12b/P1.auc\endcsname{1.000}
 \expandafter\def\csname r@essay_separability.gemma3:12b/P1.model\endcsname{gemma3:12b}
 \expandafter\def\csname r@essay_separability.gemma3:12b/P1.n\endcsname{150}
 \expandafter\def\csname r@essay_separability.gemma3:12b/P1.prompt\endcsname{P1}
-\expandafter\def\csname r@essay_separability.gemma3:12b/P2.auc\endcsname{0.988}
+\expandafter\def\csname r@essay_separability.gemma3:12b/P2.auc\endcsname{0.989}
 \expandafter\def\csname r@essay_separability.gemma3:12b/P2.model\endcsname{gemma3:12b}
 \expandafter\def\csname r@essay_separability.gemma3:12b/P2.n\endcsname{150}
 \expandafter\def\csname r@essay_separability.gemma3:12b/P2.prompt\endcsname{P2}
@@ -181,7 +369,7 @@
 \expandafter\def\csname r@essay_separability.mistral:7b/P1.model\endcsname{mistral:7b}
 \expandafter\def\csname r@essay_separability.mistral:7b/P1.n\endcsname{150}
 \expandafter\def\csname r@essay_separability.mistral:7b/P1.prompt\endcsname{P1}
-\expandafter\def\csname r@essay_separability.mistral:7b/P2.auc\endcsname{0.991}
+\expandafter\def\csname r@essay_separability.mistral:7b/P2.auc\endcsname{0.990}
 \expandafter\def\csname r@essay_separability.mistral:7b/P2.model\endcsname{mistral:7b}
 \expandafter\def\csname r@essay_separability.mistral:7b/P2.n\endcsname{150}
 \expandafter\def\csname r@essay_separability.mistral:7b/P2.prompt\endcsname{P2}
@@ -193,7 +381,7 @@
 \expandafter\def\csname r@essay_separability.qwen3:8b/P1.model\endcsname{qwen3:8b}
 \expandafter\def\csname r@essay_separability.qwen3:8b/P1.n\endcsname{150}
 \expandafter\def\csname r@essay_separability.qwen3:8b/P1.prompt\endcsname{P1}
-\expandafter\def\csname r@essay_separability.qwen3:8b/P2.auc\endcsname{0.867}
+\expandafter\def\csname r@essay_separability.qwen3:8b/P2.auc\endcsname{0.865}
 \expandafter\def\csname r@essay_separability.qwen3:8b/P2.model\endcsname{qwen3:8b}
 \expandafter\def\csname r@essay_separability.qwen3:8b/P2.n\endcsname{150}
 \expandafter\def\csname r@essay_separability.qwen3:8b/P2.prompt\endcsname{P2}
@@ -201,3 +389,198 @@
 \expandafter\def\csname r@essay_separability.qwen3:8b/P3.model\endcsname{qwen3:8b}
 \expandafter\def\csname r@essay_separability.qwen3:8b/P3.n\endcsname{150}
 \expandafter\def\csname r@essay_separability.qwen3:8b/P3.prompt\endcsname{P3}
+\expandafter\def\csname r@essay_thresholds.ELL@0.4.group\endcsname{ELL@0.4}
+\expandafter\def\csname r@essay_thresholds.ELL@0.4.mso\endcsname{2.1}
+\expandafter\def\csname r@essay_thresholds.ELL@0.4.n\endcsname{666}
+\expandafter\def\csname r@essay_thresholds.ELL@0.5.group\endcsname{ELL@0.5}
+\expandafter\def\csname r@essay_thresholds.ELL@0.5.mso\endcsname{1.2}
+\expandafter\def\csname r@essay_thresholds.ELL@0.5.n\endcsname{666}
+\expandafter\def\csname r@essay_thresholds.ELL@0.6.group\endcsname{ELL@0.6}
+\expandafter\def\csname r@essay_thresholds.ELL@0.6.mso\endcsname{1.1}
+\expandafter\def\csname r@essay_thresholds.ELL@0.6.n\endcsname{666}
+\expandafter\def\csname r@essay_thresholds.all@0.4.group\endcsname{all@0.4}
+\expandafter\def\csname r@essay_thresholds.all@0.4.mso\endcsname{4.7}
+\expandafter\def\csname r@essay_thresholds.all@0.4.n\endcsname{7,424}
+\expandafter\def\csname r@essay_thresholds.all@0.5.group\endcsname{all@0.5}
+\expandafter\def\csname r@essay_thresholds.all@0.5.mso\endcsname{3.2}
+\expandafter\def\csname r@essay_thresholds.all@0.5.n\endcsname{7,424}
+\expandafter\def\csname r@essay_thresholds.all@0.6.group\endcsname{all@0.6}
+\expandafter\def\csname r@essay_thresholds.all@0.6.mso\endcsname{2.3}
+\expandafter\def\csname r@essay_thresholds.all@0.6.n\endcsname{7,424}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.4.group\endcsname{non-ELL@0.4}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.4.mso\endcsname{5.0}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.4.n\endcsname{6,758}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.5.group\endcsname{non-ELL@0.5}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.5.mso\endcsname{3.4}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.5.n\endcsname{6,758}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.6.group\endcsname{non-ELL@0.6}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.6.mso\endcsname{2.5}
+\expandafter\def\csname r@essay_thresholds.non-ELL@0.6.n\endcsname{6,758}
+\expandafter\def\csname r@hansard_baseline_pre2022.all.group\endcsname{all}
+\expandafter\def\csname r@hansard_baseline_pre2022.all.hi\endcsname{4.2}
+\expandafter\def\csname r@hansard_baseline_pre2022.all.lo\endcsname{3.2}
+\expandafter\def\csname r@hansard_baseline_pre2022.all.mso\endcsname{3.7}
+\expandafter\def\csname r@hansard_baseline_pre2022.all.n\endcsname{5,124}
+\expandafter\def\csname r@hansard_features_human_typical.dep:prt.coef\endcsname{-0.27}
+\expandafter\def\csname r@hansard_features_human_typical.dep:prt.feature\endcsname{dep:prt}
+\expandafter\def\csname r@hansard_features_human_typical.fw:around.coef\endcsname{-0.31}
+\expandafter\def\csname r@hansard_features_human_typical.fw:around.feature\endcsname{fw:around}
+\expandafter\def\csname r@hansard_features_human_typical.fw:some.coef\endcsname{-0.27}
+\expandafter\def\csname r@hansard_features_human_typical.fw:some.feature\endcsname{fw:some}
+\expandafter\def\csname r@hansard_features_human_typical.fw:which.coef\endcsname{-0.26}
+\expandafter\def\csname r@hansard_features_human_typical.fw:which.feature\endcsname{fw:which}
+\expandafter\def\csname r@hansard_features_human_typical.pos:ADV_ADP_PROPN.coef\endcsname{-0.22}
+\expandafter\def\csname r@hansard_features_human_typical.pos:ADV_ADP_PROPN.feature\endcsname{pos:ADV\_ADP\_PROPN}
+\expandafter\def\csname r@hansard_features_human_typical.pos:AUX_ADP_DET.coef\endcsname{-0.25}
+\expandafter\def\csname r@hansard_features_human_typical.pos:AUX_ADP_DET.feature\endcsname{pos:AUX\_ADP\_DET}
+\expandafter\def\csname r@hansard_features_human_typical.pos:CCONJ_NOUN_CCONJ.coef\endcsname{-0.30}
+\expandafter\def\csname r@hansard_features_human_typical.pos:CCONJ_NOUN_CCONJ.feature\endcsname{pos:CCONJ\_NOUN\_CCONJ}
+\expandafter\def\csname r@hansard_features_human_typical.pos:CCONJ_PUNCT_ADP.coef\endcsname{-0.23}
+\expandafter\def\csname r@hansard_features_human_typical.pos:CCONJ_PUNCT_ADP.feature\endcsname{pos:CCONJ\_PUNCT\_ADP}
+\expandafter\def\csname r@hansard_features_human_typical.pos:NOUN_AUX_ADP.coef\endcsname{-0.31}
+\expandafter\def\csname r@hansard_features_human_typical.pos:NOUN_AUX_ADP.feature\endcsname{pos:NOUN\_AUX\_ADP}
+\expandafter\def\csname r@hansard_features_human_typical.pos:NOUN_CCONJ_PUNCT.coef\endcsname{-0.24}
+\expandafter\def\csname r@hansard_features_human_typical.pos:NOUN_CCONJ_PUNCT.feature\endcsname{pos:NOUN\_CCONJ\_PUNCT}
+\expandafter\def\csname r@hansard_features_human_typical.pos:PROPN_ADP_NOUN.coef\endcsname{-0.24}
+\expandafter\def\csname r@hansard_features_human_typical.pos:PROPN_ADP_NOUN.feature\endcsname{pos:PROPN\_ADP\_NOUN}
+\expandafter\def\csname r@hansard_features_human_typical.pos:PUNCT_ADJ_CCONJ.coef\endcsname{-0.23}
+\expandafter\def\csname r@hansard_features_human_typical.pos:PUNCT_ADJ_CCONJ.feature\endcsname{pos:PUNCT\_ADJ\_CCONJ}
+\expandafter\def\csname r@hansard_features_human_typical.pos:PUNCT_NOUN_CCONJ.coef\endcsname{-0.28}
+\expandafter\def\csname r@hansard_features_human_typical.pos:PUNCT_NOUN_CCONJ.feature\endcsname{pos:PUNCT\_NOUN\_CCONJ}
+\expandafter\def\csname r@hansard_features_human_typical.pun:'.coef\endcsname{-0.33}
+\expandafter\def\csname r@hansard_features_human_typical.pun:'.feature\endcsname{pun:'}
+\expandafter\def\csname r@hansard_features_human_typical.pun:-.coef\endcsname{-0.56}
+\expandafter\def\csname r@hansard_features_human_typical.pun:-.feature\endcsname{pun:-}
+\expandafter\def\csname r@hansard_features_llm_typical.dep:punct.coef\endcsname{0.31}
+\expandafter\def\csname r@hansard_features_llm_typical.dep:punct.feature\endcsname{dep:punct}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:ADJ_NOUN_PUNCT.coef\endcsname{0.24}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:ADJ_NOUN_PUNCT.feature\endcsname{pos:ADJ\_NOUN\_PUNCT}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:NOUN_PUNCT_CCONJ.coef\endcsname{0.43}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:NOUN_PUNCT_CCONJ.feature\endcsname{pos:NOUN\_PUNCT\_CCONJ}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:NOUN_PUNCT_VERB.coef\endcsname{0.27}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:NOUN_PUNCT_VERB.feature\endcsname{pos:NOUN\_PUNCT\_VERB}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PROPN_PUNCT_PUNCT.coef\endcsname{0.30}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PROPN_PUNCT_PUNCT.feature\endcsname{pos:PROPN\_PUNCT\_PUNCT}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PUNCT_CCONJ_ADJ.coef\endcsname{0.25}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PUNCT_CCONJ_ADJ.feature\endcsname{pos:PUNCT\_CCONJ\_ADJ}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PUNCT_CCONJ_DET.coef\endcsname{0.27}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PUNCT_CCONJ_DET.feature\endcsname{pos:PUNCT\_CCONJ\_DET}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PUNCT_CCONJ_NOUN.coef\endcsname{0.26}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PUNCT_CCONJ_NOUN.feature\endcsname{pos:PUNCT\_CCONJ\_NOUN}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PUNCT_VERB_PRON.coef\endcsname{0.25}
+\expandafter\def\csname r@hansard_features_llm_typical.pos:PUNCT_VERB_PRON.feature\endcsname{pos:PUNCT\_VERB\_PRON}
+\expandafter\def\csname r@hansard_features_llm_typical.pun:".coef\endcsname{0.54}
+\expandafter\def\csname r@hansard_features_llm_typical.pun:".feature\endcsname{pun:"}
+\expandafter\def\csname r@hansard_features_llm_typical.pun:,.coef\endcsname{0.40}
+\expandafter\def\csname r@hansard_features_llm_typical.pun:,.feature\endcsname{pun:,}
+\expandafter\def\csname r@hansard_features_llm_typical.pun:–.coef\endcsname{0.53}
+\expandafter\def\csname r@hansard_features_llm_typical.pun:–.feature\endcsname{pun:–}
+\expandafter\def\csname r@hansard_features_llm_typical.pun:—.coef\endcsname{1.24}
+\expandafter\def\csname r@hansard_features_llm_typical.pun:—.feature\endcsname{pun:—}
+\expandafter\def\csname r@hansard_features_llm_typical.s:mtld.coef\endcsname{0.55}
+\expandafter\def\csname r@hansard_features_llm_typical.s:mtld.feature\endcsname{s:mtld}
+\expandafter\def\csname r@hansard_features_llm_typical.s:word_len.coef\endcsname{0.47}
+\expandafter\def\csname r@hansard_features_llm_typical.s:word_len.feature\endcsname{s:word\_len}
+\expandafter\def\csname r@hansard_instrument.cv_auc_all\endcsname{0.977}
+\expandafter\def\csname r@hansard_instrument.kappa_logreg_vs_gbm\endcsname{0.23}
+\expandafter\def\csname r@hansard_instrument.mso_gbm\endcsname{3.1}
+\expandafter\def\csname r@hansard_instrument.mso_logreg\endcsname{4.3}
+\expandafter\def\csname r@hansard_instrument.n_train_per_class\endcsname{2,280}
+\expandafter\def\csname r@hansard_instrument.share_flagged_by_both\endcsname{0.9}
+\expandafter\def\csname r@hansard_instrument.spearman_scores_logreg_vs_gbm\endcsname{0.53}
+\expandafter\def\csname r@hansard_its.all.excess_at_2025-06\endcsname{1.4}
+\expandafter\def\csname r@hansard_its.all.excess_hi\endcsname{3.1}
+\expandafter\def\csname r@hansard_its.all.excess_lo\endcsname{-0.2}
+\expandafter\def\csname r@hansard_its.all.excess_se\endcsname{0.8}
+\expandafter\def\csname r@hansard_its.all.level_shift\endcsname{0.1}
+\expandafter\def\csname r@hansard_its.all.level_shift_p\endcsname{92.5}
+\expandafter\def\csname r@hansard_its.all.months\endcsname{92}
+\expandafter\def\csname r@hansard_its.all.placebo.2019-11.fake_break\endcsname{2019-11}
+\expandafter\def\csname r@hansard_its.all.placebo.2019-11.level_shift\endcsname{-0.8}
+\expandafter\def\csname r@hansard_its.all.placebo.2019-11.level_shift_p\endcsname{42.4}
+\expandafter\def\csname r@hansard_its.all.placebo.2019-11.slope_change_p\endcsname{73.9}
+\expandafter\def\csname r@hansard_its.all.placebo.2019-11.slope_change_per_year\endcsname{-0.2}
+\expandafter\def\csname r@hansard_its.all.placebo.2020-11.fake_break\endcsname{2020-11}
+\expandafter\def\csname r@hansard_its.all.placebo.2020-11.level_shift\endcsname{-1.7}
+\expandafter\def\csname r@hansard_its.all.placebo.2020-11.level_shift_p\endcsname{6.0}
+\expandafter\def\csname r@hansard_its.all.placebo.2020-11.slope_change_p\endcsname{64.4}
+\expandafter\def\csname r@hansard_its.all.placebo.2020-11.slope_change_per_year\endcsname{0.3}
+\expandafter\def\csname r@hansard_its.all.pre_slope_p\endcsname{0.197}
+\expandafter\def\csname r@hansard_its.all.pre_slope_per_year\endcsname{0.1}
+\expandafter\def\csname r@hansard_its.all.slope_change_p\endcsname{4.9}
+\expandafter\def\csname r@hansard_its.all.slope_change_per_year\endcsname{0.5}
+\expandafter\def\csname r@hansard_lomo.gemma3:12b.held_out_model\endcsname{gemma3:12b}
+\expandafter\def\csname r@hansard_lomo.gemma3:12b.mso_scored_humans\endcsname{4.3}
+\expandafter\def\csname r@hansard_lomo.gemma3:12b.recall_on_unseen_model\endcsname{94.0}
+\expandafter\def\csname r@hansard_lomo.gpt-oss:20b.held_out_model\endcsname{gpt-oss:20b}
+\expandafter\def\csname r@hansard_lomo.gpt-oss:20b.mso_scored_humans\endcsname{3.9}
+\expandafter\def\csname r@hansard_lomo.gpt-oss:20b.recall_on_unseen_model\endcsname{90.0}
+\expandafter\def\csname r@hansard_lomo.llama3.1:8b.held_out_model\endcsname{llama3.1:8b}
+\expandafter\def\csname r@hansard_lomo.llama3.1:8b.mso_scored_humans\endcsname{4.1}
+\expandafter\def\csname r@hansard_lomo.llama3.1:8b.recall_on_unseen_model\endcsname{86.6}
+\expandafter\def\csname r@hansard_lomo.mistral:7b.held_out_model\endcsname{mistral:7b}
+\expandafter\def\csname r@hansard_lomo.mistral:7b.mso_scored_humans\endcsname{4.6}
+\expandafter\def\csname r@hansard_lomo.mistral:7b.recall_on_unseen_model\endcsname{93.8}
+\expandafter\def\csname r@hansard_lomo.qwen3:8b.held_out_model\endcsname{qwen3:8b}
+\expandafter\def\csname r@hansard_lomo.qwen3:8b.mso_scored_humans\endcsname{3.9}
+\expandafter\def\csname r@hansard_lomo.qwen3:8b.recall_on_unseen_model\endcsname{76.0}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P1.auc\endcsname{1.000}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P1.model\endcsname{gemma3:12b}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P1.n\endcsname{157}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P1.prompt\endcsname{P1}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P2.auc\endcsname{0.974}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P2.model\endcsname{gemma3:12b}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P2.n\endcsname{141}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P2.prompt\endcsname{P2}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P3.auc\endcsname{0.999}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P3.model\endcsname{gemma3:12b}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P3.n\endcsname{150}
+\expandafter\def\csname r@hansard_separability.gemma3:12b/P3.prompt\endcsname{P3}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P1.auc\endcsname{1.000}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P1.model\endcsname{gpt-oss:20b}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P1.n\endcsname{150}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P1.prompt\endcsname{P1}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P2.auc\endcsname{0.940}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P2.model\endcsname{gpt-oss:20b}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P2.n\endcsname{150}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P2.prompt\endcsname{P2}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P3.auc\endcsname{1.000}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P3.model\endcsname{gpt-oss:20b}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P3.n\endcsname{150}
+\expandafter\def\csname r@hansard_separability.gpt-oss:20b/P3.prompt\endcsname{P3}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P1.auc\endcsname{0.998}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P1.model\endcsname{llama3.1:8b}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P1.n\endcsname{158}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P1.prompt\endcsname{P1}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P2.auc\endcsname{0.971}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P2.model\endcsname{llama3.1:8b}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P2.n\endcsname{156}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P2.prompt\endcsname{P2}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P3.auc\endcsname{0.995}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P3.model\endcsname{llama3.1:8b}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P3.n\endcsname{155}
+\expandafter\def\csname r@hansard_separability.llama3.1:8b/P3.prompt\endcsname{P3}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P1.auc\endcsname{0.998}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P1.model\endcsname{mistral:7b}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P1.n\endcsname{150}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P1.prompt\endcsname{P1}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P2.auc\endcsname{0.972}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P2.model\endcsname{mistral:7b}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P2.n\endcsname{150}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P2.prompt\endcsname{P2}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P3.auc\endcsname{0.999}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P3.model\endcsname{mistral:7b}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P3.n\endcsname{150}
+\expandafter\def\csname r@hansard_separability.mistral:7b/P3.prompt\endcsname{P3}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P1.auc\endcsname{0.999}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P1.model\endcsname{qwen3:8b}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P1.n\endcsname{152}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P1.prompt\endcsname{P1}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P2.auc\endcsname{0.816}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P2.model\endcsname{qwen3:8b}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P2.n\endcsname{155}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P2.prompt\endcsname{P2}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P3.auc\endcsname{0.991}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P3.model\endcsname{qwen3:8b}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P3.n\endcsname{156}
+\expandafter\def\csname r@hansard_separability.qwen3:8b/P3.prompt\endcsname{P3}
