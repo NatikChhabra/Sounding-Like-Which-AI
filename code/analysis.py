@@ -231,6 +231,9 @@ def timeseries(data, genre, by_field=False):
     save(f"{genre}_marker_vs_mso", {"corr_marker_inregion": float(pointbiserialr(s.marker, s.in_region).statistic),
                                     "share_inregion_with_marker": float(s[s.in_region == 1].marker.mean()),
                                     "share_outregion_with_marker": float(s[s.in_region == 0].marker.mean())})
+    yr = s.groupby(s.date.dt.year).agg(n=("in_region", "size"), mso=("in_region", "mean"),
+                                       marker_share=("marker", "mean")).reset_index()
+    save(f"{genre}_yearly", yr.rename(columns={"date": "group"}).assign(group=lambda d: d.group.astype(str)))
     # base (non-chat) RAID generators: does a region defined by chat models also capture them?
     base_llm = llm[~llm.model.map(CHAT)]
     if len(base_llm):
