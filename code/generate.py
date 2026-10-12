@@ -41,7 +41,7 @@ PROMPTS = {
 def chat(model, prompt, seed):
     body = {"model": model, "stream": False, "messages": [{"role": "user", "content": prompt}],
             "options": {"temperature": 0.8, "seed": seed, "num_predict": 1200}}
-    if model.startswith("qwen3"):
+    if model.startswith(("qwen3", "gemma4", "granite4")):  # thinking-capable; answer directly like the others
         body["think"] = False
     if model.startswith("gpt-oss"):
         body["think"] = "low"

@@ -400,12 +400,13 @@ PRE2022_DATA = ("raid-gpt4", "raid-llama-chat")
 # Open models whose pretraining data predate ChatGPT, run locally on the same prompts (added after review round 2;
 # kept out of every other analysis): Llama 2 chat (pretraining cutoff Sep 2022) and Vicuna (Llama + ShareGPT).
 OLD = ("llama2:7b", "vicuna:7b")
+NEW = ("gemma4:12b", "qwen3.5:9b", "granite4.2:8b")  # 2026 open models with logged decoding (vintage analysis only)
 # RAID chat outputs often summarise the paper instead of writing its abstract ("In the paper titled ...")
 SUMMARY = re.compile(r"\btitled\b|\bthe authors\b|^\s*(in )?the (paper|article|study)\b", re.I)
 
 
 def load_old(data, llm):
-    """Append the pre-ChatGPT-data open models (separate file, separate feature cache)."""
+    """Append the vintage-only open models (OLD and NEW; separate file, separate feature cache)."""
     f = Path(data) / "llm_arxiv_old.jsonl"
     if not f.exists():
         return llm
@@ -468,15 +469,17 @@ def vintage_sets(llm):
     p1 = chat[(chat.prompt == "P1") | chat.model.str.startswith("raid-")]
     sets = {f"single:{g}": p1[p1.model == g] for g in sorted(p1.model.unique())}
     old, raid_pre = chat[chat.model.isin(OLD)], chat[chat.model.isin(PRE2022_DATA)]
-    new = chat[~chat.model.isin(OLD)]  # every set below except the pre-ChatGPT-data ones is as before
+    new = chat[~chat.model.isin(OLD + NEW)]  # every set below except the vintage-only ones is as before
     raid_pre_c = chat[chat.model.isin(PRE2022_DATA + ("raid-chatgpt",))]
     sets |= {"pre2022data": raid_pre, "pre2022data_plus_chatgpt": raid_pre_c,
              "pre2022data_abstract_register": raid_pre[~raid_pre.text.str.contains(SUMMARY)],
              "raid_all": new[new.model.str.startswith("raid-")],
-             "local_p1": p1[~p1.model.str.startswith("raid-") & (p1.model != FRONTIER) & ~p1.model.isin(OLD)],
+             "local_p1": p1[~p1.model.str.startswith("raid-") & (p1.model != FRONTIER) & ~p1.model.isin(OLD + NEW)],
              "frontier_p1": p1[p1.model == FRONTIER],
              "all_no_revision": new[new.prompt != "P2"],
              "all": new}
+    if chat.model.isin(NEW).any():
+        sets |= {"open2026_p1": p1[p1.model.isin(NEW)], "all2026_p1": p1[p1.model.isin(NEW + (FRONTIER,))]}
     if len(old):
         sets |= {"old_open_p1": old[old.prompt == "P1"], "old_open_all": old,
                  "pre2022data_matched": pd.concat([old[old.prompt == "P1"], raid_pre[~raid_pre.text.str.contains(SUMMARY)]])}

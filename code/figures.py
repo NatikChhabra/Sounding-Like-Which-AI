@@ -125,7 +125,8 @@ VINTAGE = [("raid-cohere-chat", "Cohere chat", 2023), ("raid-mpt-chat", "MPT cha
            ("vicuna:7b", "Vicuna 7B v1.5", 2023), ("mistral:7b", "Mistral 7B v0.3", 2024),
            ("llama3.1:8b", "Llama 3.1 8B", 2024), ("phi4:14b", "Phi-4 14B", 2024), ("gemma3:12b", "Gemma 3 12B", 2025),
            ("qwen3:8b", "Qwen3 8B", 2025), ("granite3.3:8b", "Granite 3.3 8B", 2025), ("gpt-oss:20b", "gpt-oss 20B", 2025),
-           ("claude-opus-5.5", "2026 model", 2026)]
+           ("granite4.2:8b", "Granite 4.2 8B", 2026), ("qwen3.5:9b", "Qwen3.5 9B", 2026),
+           ("gemma4:12b", "Gemma 4 12B", 2026), ("claude-opus-5.5", "Claude (2026 model)", 2026)]
 YEAR_COLOR = {2023: "#e87ba4", 2024: "#eda100", 2025: AQUA, 2026: ORANGE}
 
 
@@ -135,7 +136,7 @@ def fig_vintage():
     fig, (a, b) = plt.subplots(1, 2, figsize=(6.6, 2.4), gridspec_kw={"width_ratios": [1, 1.25]})
     sets = [("pre2022data_matched", "Pre-ChatGPT training data", BLUE), ("raid_all", "RAID 2023 chat models", "#e87ba4"),
             ("local_p1", "Open models 2024-25", AQUA), ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", "#eda100"),
-            ("frontier_p1", "2026 model", ORANGE)]
+            ("open2026_p1", "Open models 2026", "#8b5cf6"), ("frontier_p1", "Claude (2026 model)", ORANGE)]
     for k, label, c in sets:
         if k in v.index:
             a.plot(years, [100 * v.loc[k, f"y{y}"] for y in years], color=c, lw=1.8, marker="o", ms=2.5, label=label)
