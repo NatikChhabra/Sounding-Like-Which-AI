@@ -1,4 +1,4 @@
-﻿"""All tables and figures. Usage: python analysis.py DATA_DIR {essay|arxiv|hansard|all}
+"""All tables and figures. Usage: python analysis.py DATA_DIR {essay|arxiv|hansard|all}
 
 Writes results/<genre>_*.csv|json. Every number in the paper must come from these files.
 """
