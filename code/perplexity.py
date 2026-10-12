@@ -14,6 +14,22 @@ import features
 MODEL = "Qwen/Qwen2.5-0.5B"
 
 
+def scorer():
+    """Returns f(texts) -> list of mean token negative log-likelihoods (same cleaning as the main run)."""
+    torch.set_num_threads(6)
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    lm = AutoModelForCausalLM.from_pretrained(MODEL, torch_dtype=torch.float32).eval()
+
+    def f(texts):
+        out = []
+        with torch.no_grad():
+            for t in texts:
+                ids = tok(features.clean(t), return_tensors="pt", truncation=True, max_length=512).input_ids
+                out.append(lm(ids, labels=ids).loss.item() if ids.shape[1] >= 5 else float("nan"))
+        return out
+    return f
+
+
 def main(data):
     data = Path(data)
     human = pd.read_parquet(data / "human_essay.parquet")

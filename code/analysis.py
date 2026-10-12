@@ -154,8 +154,7 @@ def essay(data):
                                                     [ci_row(g, pe[(s.group == g).values]) for g in ("ELL", "non-ELL")]))
     save("essay_embedding_auc", {"heldout_auc": roc_auc_score(yte, clf.predict_proba(Xte)[:, 1])})
     # Liang et al. 2023 human essays, out of genre (reported as such, not as a learner test)
-    lg = pd.read_json(Path(data) / "learner/liang_toefl_all_data.json")
-    lg = lg[(lg.kind == "Human-Written") & lg.name.isin(["Real TOEFL", "Real College Essays"])]
+    lg = liang_essays(data)
     pl = score(features.extract(lg.text.tolist()))
     save("essay_liang", pd.DataFrame([ci_row(g, pl[(lg.name == g).values]) for g in sorted(lg.name.unique())]))
 
@@ -188,6 +187,24 @@ def essay_perplexity(data):
                                        "or_hi": float(np.exp(ci[1])), "p_value": float(f.pvalues["ell"]),
                                        "mean_logppl_ell": float(s[s.ell == 1].lp.mean()),
                                        "mean_logppl_nonell": float(s[s.ell == 0].lp.mean())})
+    # Liang et al. (2023) original contrast, out of genre: TOEFL essays vs US 8th-grade essays
+    import perplexity
+    lg = liang_essays(data)
+    lp = np.array(perplexity.scorer()(lg.text.tolist()))
+    pl = clf.predict_proba(lp.reshape(-1, 1))[:, 1]
+    save("essay_liang_perplexity", pd.DataFrame([{**ci_row(g, pl[(lg.name == g).values]),
+                                                  "mean_logppl": float(np.nanmean(lp[(lg.name == g).values]))}
+                                                 for g in sorted(lg.name.unique())]))
+
+
+def liang_essays(data):
+    """Human essays released by Liang et al. (2023): TOEFL and US college essays (HF copy) plus the US 8th-grade
+    essays (authors' GitHub repository)."""
+    lg = pd.read_json(Path(data) / "learner/liang_toefl_all_data.json")
+    lg = lg[(lg.kind == "Human-Written") & lg.name.isin(["Real TOEFL", "Real College Essays"])][["name", "text"]]
+    us8 = pd.DataFrame({"name": "Real US 8th grade",
+                        "text": [r["document"] for r in json.loads((Path(data) / "learner/liang_us8th.json").read_text(encoding="utf-8"))]})
+    return pd.concat([lg, us8], ignore_index=True)
 
 
 # ----------------------------------------------------------------------------------------- time series

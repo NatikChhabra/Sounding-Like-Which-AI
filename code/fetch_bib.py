@@ -25,6 +25,22 @@ def doi_entry(key, doi):
     return bib, (title.group(1) if title else "?"), (year.group(1) if year else "?"), "https://doi.org/" + doi
 
 
+def bib_entry(key, url):
+    """Raw BibTeX served by the official venue page (ACL Anthology, NeurIPS/ICLR proceedings, PMLR)."""
+    import html
+    bib = get(url).strip()
+    if not bib.startswith("@"):  # PMLR embeds the BibTeX in the paper's HTML page
+        m = re.search(r"(@\w+\{[^@]*?\n\})", html.unescape(re.sub(r"<[^>]+>", "", bib)))
+        if not m:
+            raise ValueError(f"no BibTeX at {url}")
+        bib = m.group(1).strip()
+    bib = re.sub(r"^@(\w+)\s*\{[^,]*,", lambda m: f"@{m.group(1)}{{{key},", bib, count=1)
+    bib = re.sub(r"(?<!\\)&", r"\\&", bib)
+    title = re.search(r"(?<![a-z])title\s*=\s*[{\"](.+?)[}\"],", bib, re.S)
+    year = re.search(r"year\s*=\s*[{\"]?(\d{4})", bib)
+    return bib, (title.group(1) if title else "?"), (year.group(1) if year else "?"), url.rsplit(".bib", 1)[0]
+
+
 def arxiv_entry(key, aid):
     e = ET.fromstring(get("http://export.arxiv.org/api/query?" + urllib.parse.urlencode({"id_list": aid})))
     e = e.find("a:entry", NS)
@@ -32,11 +48,29 @@ def arxiv_entry(key, aid):
     if not title or title == "Error":
         raise ValueError(f"arXiv id {aid} not found")
     authors = " and ".join(a.findtext("a:name", "", NS) for a in e.iterfind("a:author", NS))
-    year = e.findtext("a:published", "", NS)[:4]
+    # an explicitly versioned id (e.g. 2409.01754v4) cites that version, so use its date
+    year = e.findtext("a:updated" if re.search(r"v\d+$", aid) else "a:published", "", NS)[:4]
     bib = (f"@misc{{{key},\n  title = {{{title}}},\n  author = {{{authors}}},\n  year = {{{year}}},\n"
            f"  eprint = {{{aid}}},\n  archivePrefix = {{arXiv}},\n  url = {{https://arxiv.org/abs/{aid}}}\n}}")
     time.sleep(3)
     return bib, title, year, f"https://arxiv.org/abs/{aid}"
+
+
+PROPER = {"Wikipedia", "Australian", "English", "Hansard", "Parliamentary", "Debates", "Bayes", "Korean",
+          "Binoculars", "Coevolution"}
+
+
+def tidy(bib):
+    """ACL's style lower-cases titles: brace acronyms (>=2 capitals, e.g. ChatGPT, LLMs, AI) and proper nouns so
+    they survive; give page ranges a LaTeX en dash."""
+    def protect(m):
+        words = re.split(r"(\s+)", m.group(2))
+        out = [w if ("{" in w or not (len(re.findall(r"[A-Z]", w)) >= 2 or w.strip(".,:;?!()") in PROPER))
+               else "{" + w + "}" for w in words]
+        return m.group(1) + "".join(out) + m.group(3)
+    # title = {...} with at most one level of nested braces; works for one-line (Crossref) and multi-line entries
+    bib = re.sub(r"((?<![a-z])title\s*=\s*\{)((?:[^{}]|\{[^{}]*\})*)(\})", protect, bib)
+    return re.sub(r"(pages\s*=\s*\{\s*\d+)\s*[–—-]+\s*(\d+)", r"\1--\2", bib)
 
 
 def main(src):
@@ -47,8 +81,8 @@ def main(src):
         key, ident = line.split()[:2]
         kind, val = ident.split(":", 1)
         try:
-            bib, title, year, url = (doi_entry if kind == "doi" else arxiv_entry)(key, val)
-            bibs.append(bib)
+            bib, title, year, url = {"doi": doi_entry, "arxiv": arxiv_entry, "bib": bib_entry}[kind](key, val)
+            bibs.append(tidy(bib))
             rows.append(f"- [ ] `{key}` ({year}) [{title}]({url})")
         except Exception as ex:  # unresolvable = must not be cited
             rows.append(f"- [ ] `{key}` **FAILED TO RESOLVE ({ident}): {ex}** — do not cite until fixed")
