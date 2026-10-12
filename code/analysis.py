@@ -217,6 +217,20 @@ def timeseries(data, genre, by_field=False):
         from scipy.stats import chi2_contingency
         chi2, pv, dof, _ = chi2_contingency(tab)
         tests["baseline_field_heterogeneity"] = {"chi2": chi2, "dof": dof, "p": pv}
+    # comparison with the lexical approach of prior work: share of documents using any marker word.
+    # Markers only from verified sources: Kobak et al. 2025 (delves, underscores, showcasing), Gray 2024
+    # (meticulously, intricate, commendable), Yakura et al. 2024 (boast, intricacies).
+    MARK = r"\b(delv(e|es|ed|ing)|underscor(e|es|ed|ing)|showcas(e|es|ed|ing)|meticulous(ly)?|intricate|" \
+           r"intricac(y|ies)|commendabl(e|y)|boast(s|ed|ing)?)\b"
+    s["marker"] = s.text.str.contains(MARK, case=False, regex=True).astype(int)
+    mm = s.groupby(s.date.dt.to_period("M")).agg(n=("marker", "size"), mso=("marker", "mean")).reset_index()
+    mm = mm.rename(columns={"date": "month"})
+    save(f"{genre}_marker_monthly", mm)
+    save(f"{genre}_marker_its", segmented(mm))
+    from scipy.stats import pointbiserialr
+    save(f"{genre}_marker_vs_mso", {"corr_marker_inregion": float(pointbiserialr(s.marker, s.in_region).statistic),
+                                    "share_inregion_with_marker": float(s[s.in_region == 1].marker.mean()),
+                                    "share_outregion_with_marker": float(s[s.in_region == 0].marker.mean())})
     # base (non-chat) RAID generators: does a region defined by chat models also capture them?
     base_llm = llm[~llm.model.map(CHAT)]
     if len(base_llm):
@@ -231,6 +245,34 @@ def timeseries(data, genre, by_field=False):
     save(f"{genre}_baseline_pre2022", pd.DataFrame(base))
     save(f"{genre}_its", tests)
     return tests
+
+
+def latex_paragraphs(path):
+    """Plain-text paragraphs (>= 50 words) of the paper's own prose, LaTeX stripped."""
+    import re
+    t = Path(path).read_text(encoding="utf-8")
+    t = t.split(r"\begin{document}", 1)[1].split(r"\bibliography", 1)[0]
+    t = re.sub(r"(?<!\\)%.*", "", t).replace(r"\%", "%").replace(r"\S", "Section ")
+    t = re.sub(r"\\(cite[tp]?|citealp|ref|label|R)\{[^}]*\}", "X", t)
+    t = re.sub(r"\\(section|subsection|paragraph)\*?\{([^}]*)\}", r"\n\n", t)
+    t = re.sub(r"\$[^$]*\$", "X", t)
+    t = re.sub(r"\\begin\{equation\}.*?\\end\{equation\}", " ", t, flags=re.S)
+    t = re.sub(r"\\(begin|end)\{[^}]*\}", " ", t).replace(r"\mso{}", "MSO").replace("``", '"').replace("''", '"')
+    t = re.sub(r"\\item\s*", "", t)
+    t = re.sub(r"\\[a-zA-Z]+\*?(\[[^\]]*\])?", "", t).replace("{", "").replace("}", "").replace("~", " ")
+    return [" ".join(p.split()) for p in re.split(r"\n\s*\n", t) if len(p.split()) >= 50]
+
+
+def selftest(data):
+    """Score this paper's own prose with the arXiv instrument; compare with human cs abstracts from 2026."""
+    human, llm = mso.load(data, "arxiv")
+    score = region(human, llm, "arxiv_selftest")
+    paras = latex_paragraphs(Path(__file__).resolve().parent.parent / "paper" / "main.tex")
+    p = score(features.extract(paras))
+    cs26 = human[(human.pool == "score") & (human.group == "cs") & (human.date >= "2026-01-01")]
+    save("selftest", {"n_paragraphs": len(paras), "share_paragraphs_in_region": float((p >= 0.5).mean()),
+                      "median_p_paper": float(np.median(p)), "mso_cs_2026_humans": float((score(list(cs26.f)) >= 0.5).mean()),
+                      "n_cs_2026": len(cs26)})
 
 
 def control():
@@ -248,6 +290,6 @@ def control():
 if __name__ == "__main__":
     data, which = sys.argv[1], sys.argv[2]
     jobs = {"essay": lambda: essay(data), "arxiv": lambda: timeseries(data, "arxiv", by_field=True),
-            "hansard": lambda: timeseries(data, "hansard"), "control": control}
+            "hansard": lambda: timeseries(data, "hansard"), "control": control, "selftest": lambda: selftest(data)}
     for j in (jobs if which == "all" else [which]):
         jobs[j]()

@@ -8,6 +8,7 @@ import pandas as pd
 
 RES = Path(__file__).resolve().parent.parent / "results"
 PCT = ("mso", "recall", "share", "excess", "level_shift", "slope_change", "pre_slope", "lo", "hi", "difference")
+# note: "corr_*" keys are correlations (2 dp), handled by the default branch
 KEYCOLS = ("group", "held_out_model", "feature", "fake_break")
 
 

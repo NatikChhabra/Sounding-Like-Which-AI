@@ -22,8 +22,8 @@ plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.edgecolor": M
                      "legend.frameon": False, "pdf.fonttype": 42})
 
 
-def its_panel(ax, genre, color, label):
-    m = pd.read_csv(RES / f"{genre}_monthly.csv")
+def its_panel(ax, name, color, label, ylabel="MSO (% of human docs in LLM region)"):
+    m = pd.read_csv(RES / f"{name}.csv")
     m["month"] = pd.PeriodIndex(m.month, freq="M")
     t = np.array([(p - T0).n for p in m.month])
     x = m.month.dt.to_timestamp()
@@ -35,16 +35,20 @@ def its_panel(ax, genre, color, label):
     ax.plot(x, roll, color=color, lw=2, label="6-month mean")
     ax.axvline(T0.to_timestamp(), color=INK, lw=0.6)
     ax.text(T0.to_timestamp(), ax.get_ylim()[1], " ChatGPT", color=INK, va="top", fontsize=7)
-    ax.set_ylabel("MSO (% of human docs in LLM region)")
-    ax.legend(loc="upper left", fontsize=6.5)
+    ax.set_ylabel(ylabel)
+    ax.legend(loc="upper left", fontsize=6)
 
 
 def fig_timeseries():
-    fig, axes = plt.subplots(1, 2, figsize=(6.3, 2.3), sharex=True)
-    its_panel(axes[0], "arxiv", BLUE, "arXiv abstracts")
-    axes[0].set_title("arXiv abstracts (treatment)", fontsize=8, color=INK, loc="left")
-    its_panel(axes[1], "hansard", ORANGE, "Hansard speech")
-    axes[1].set_title("Australian parliamentary speech (control)", fontsize=8, color=INK, loc="left")
+    fig, axes = plt.subplots(1, 3, figsize=(6.6, 2.3), sharex=True)
+    its_panel(axes[0], "arxiv_monthly", BLUE, "arXiv")
+    axes[0].set_title("(a) MSO, arXiv abstracts", fontsize=8, color=INK, loc="left")
+    its_panel(axes[1], "hansard_monthly", ORANGE, "Hansard")
+    axes[1].set_title("(b) MSO, parliamentary speech", fontsize=8, color=INK, loc="left")
+    its_panel(axes[2], "arxiv_marker_monthly", AQUA, "arXiv", ylabel="% of abstracts with a marker word")
+    axes[2].set_title("(c) Marker words, arXiv", fontsize=8, color=INK, loc="left")
+    for ax in axes:
+        ax.tick_params(axis="x", labelrotation=45, labelsize=6.5)
     fig.tight_layout()
     fig.savefig(FIG / "timeseries.pdf")
 
