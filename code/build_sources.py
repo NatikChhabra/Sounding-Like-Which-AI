@@ -23,20 +23,27 @@ def split(df, frac=0.5, seed=0):
 
 def essay(d):
     p = pd.read_csv(d / "learner/persuade_2.0_train.csv",
-                    usecols=["essay_id", "full_text", "prompt_name", "ell_status", "grade_level"])
+                    usecols=["essay_id", "full_text", "prompt_name", "ell_status", "grade_level", "holistic_essay_score"])
     p = p.drop_duplicates("essay_id").dropna(subset=["full_text"])
     p = p[p.ell_status.isin(["Yes", "No"])]
     return split(pd.DataFrame({
         "id": "persuade:" + p.essay_id.astype(str), "genre": "essay", "title": p.prompt_name,
         "text": p.full_text, "date": pd.Timestamp("2019-01-01"),  # PERSUADE essays are pre-2020
-        "group": np.where(p.ell_status == "Yes", "ELL", "non-ELL"), "grade": p.grade_level}))
+        "group": np.where(p.ell_status == "Yes", "ELL", "non-ELL"), "grade": p.grade_level,
+        "score": p.holistic_essay_score}))
 
 
 def arxiv(d):
-    a = pd.read_json(d / "arxiv/sample.jsonl", lines=True).drop_duplicates("id")
+    a = pd.read_json(d / "arxiv_v2/sample.jsonl", lines=True).drop_duplicates("id")
+    pub = pd.to_datetime(a.published).dt.tz_localize(None)
+    upd = pd.to_datetime(a.updated).dt.tz_localize(None)
+    # the API returns the LATEST abstract version: a paper first submitted before the cutoff but revised after
+    # it may carry post-ChatGPT text, so it cannot stand for pre-LLM writing and is dropped
+    keep = ~((pub < CUTOFF) & (upd >= CUTOFF))
+    a, pub = a[keep], pub[keep]
     return split(pd.DataFrame({
-        "id": "arxiv:" + a.id, "genre": "arxiv", "title": a.title, "text": a.abstract,
-        "date": pd.to_datetime(a.published).dt.tz_localize(None), "group": a.field}))
+        "id": "arxiv:" + a.id.str.replace(r"v\d+$", "", regex=True), "genre": "arxiv", "title": a.title,
+        "text": a.abstract, "date": pub, "group": a.field}))
 
 
 def hansard(d, per_month=150, seed=0):
@@ -64,6 +71,11 @@ if __name__ == "__main__":
     assert df.id.is_unique, "document ids must be unique (feature cache is keyed by id)"
     if "grp" not in df:
         df["grp"] = df.id
+    llm_file = d / f"llm_{genre}.jsonl"
+    if llm_file.exists():  # documents that seeded LLM prompts must never be measured
+        seeds = set(pd.read_json(llm_file, lines=True).src_id.str.replace(r"v\d+$", "", regex=True))
+        df.loc[df.id.isin(seeds) & (df.date < CUTOFF), "pool"] = "train"
+        df = df[~(df.id.isin(seeds) & (df.date >= CUTOFF))]
     df.to_parquet(d / f"human_{genre}.parquet", index=False)
     df[df.pool == "train"].to_parquet(d / f"seed_{genre}.parquet", index=False)
     print(genre, len(df), "docs;", (df.pool == "train").sum(), "train pool")

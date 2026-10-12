@@ -32,6 +32,23 @@ _WRAPPER = re.compile(r"^\W*(here'?s|here is|below is|sure|okay|certainly|of cou
 _NOTE = re.compile(r"^\s*(\*?\(?note|word count|i hope|let me know)", re.I)
 
 
+_MATH = re.compile(r"\$\$.*?\$\$|\$[^$]*\$|\\\(.*?\\\)|\\\[.*?\\\]", re.S)
+_KEEP = re.compile(r"\\(emph|textit|textbf|textsc|texttt|textrm|mathrm|text|it|bf)\s*\{([^{}]*)\}")
+
+
+def delatex(text):
+    """Map LaTeX conventions (common in human arXiv abstracts, rare in LLM output) to plain typography so
+    the instrument cannot separate human from LLM text by encoding: math -> 'X', '---'/'--' -> em/en dash,
+    formatting commands -> their content, other commands removed."""
+    text = _MATH.sub(" X ", text)
+    text = text.replace("---", "\u2014").replace("--", "\u2013")
+    text = _KEEP.sub(r"\2", text)
+    text = re.sub(r"\\(cite[tp]?|ref|url|label)\{[^}]*\}", "", text)
+    text = re.sub(r"\\[a-zA-Z]+\*?", "", text).replace("~", " ").replace("``", '"').replace("''", '"')
+    text = re.sub(r"\\([%&_#$])", r"\1", text)  # escaped symbols: \% -> %
+    return text.replace("{", "").replace("}", "")
+
+
 def unwrap(text):
     """Drop chat wrappers: 'Here's the essay:' intro, '---' rules, markdown headings,
     all-bold title lines, trailing notes. Applied to human text too (rarely matches)."""
@@ -51,7 +68,7 @@ def unwrap(text):
 
 def clean(text):
     """Strip wrappers, markdown and labels so formatting artefacts can't give LLM text away."""
-    text = unwrap(text)
+    text = delatex(unwrap(text))  # unwrap first: a markdown '---' rule is not a dash
     for pat, rep in _MD:
         text = pat.sub(rep, text)
     words = text.split()
@@ -114,6 +131,8 @@ if __name__ == "__main__":
     g2 = "Okay, here's an essay responding to the prompt, aiming for a student voice.\n\nCars are bad."
     assert clean(g2) == "Cars are bad.", clean(g2)
     assert clean("Here we present a method.\n\nIt works.").startswith("Here we")  # human abstracts kept
+    h = r"We prove that $f(x)\le 1$ --- a \emph{sharp} bound~\cite{a} --- holds for $n$--$m$ pairs."
+    assert clean(h) == "We prove that X — a sharp bound — holds for X – X pairs.", clean(h)
     g3 = "**Abstract**  \nLong‑document work. We introduce *Sparse Attention* (SA), 2 * 3 = 6."
     assert clean(g3) == "Long-document work. We introduce Sparse Attention (SA), 2 * 3 = 6.", clean(g3)
     feats = extract([a, "The cat sat on the mat. It was happy, and so was I."], n_process=1)

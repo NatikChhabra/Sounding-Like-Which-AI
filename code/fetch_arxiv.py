@@ -1,22 +1,27 @@
 """Stratified random sample of arXiv abstracts, 2015-01 to 2026-09, via the arXiv API.
 
-For each (field, month): one random window of WINDOW[field] consecutive days, up to 400 papers whose
-PRIMARY category is in the field. Window length scales with field size so cells reach ~150 papers.
-Resumable: finished cells are listed in done.txt. Usage: python fetch_arxiv.py OUT_DIR
+For each (field, month): one random window of WINDOW[field] consecutive days. ALL papers in the window are
+fetched (paginated), papers whose primary category is outside the field are dropped, and PER_CELL papers are
+drawn uniformly at random, so every field-month cell has the same design weight and no part of the window is
+favoured (v1 of this script kept only the first 400 results, which truncated recent cs windows to papers
+submitted early in the day). Both the v1 submission date (`published`) and last-revision date (`updated`)
+are recorded. Resumable via done.txt. Usage: python fetch_arxiv.py OUT_DIR
 """
 import calendar, json, random, sys, time, urllib.error, urllib.parse, urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 API = "http://export.arxiv.org/api/query"
-NS = {"a": "http://www.w3.org/2005/Atom", "x": "http://arxiv.org/schemas/atom"}
+NS = {"a": "http://www.w3.org/2005/Atom", "x": "http://arxiv.org/schemas/atom",
+      "o": "http://a9.com/-/spec/opensearch/1.1/"}
 WINDOW = {"cs": 2, "math": 3, "astro-ph": 4, "cond-mat": 4, "stat": 6, "eess": 6, "q-bio": 12, "econ": 15}
 MONTHS = [(y, m) for y in range(2015, 2027) for m in range(1, 13) if (y, m) <= (2026, 9)]
+PER_CELL, PAGE = 200, 500
 
 
-def query(field, start, end):
+def query(field, start, end, offset):
     q = f"cat:{field}.* AND submittedDate:[{start}0000 TO {end}2359]"
-    url = API + "?" + urllib.parse.urlencode({"search_query": q, "max_results": 400,
+    url = API + "?" + urllib.parse.urlencode({"search_query": q, "start": offset, "max_results": PAGE,
                                                "sortBy": "submittedDate", "sortOrder": "ascending"})
     for attempt in range(8):
         try:
@@ -24,7 +29,32 @@ def query(field, start, end):
                 return ET.fromstring(r.read())
         except (urllib.error.URLError, TimeoutError, ET.ParseError):
             time.sleep(15 * (attempt + 1))
-    return None  # caller skips the cell without marking it done; a rerun retries it
+    return None
+
+
+def fetch_window(field, start, end):
+    """All entries in the window (list of dicts) or None if the API kept failing."""
+    rows, offset, total = [], 0, None
+    while total is None or offset < total:
+        root = query(field, start, end, offset)
+        time.sleep(3.1)  # arXiv API terms: max 1 request / 3 s
+        if root is None:
+            return None
+        total = int(root.findtext("o:totalResults", "0", NS))
+        entries = root.findall("a:entry", NS)
+        if not entries and offset < total:
+            return None  # API returned an empty page mid-window: treat as failure, retry cell later
+        for e in entries:
+            prim = e.find("x:primary_category", NS)
+            prim = prim.get("term") if prim is not None else ""
+            if prim.startswith(field + "."):
+                rows.append({"id": e.findtext("a:id", "", NS).rsplit("/abs/", 1)[-1], "field": field,
+                             "primary": prim, "published": e.findtext("a:published", "", NS),
+                             "updated": e.findtext("a:updated", "", NS),
+                             "title": " ".join(e.findtext("a:title", "", NS).split()),
+                             "abstract": " ".join(e.findtext("a:summary", "", NS).split())})
+        offset += PAGE
+    return rows
 
 
 def main(out):
@@ -42,28 +72,16 @@ def main(out):
             last = calendar.monthrange(y, m)[1]
             d0 = min(d0, max(1, last - WINDOW[field] + 1))
             d1 = min(last, d0 + WINDOW[field] - 1)
-            root = query(field, f"{y}{m:02d}{d0:02d}", f"{y}{m:02d}{d1:02d}")
-            if root is None:
+            rows = fetch_window(field, f"{y}{m:02d}{d0:02d}", f"{y}{m:02d}{d1:02d}")
+            if rows is None:
                 print(cell, "FAILED, will retry on rerun", flush=True)
                 continue
-            n = 0
-            for e in root.iterfind("a:entry", NS):
-                prim = e.find("x:primary_category", NS)
-                prim = prim.get("term") if prim is not None else ""
-                if not prim.startswith(field + "."):
-                    continue  # cross-list from another field
-                fo.write(json.dumps({
-                    "id": e.findtext("a:id", "", NS).rsplit("/abs/", 1)[-1],
-                    "field": field, "primary": prim, "published": e.findtext("a:published", "", NS),
-                    "title": " ".join(e.findtext("a:title", "", NS).split()),
-                    "abstract": " ".join(e.findtext("a:summary", "", NS).split()),
-                }) + "\n")
-                n += 1
+            pick = random.Random(f"{cell}").sample(rows, min(PER_CELL, len(rows)))
+            fo.writelines(json.dumps(r) + "\n" for r in pick)
             fo.flush()
             with done_f.open("a") as f:
                 f.write(cell + "\n")
-            print(cell, n, flush=True)
-            time.sleep(3.1)  # arXiv API terms: max 1 request / 3 s
+            print(cell, len(rows), "->", len(pick), flush=True)
 
 
 if __name__ == "__main__":

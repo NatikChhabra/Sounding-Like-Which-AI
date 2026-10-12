@@ -21,6 +21,14 @@ from sklearn.preprocessing import StandardScaler
 import features
 
 SEED = 0
+EXCLUDE = ()  # feature-name prefixes to drop (ablations), e.g. ("pun:—", "pun:–")
+
+
+def _mask(vec, Xv):
+    """Keep features present in >=1% of training docs and not excluded by an ablation."""
+    names = np.array(vec.feature_names_)
+    return ((Xv != 0).mean(0) >= 0.01) & ~np.array([n.startswith(EXCLUDE) for n in names]) if EXCLUDE \
+        else (Xv != 0).mean(0) >= 0.01
 
 
 def load(data, genre):
@@ -28,6 +36,8 @@ def load(data, genre):
     data = Path(data)
     human = pd.read_parquet(data / f"human_{genre}.parquet")
     llm = pd.read_json(data / f"llm_{genre}.jsonl", lines=True)
+    if genre == "arxiv":  # v1 sample ids carried a version suffix; v2 ids do not
+        llm["src_id"] = llm.src_id.str.replace(r"v\d+$", "", regex=True)
     llm["id"] = llm.src_id + "|" + llm.model + "|" + llm.prompt
     llm["id"] = llm.id + "|" + llm.groupby("id").cumcount().astype(str)  # unique even if a source repeats
     extra = data / f"raid_{genre}.jsonl"  # commercial-model outputs, if available
@@ -56,12 +66,12 @@ def cached_features(df, cache):
     return df
 
 
-def make_model(kind="logreg"):
+def make_model(kind="logreg", cv=5):
     if kind == "logreg":
         base = make_pipeline(StandardScaler(), LogisticRegression(C=0.1, max_iter=3000))
     else:
         base = HistGradientBoostingClassifier(max_iter=300, learning_rate=0.05, random_state=SEED)
-    return CalibratedClassifierCV(base, method="isotonic", cv=5)
+    return CalibratedClassifierCV(base, method="isotonic", cv=cv)
 
 
 PER_MODEL = 450  # = 3 prompts x 150 for each local model; equal weight per generator (pre-registered)
@@ -77,16 +87,20 @@ def training_set(human, llm, exclude_model=None):
     L = L.sample(n=len(H), random_state=SEED)
     X = list(H.f) + list(L.f)
     y = np.r_[np.zeros(len(H)), np.ones(len(L))]
-    # a polished text shares a group with its human source; Hansard groups are speakers
-    groups = list(H.grp if "grp" in H else H.id) + list(L.src_id)
+    # a revised text shares a group with its human source; Hansard groups are speakers
+    id2grp = dict(zip(human.id, human.grp)) if "grp" in human else {}
+    groups = list(H.grp if "grp" in H else H.id) + [id2grp.get(s, s) for s in L.src_id]
     return X, y, groups, L
 
 
-def fit(X, y, kind="logreg"):
+def fit(X, y, kind="logreg", groups=None):
+    """Calibrated classifier; with `groups`, calibration folds are grouped too (no source/revision or
+    speaker split across calibration folds)."""
     vec = DictVectorizer(sparse=False)
     Xv = np.nan_to_num(vec.fit_transform(X))
-    keep = (Xv != 0).mean(0) >= 0.01  # drop features present in <1% of training docs
-    model = make_model(kind).fit(Xv[:, keep], y)
+    keep = _mask(vec, Xv)
+    cv = list(GroupKFold(5).split(Xv, y, groups)) if groups is not None else 5
+    model = make_model(kind, cv).fit(Xv[:, keep], y)
 
     def score(F, chunk=5000):  # chunked: scoring 100k+ docs at once does not fit in memory
         F = list(F)
@@ -98,7 +112,7 @@ def fit(X, y, kind="logreg"):
 def cv_auc(X, y, groups, kind="logreg"):
     vec = DictVectorizer(sparse=False)
     Xv = np.nan_to_num(vec.fit_transform(X))
-    Xv = Xv[:, (Xv != 0).mean(0) >= 0.01]
+    Xv = Xv[:, _mask(vec, Xv)]
     p = cross_val_predict(make_model(kind), Xv, y, groups=groups, cv=GroupKFold(5), method="predict_proba")[:, 1]
     return roc_auc_score(y, p), p
 
