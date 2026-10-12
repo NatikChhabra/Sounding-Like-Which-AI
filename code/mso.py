@@ -29,6 +29,7 @@ def load(data, genre):
     human = pd.read_parquet(data / f"human_{genre}.parquet")
     llm = pd.read_json(data / f"llm_{genre}.jsonl", lines=True)
     llm["id"] = llm.src_id + "|" + llm.model + "|" + llm.prompt
+    llm["id"] = llm.id + "|" + llm.groupby("id").cumcount().astype(str)  # unique even if a source repeats
     extra = data / f"raid_{genre}.jsonl"  # commercial-model outputs, if available
     if extra.exists():
         r = pd.read_json(extra, lines=True)
@@ -71,7 +72,8 @@ def training_set(human, llm, exclude_model=None):
     L = L.sample(n=len(H), random_state=SEED)
     X = list(H.f) + list(L.f)
     y = np.r_[np.zeros(len(H)), np.ones(len(L))]
-    groups = list(H.id) + list(L.src_id)  # a polished text and its human source share a group
+    # a polished text shares a group with its human source; Hansard groups are speakers
+    groups = list(H.grp if "grp" in H else H.id) + list(L.src_id)
     return X, y, groups, L
 
 
