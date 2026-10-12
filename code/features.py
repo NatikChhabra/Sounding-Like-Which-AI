@@ -123,7 +123,7 @@ def doc_features(doc):
     return out
 
 
-def extract(texts, n_process=5):
+def extract(texts, n_process=3):  # 3 workers: 5 plus a GPU job preceded a system crash on this machine
     nlp = spacy.load("en_core_web_sm", disable=["ner", "lemmatizer"])
     docs = nlp.pipe((clean(t) for t in texts), batch_size=200, n_process=n_process)
     return [doc_features(d) for d in docs]
