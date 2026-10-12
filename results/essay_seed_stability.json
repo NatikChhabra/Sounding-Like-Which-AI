@@ -1,0 +1,17 @@
+{
+  "n_seeds": 10,
+  "mso_all_min": 0.03017241379310345,
+  "mso_all_median": 0.03293372844827586,
+  "mso_all_max": 0.03771551724137931,
+  "mso_ell_min": 0.012012012012012012,
+  "mso_ell_median": 0.016516516516516516,
+  "mso_ell_max": 0.02252252252252252,
+  "mso_nonell_min": 0.0315182006510802,
+  "mso_nonell_median": 0.034477656111275526,
+  "mso_nonell_max": 0.03965670316661734,
+  "odds_ratio_min": 0.4155290658805288,
+  "odds_ratio_median": 0.560172156462321,
+  "odds_ratio_max": 0.8744388536081275,
+  "share_seeds_p_below_05": 0.3,
+  "share_seeds_ell_lower": 1.0
+}
