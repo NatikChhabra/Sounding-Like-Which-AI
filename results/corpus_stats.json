@@ -1,0 +1,18 @@
+{
+  "arxiv_n_docs": 131448,
+  "arxiv_n_train": 39829,
+  "arxiv_n_score": 91619,
+  "arxiv_n_llm_local": 3600,
+  "arxiv_n_generators_local": 8,
+  "hansard_n_docs": 13725,
+  "hansard_n_train": 5139,
+  "hansard_n_score": 8586,
+  "hansard_n_llm_local": 3630,
+  "hansard_n_generators_local": 8,
+  "essay_n_docs": 14797,
+  "essay_n_train": 7373,
+  "essay_n_score": 7424,
+  "essay_n_llm_local": 3600,
+  "essay_n_generators_local": 8,
+  "arxiv_n_fields": 8
+}

@@ -13,8 +13,9 @@
 \input{../results/numbers.tex}
 \newcommand{\TODO}[1]{\textcolor{red}{[TODO: #1]}}
 \newcommand{\mso}{\textsc{mso}}
+\newcommand{\pp}{\,pp}
 
-\title{Sounding Like AI Before AI: Machine-Style Overlap in Human Writing}
+\title{After the Delve Fades: Scientific Abstracts Keep Moving Toward LLM Style}
 
 \author{Anonymous submission}
 
@@ -22,51 +23,59 @@
 \maketitle
 
 \begin{abstract}
-Corpus studies of large language models (LLMs) ask how much text was written with LLM help. We ask how much
-\emph{human} writing is stylistically indistinguishable from LLM output, regardless of who wrote it, and how
-much of that overlap predates LLMs. We define \textbf{Machine-Style Overlap} (\mso{}): the share of a genre's
-documents whose topic-robust style features are at least as typical of LLM output as of pre-LLM human writing.
-For pre-LLM text, \mso{} is the human half of a Bayes error, so the ``false positives'' that prevalence studies
-subtract are a population property. In 159k arXiv abstracts (2015--2026), \R{arxiv_baseline_pre2022.all.mso}\%
-of pre-ChatGPT abstracts already sat in the LLM region, ranging from \R{arxiv_baseline_pre2022.astro-ph.mso}\%
-in astrophysics to \R{arxiv_baseline_pre2022.econ.mso}\% in economics. After November 2022, \mso{} rose
-\R{arxiv_its.all.excess_at_2025-06} points above its pre-2022 trend, versus \R{hansard_its.all.excess_at_2025-06}
-points in parliamentary speech; the rise is largest in computer science and smallest in mathematics. Marker
-words such as \emph{delve} rose and then fell back towards baseline, while \mso{} stayed high. Among
-pre-LLM student essays, English-language learners are \emph{less} machine-like than their peers, the opposite
-of the bias reported for perplexity-based detectors. Whether text ``sounds like AI'' depends on the instrument
-asking, and for scientific prose the answer has changed more than word counts suggest.
+Corpus studies of LLM-assisted writing estimate how much text was produced with large language model (LLM)
+help. We ask a complementary question: how much writing, whoever wrote it, falls on the LLM side of a
+stylistic boundary, and how much already did before ChatGPT. We define \textbf{Machine-Style Overlap}
+(\mso{}), the share of a genre's documents that a calibrated classifier on content-word-free style features
+places at least as close to LLM output as to pre-ChatGPT human writing. In \R{corpus_stats.arxiv_n_docs} arXiv
+abstracts (2015--2026), \mso{} was \R{arxiv_baseline_pre2022.all.mso}\% before ChatGPT, varying from
+\R{arxiv_baseline_pre2022.astro-ph.mso}\% in astrophysics to \R{arxiv_baseline_pre2022.econ.mso}\% in
+economics, and reached \R{arxiv_yearly.2026.mso}\% in 2026. By June 2025 it was \R{arxiv_its.all.excess}
+percentage points above its pre-ChatGPT trend, a gap that survives length, notation, topic, threshold and
+punctuation controls and is absent in placebo and drift tests; Australian parliamentary speech did not move
+measurably. Marker words such as \emph{delve} peaked in 2024 and returned almost to trend, while \mso{} kept
+rising. The measured trajectory depends on which generators define the LLM side: a region built only from 2023
+models shows the shift receding in 2026, whereas regions that include current models show it continuing.
+Marker-word counts therefore understate how far scientific abstracts have moved toward LLM style.
 \end{abstract}
 
 \section{Introduction}
 
-Two findings about writing since November 2022 sit uneasily together. Large corpus studies find clear traces of
-LLM-assisted writing in scientific abstracts, peer reviews, press releases and encyclopedia articles
-\citep{kobak2025, liang2024mapping, liang2024monitoring, liang2025widespread, brooks2024}, and LLM-favoured
-words have entered unscripted speech \citep{yakura2024, anderson2025spoken}. Yet people are poor at telling
-human from machine text \citep{clark2021, jakesch2023, casal2023}, detectors can be evaded
-\citep{sadasivan2023, krishna2023, dugan2024raid}, and detectors flag non-native writers' human text as
-AI-generated at high rates \citep{liang2023detectors, park2026}. The boundary between human and machine writing
-appears thin, but existing work does not say how thin, for which kinds of writing, or since when.
+LLM influence on writing is easy to detect in aggregate but hard to detect in individual documents. Corpus
+studies find clear traces of LLM-assisted writing in scientific abstracts, peer reviews, press releases and
+encyclopedia articles \citep{kobak2025, liang2024mapping, liang2024monitoring, liang2025widespread,
+brooks2024}, and LLM-favoured words have entered unscripted speech \citep{yakura2024, anderson2025spoken}. Yet
+readers are poor at telling human from machine text \citep{clark2021, jakesch2023, casal2023}, detectors can be
+evaded \citep{sadasivan2023, krishna2023, dugan2024raid}, and detectors have flagged non-native writers' human
+text as AI-generated at high rates \citep{liang2023detectors, park2026}. No existing measure says how much
+writing falls on the machine side of that boundary, in which genres, or since when.
 
 Existing measurements answer a \emph{prevalence} question: what fraction of a corpus was produced or modified
-by an LLM? We answer an \emph{overlap} question: what fraction of human-written text is stylistically
-indistinguishable from LLM output? The two diverge in an informative place. Several prevalence studies observe
-a small but non-zero ``LLM share'' before ChatGPT existed and treat it as estimator error
-\citep{liang2024mapping, lin2025, brooks2024}. We argue that this pre-LLM share is not noise. Under a fixed
-feature map it is a property of the two text populations: the part of human writing that already sounded like
-AI before AI could write.
+with an LLM? We answer an \emph{overlap} question: what fraction of a genre's writing is stylistically
+closer to LLM output than to pre-ChatGPT human writing? The two questions read one number differently: the
+small ``LLM share'' that prevalence estimators report for text written before ChatGPT, which several studies
+calibrate away as estimator error \citep{liang2024mapping, lin2025, brooks2024}. For a fixed feature map and
+a fixed set of reference generators, that share is a property of the two text distributions, and its change
+over time is our object of study.
 
 \paragraph{Contributions.}
-(1)~We define Machine-Style Overlap (\mso{}) and show that its pre-LLM value is the human half of a Bayes error
-(\S\ref{sec:mso}). (2)~We estimate \mso{} in three genres with topic-robust stylometric features and text
-from a broad set of open-weight and commercial generators (\S\ref{sec:data}--\ref{sec:method}). (3)~We show the
-pre-LLM baseline is structured, varying more than threefold across scientific fields, and that arXiv
-abstracts moved into the LLM region after 2022 far beyond their pre-trend, with a field-level dose pattern,
-placebo breaks and a parliamentary-speech control (\S\ref{sec:results}). (4)~We show that marker-word
-counts, the standard lexical measure, peaked and receded while \mso{} did not, and that the population most
-often falsely flagged by perplexity-based detectors, English-language learners, is the \emph{least}
-machine-like under style-based overlap.
+(1)~We define Machine-Style Overlap (\mso{}), a classify-and-count quantity \citep{forman2008} whose
+pre-ChatGPT value estimates the human-side component of a Bayes error (\S\ref{sec:mso}).
+(2)~We estimate it in three genres with content-word-free features and \R{arxiv_instrument.n_generators}
+reference generators, from 2023 commercial systems to a 2026 frontier model (\S\ref{sec:data}--\ref{sec:method}).
+(3)~We show that arXiv abstracts moved into the LLM region far beyond their pre-ChatGPT trend, more in
+fields with higher reported LLM adoption, with no shift at placebo dates, no drift in an out-of-sample
+placebo, and no measurable change in parliamentary speech (\S\ref{sec:shift}).
+(4)~We show that marker-word counts peaked and receded while \mso{} did not (\S\ref{sec:markers}), and that
+the trajectory depends on how current the reference generators are (\S\ref{sec:gensets}).
+(5)~We report two secondary results: stylistic dispersion of abstracts declined steadily since 2015 without a
+post-ChatGPT acceleration (\S\ref{sec:dispersion}), and, contrary to our pre-registered hypothesis, essays by
+English-language learners are \emph{less} machine-like than their peers' essays, mostly because of
+proficiency (\S\ref{sec:learners}).
+Our analysis plan, with five hypotheses (H1: pre-ChatGPT \mso{} is non-zero and differs by field; H2: arXiv
+\mso{} rises above its pre-ChatGPT trend; H3: more than in a less-exposed genre; H4: more in computer science
+than in mathematics; H5: learner essays have higher \mso{}), was committed to version control before any
+result was computed; deviations are listed in Appendix~\ref{app:deviations}.
 
 \section{Related Work}
 
@@ -74,12 +83,11 @@ machine-like under style-based overlap.
 Excess-vocabulary methods compare word frequencies with a counterfactual extrapolated from pre-LLM years
 \citep{kobak2025, holzwarth2026, lee2026}; distributional methods fit a mixture of human and LLM word
 distributions \citep{liang2024mapping, liang2024monitoring, liang2025widespread, geng2024}; classifier- and
-detector-based studies label documents \citep{lin2025, brooks2024, sun2025}. All target the share of text
-produced with LLM help. The closest designs to ours are \citet{bentley2026}, who build an LLM-associated
-style index for arXiv abstracts from a small set of markers and test for a post-2023 break, and
-\citet{chang2026}, who analyse a decade of convergence between human writing and machine patterns. We differ
-in the estimand, a distributional overlap in a multi-feature style space whose pre-LLM level is itself the
-object of study, and in excluding content words entirely: authors react to publicised markers
+detector-based studies label documents \citep{lin2025, brooks2024, sun2025, khan2025}. All target the share
+of text produced with LLM help. Closest to ours, \citet{bentley2026} track an LLM-associated style index for
+arXiv abstracts built from a few markers, and \citet{chang2026} analyse a decade of convergence between human
+writing and machine patterns. We differ in the estimand, a distributional overlap whose pre-ChatGPT level is
+itself of interest, and in excluding content words from the features: authors react to publicised markers
 \citep{geng2025}, so lexical markers are a moving target.
 
 \paragraph{Homogenization and human adoption.}
@@ -87,113 +95,130 @@ Writing with instruction-tuned models reduces content diversity \citep{padmakuma
 anderson2024homog}; LLM rewriting compresses stylistic variance \citep{sourati2025}; preference tuning reduces
 output diversity \citep{kirk2024, wu2025monoculture} and plausibly produces LLM-overused words
 \citep{juzek2025}. Humans adopt LLM vocabulary in speech \citep{yakura2024, anderson2025spoken} and academic
-writing \citep{geng2025, lin2025}. If LLM style partly reflects preferences that human raters already held,
-some pre-LLM human writing should already sit inside the LLM region, which is what \mso{} measures.
+writing \citep{geng2025, lin2025}. \mso{} quantifies how much human writing shares LLM style at a given time;
+a non-zero pre-ChatGPT value is necessary for, but not evidence of, a preference-amplification account.
 
-\paragraph{Stylistic differences between humans and LLMs.}
-Instruction-tuned LLMs differ systematically from humans on lexico-grammatical features \citep{reinhart2025,
-munozortiz2024}, but genre explains more stylistic variance than source \citep{rallapalli2026}, so any overlap
-measure must be genre-specific. Distribution-level comparisons such as MAUVE \citep{pillutla2021} and coverage
-frameworks \citep{yang2026coverage} evaluate models against human text; we reverse the direction and track
-where human documents fall relative to an LLM region over time.
+\paragraph{Style of human and LLM text.}
+LLM text differs systematically from human text in lexico-grammatical features \citep{reinhart2025,
+munozortiz2024, berbersardinha2024, herbold2023} and in recurring part-of-speech templates \citep{shaib2024},
+but genre explains more stylistic variance than source \citep{rallapalli2026}, so any overlap measure must be
+genre-specific. Distribution-level comparisons such as MAUVE \citep{pillutla2021} and coverage frameworks
+\citep{yang2026coverage} evaluate models against human text; we reverse the direction and track where human
+documents fall relative to an LLM region over time.
 
 \paragraph{Detection and perception.}
 Untrained readers judge GPT-3 text at chance \citep{clark2021}; people rely on flawed cues
 \citep{jakesch2023}; linguists and scientific reviewers misclassify abstracts \citep{casal2023, gao2023}.
-Detectors are evadable \citep{sadasivan2023, krishna2023, dugan2024raid} and their false positives fall
-disproportionately on non-native writing \citep{liang2023detectors, park2026}. We rely on these published
-findings for claims about human perception and collect no human judgements.
+Zero-shot detectors use perplexity-based statistics \citep{hans2024binoculars, bao2024fastdetectgpt}, can be
+evaded \citep{sadasivan2023, krishna2023, dugan2024raid}, face limits that grow as distributions converge
+\citep{chakraborty2024}, and have produced false positives concentrated on non-native writing
+\citep{liang2023detectors, park2026, mizumoto2026}. We rely on published studies for claims about human
+perception and collect no human judgements.
 
 \section{Machine-Style Overlap}
 \label{sec:mso}
 
-Fix a genre $G$ and a feature map $\phi$ from documents to style vectors. Let $H_0$ be the distribution of
-$\phi(d)$ for human documents of genre $G$ written before LLM writing assistance was widely available (here,
-before 30 November 2022), and $L$ the distribution of $\phi(d)$ for LLM output in the same genre, a mixture
-over generators and prompting styles with equal weights. For any population $S$ of documents,
+Fix a genre and a feature map $\phi$ from documents to style vectors. Let $P_{\text{pre}}$ be the distribution
+of $\phi(d)$ for human documents written before ChatGPT's release (30 November 2022; ``pre-ChatGPT''
+throughout), and $P_{\text{LLM}}$ the distribution for LLM output in the same genre, an equal-weight mixture
+over a reference set of generators and prompting styles chosen by us. For any population $S$ of documents,
 \begin{equation}
-\mathrm{MSO}_G(S) = \Pr_{d\sim S}\big[\, p_L(\phi(d)) \ge p_{H_0}(\phi(d)) \,\big].
+\mathrm{MSO}(S) = \Pr_{d\sim S}\big[\, p_{\text{LLM}}(\phi(d)) \ge p_{\text{pre}}(\phi(d)) \,\big].
 \end{equation}
-A document is \emph{in the LLM region} if its style is at least as likely under LLM output as under pre-LLM
-human writing. With equal class priors the Bayes posterior is $\eta(x) = p_L(x)/(p_L(x)+p_{H_0}(x))$, so
-$\mathrm{MSO}_G(S) = \Pr_S[\eta(\phi(d)) \ge 1/2]$.
+With equal priors the Bayes posterior is $\eta(x) = p_{\text{LLM}}(x)/(p_{\text{LLM}}(x)+p_{\text{pre}}(x))$, so
+$\mathrm{MSO}(S) = \Pr_S[\eta(\phi(d)) \ge \tfrac12]$: \mso{} is the flag rate of the Bayes-optimal
+classifier, i.e.\ classify-and-count \citep{forman2008} with a calibrated threshold.
 
-\paragraph{Pre-LLM overlap is a population property.}
-For $S = H_0$, \mso{} is the false-positive rate of the Bayes-optimal classifier, and the Bayes error is
-$\tfrac12\big(\mathrm{MSO}_G(H_0) + \Pr_L[\eta < \tfrac12]\big)$. The baseline is therefore the human half of an
-irreducible error under $\phi$: zero only if human and LLM styles are perfectly separable, and rising towards
-$\tfrac12$ as the distributions coincide. Prevalence studies that subtract a pre-period share as
-``misclassification'' remove exactly this quantity.
+\paragraph{Pre-ChatGPT overlap.}
+For $S = P_{\text{pre}}$, \mso{} is the Bayes classifier's false-positive rate, and the Bayes error is
+$\tfrac12\big(\mathrm{MSO}(P_{\text{pre}}) + \Pr_{\text{LLM}}[\eta < \tfrac12]\big)$, which is zero only when
+the two styles are separable and reaches $\tfrac12$ when they coincide. The pre-ChatGPT baseline is the human
+component of that error. Prevalence studies that subtract a pre-period share as misclassification remove the
+analogue of this quantity under their own feature map.
 
-\paragraph{Overlap after 2022.}
-For later populations $S_t$, $\mathrm{MSO}_G(S_t)$ measures how much of the genre at time $t$ falls in a region
-defined relative to \emph{pre-LLM} human writing. It is agnostic to authorship by design: an increase is
-consistent with undisclosed LLM use, with humans adopting LLM style, or both, and we do not separate them.
+\paragraph{Overlap after ChatGPT.}
+For later populations $S_t$, $\mathrm{MSO}(S_t)$ measures how much writing at time $t$ falls in a region defined
+relative to pre-ChatGPT human writing. It is agnostic to authorship: a rise is consistent with undisclosed LLM
+use, with humans adopting LLM style, or both, and we do not separate them.
 
 \paragraph{Estimation.}
-We estimate $\eta$ with calibrated classifiers trained on balanced samples of pre-LLM human and LLM documents.
-Finite-sample classifiers are not Bayes-optimal, so we report two model families, leave-one-generator-out
-regions and repeated training draws, and treat their spread as part of the uncertainty.
+A finite classifier only approximates $\eta$, and its flag rate is neither an upper nor a lower bound on the
+Bayes quantity. We therefore treat \mso{} as instrument-dependent and report how it varies across two
+classifier families, held-out generators, generator sets and thresholds; confidence intervals in the text are
+document-level bootstrap or regression intervals and do not include this instrument variation.
 
 \section{Data}
 \label{sec:data}
 
 \paragraph{Human text.}
-\emph{arXiv abstracts}: a stratified random sample drawn through the arXiv API: for each of 8 fields (by
-primary category) and each month from January 2015 to September 2026, all papers in one randomly placed
-window of consecutive submission days, with window length scaled to field size
-(\R{arxiv_instrument.n_train_per_class} pre-ChatGPT abstracts per class enter training; 159,102 abstracts
-in total).
-\emph{Parliamentary speech}: the Australian Hansard database \citep{katz2025hansard}, restricted to spoken
-speeches (excluding interjections and written questions), up to 150 randomly sampled per month from January
-2015 to July 2025. Spoken parliamentary speech is our less-exposed control genre.
-\emph{Student essays}: PERSUADE~2.0 \citep{crossley2024persuade}, argumentative essays by US students in grades
-6--12 on 15 prompts, written before 2020, with English-language-learner (ELL) status for each writer.
-In every genre half of the pre-cutoff documents (the \emph{train pool}) train the classifier and seed LLM
-prompts; \mso{} is measured only on the remaining documents.
+\emph{arXiv abstracts.} For each of \R{corpus_stats.arxiv_n_fields} archives (cs, math, stat, eess, q-bio,
+econ, astro-ph, cond-mat; by primary category) and each month from January 2015 to September 2026, we fetched
+all papers submitted in one randomly placed window of consecutive days (length scaled to archive size) through
+the arXiv API and drew up to 200 at random, so every archive-month has the same design weight. Because the API
+returns the latest abstract version, papers first submitted before ChatGPT but revised after it are excluded.
+After removing abstracts under 50 words, \R{corpus_stats.arxiv_n_docs} abstracts remain.
+\emph{Parliamentary speech.} The Australian Hansard database \citep{katz2025hansard}, restricted to spoken
+speeches (no interjections or written questions), up to 150 per month from January 2015 to July 2025
+(\R{corpus_stats.hansard_n_docs} speeches). Hansard is a lightly edited transcript; we treat it as less exposed
+to LLM writing, not unexposed.
+\emph{Student essays.} PERSUADE~2.0 \citep{crossley2024persuade}: \R{corpus_stats.essay_n_docs} argumentative
+essays by US students in grades 6--12 on \R{essay_ell_counts.n_prompts} prompts, written before 2020, with
+English-language-learner (ELL) status and a holistic quality score for each essay. These are school learners,
+not the TOEFL population of \citet{liang2023detectors}.
+In every genre half of the pre-ChatGPT documents (the \emph{train pool}) train the classifier and seed LLM
+prompts; \mso{} is measured only on the remaining documents, and any document used as a prompt seed is kept
+out of measurement.
 
 \paragraph{LLM text.}
-Seven open-weight models run locally through Ollama (Llama~3.1~8B, Qwen3~8B, Gemma~3~12B, Mistral~7B,
-gpt-oss~20B, Phi-4~14B, Granite~3.3~8B; temperature 0.8, fixed seeds) each received three prompt styles per
-genre: \emph{P1} write the text from a title or topic; \emph{P2} improve the wording of a human draft
-(LLM-assisted revision); \emph{P3} write the text and ``avoid typical AI phrasing'', the instruction a writer
-evading detection would give. Prompts were seeded only from train-pool documents, 150 per model and prompt.
-For abstracts we add the unattacked generations in RAID \citep{dugan2024raid}, including GPT-4 and ChatGPT,
-and abstracts from a 2026 frontier model (Claude) answering the same prompt instances. Each generator
-contributes at most 450 texts, so no single source dominates the region.
+Eight generators answered three prompt styles per genre, 150 times each: seven open-weight models run locally
+(Llama~3.1~8B, Qwen3~8B, Gemma~3~12B, Mistral~7B, gpt-oss~20B, Phi-4~14B, Granite~3.3~8B; temperature 0.8,
+fixed seeds) and Claude Opus~5.5, a 2026 frontier model, through sub-agent sessions without control over
+decoding. Claude is also the system that drafted this paper (see AI Use). The prompt styles are \emph{P1}
+write the text from a title or topic; \emph{P2} improve the wording of a human draft (LLM-assisted revision);
+\emph{P3} write the text and ``avoid typical AI phrasing'', a plausible evasion instruction. Prompts were seeded
+only from train-pool documents. For abstracts we add the RAID generations without adversarial attacks
+\citep{dugan2024raid} from six chat models (GPT-4, ChatGPT, and chat versions of Cohere, Llama, Mistral and
+MPT) and, for one analysis only, five base models. Each generator contributes at most 450 texts to training,
+so no source dominates.
 
 \section{Method}
 \label{sec:method}
 
 \paragraph{Cleaning.}
-All texts, human and LLM alike, are normalised identically: chat wrappers (``Here's the essay:''), markdown,
-headings and trailing notes are removed; curly quotes, non-breaking hyphens and non-breaking spaces are mapped
-to ASCII; every text is truncated to its first 250 words. Without this step formatting artefacts alone
-separate LLM output from human text.
+All texts, human and LLM, pass through the same normalisation: chat wrappers (``Here's the essay:''),
+markdown, headings and trailing notes are removed; curly quotes, non-breaking hyphens and spaces, and
+mis-decoded Windows-1252 characters are mapped to plain equivalents; LaTeX math becomes a placeholder token,
+LaTeX dashes (\texttt{--}, \texttt{---}) become typographic en and em dashes, and formatting commands keep
+only their content. The LaTeX step matters: human arXiv abstracts write dashes as \texttt{--} while chat
+models emit Unicode dashes, which would otherwise separate the two sources by encoding alone. Every text is
+truncated to its first 250 words.
 
 \paragraph{Features.}
-Features are deliberately topic-robust: per-token rates of closed-class words (adpositions, auxiliaries,
-conjunctions, determiners, particles, pronouns), coarse part-of-speech trigrams, dependency labels and
-punctuation marks, plus the mean and standard deviation of sentence length, mean word length and MTLD lexical
-diversity \citep{mccarthy2010}, computed with spaCy 3.8 (\texttt{en\_core\_web\_sm}). No content words are
-used. Features present in fewer than 1\% of training documents are dropped.
+Features exclude content words to limit topic sensitivity: per-token rates of closed-class words
+(adpositions, auxiliaries, conjunctions, determiners, particles, pronouns), coarse part-of-speech trigrams,
+dependency labels and punctuation marks, plus mean and standard deviation of sentence length, mean word length
+and MTLD lexical diversity \citep{mccarthy2010}, computed with spaCy~3.8 (\texttt{en\_core\_web\_sm}).
+Features present in fewer than 1\% of training documents are dropped.
 
 \paragraph{Classifiers.}
-The primary instrument is L2-regularised logistic regression ($C{=}0.1$) on standardised features with
-isotonic calibration (5-fold); the second is gradient-boosted trees, calibrated the same way. Classes are
-balanced by subsampling, so a calibrated probability of $0.5$ corresponds to a likelihood ratio of one.
-Cross-validation is grouped so that a revised text and its human source, and all speeches by one
-parliamentarian, stay in the same fold.
+The primary classifier is L2-regularised logistic regression ($C{=}0.1$) on standardised features with
+isotonic calibration; the second is gradient-boosted trees, calibrated the same way. Classes are balanced, so a
+calibrated probability of 0.5 corresponds to a likelihood ratio of one. Cross-validation and calibration folds
+are grouped so that a revised text and its human source, and all speeches by one parliamentarian, never fall
+in different folds. We call a trained, calibrated classifier with its 0.5 threshold an \emph{instrument}.
 
 \paragraph{Time series.}
-We compute monthly \mso{} and fit a segmented regression with a level shift and a slope change at December
-2022, weighted by monthly sample size, with Newey--West errors (6 lags). The pre-registered quantity is the
-\emph{excess}: the gap between the fitted post-2022 series and the extrapolated pre-2022 trend at June 2025,
-the last month covered by both treatment and control. Placebo breaks are placed at November 2019 and
-November 2020 within the pre-LLM data. For comparison with lexical methods we run the same model on the share
-of abstracts containing at least one published LLM marker word (\emph{delve}, \emph{underscore},
-\emph{showcase}, \emph{meticulous}, \emph{intricate}, \emph{intricacies}, \emph{commendable}, \emph{boast};
-taken from \citealp{kobak2025, gray2024, yakura2024}).
+We compute monthly \mso{} and fit an interrupted time-series model: weighted least squares with a level shift
+and a slope change at December 2022 and autocorrelation-robust (Newey--West, 6 lags) standard errors. Our
+primary quantity, the \emph{trend gap}, is the fitted post-ChatGPT value minus the extrapolated pre-ChatGPT
+trend in June 2025, a month fixed in code before any time-series result and within the period covered by both
+corpora (Hansard has no sittings from April to June 2025, which the model interpolates). Placebo breaks are
+placed at November 2019 and November 2020. A drift placebo trains the instrument on 2015--2018 human
+abstracts only and tests for a gap in mid-2022 over the 2015--2018 trend, before any LLM writing assistance:
+an instrument that merely ages would produce one. For comparison with lexical methods we model the share of
+abstracts containing a published marker word (\emph{delve}, \emph{underscore}, \emph{showcase},
+\emph{meticulous}, \emph{intricate}, \emph{intricacies}, \emph{commendable}, \emph{boast};
+\citealp{kobak2025, gray2024, yakura2024}).
 
 \section{Results}
 \label{sec:results}
@@ -201,176 +226,284 @@ taken from \citealp{kobak2025, gray2024, yakura2024}).
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/timeseries.pdf}
-\caption{Monthly \mso{} for (a) arXiv abstracts and (b) Australian parliamentary speech, and (c) the share of
-arXiv abstracts containing a marker word. Dashed: pre-2022 linear trend, extrapolated. The vertical line marks
-the release of ChatGPT.}
+\caption{Monthly \mso{} for (a) arXiv abstracts and (b) Australian parliamentary speech (different y-scales),
+and (c) the share of arXiv abstracts containing a marker word. Dashed: pre-ChatGPT linear trend, extrapolated.
+Vertical line: release of ChatGPT.}
 \label{fig:ts}
 \end{figure*}
 
-\subsection{Human and LLM styles are separable but overlap}
-In all three genres the instrument separates pre-LLM human text from LLM text well (cross-validated AUC
-\R{arxiv_instrument.cv_auc_all} for abstracts, \R{hansard_instrument.cv_auc_all} for speech,
-\R{essay_instrument.cv_auc_all} for essays), and the region generalises to generators it never saw (recall on
-held-out generators in Appendix~\ref{app:lomo}). The hardest case everywhere is LLM revision of a human draft
-(P2), the setting closest to everyday AI-assisted writing. Separability is high but not complete, and the
-remainder is the overlap we study.
+\subsection{Separable, but not completely}
+The instruments separate pre-ChatGPT human text from LLM text well (cross-validated AUC, where 1 is perfect
+separation: \R{arxiv_instrument.cv_auc_all} for abstracts, \R{hansard_instrument.cv_auc_all} for speech,
+\R{essay_instrument.cv_auc_all} for essays). Held out from training, older generators are still recognised
+(arXiv recall \R{arxiv_lomo.raid-cohere-chat.recall_on_unseen_model}--\R{arxiv_lomo.raid-gpt4.recall_on_unseen_model}\%;
+Appendix~\ref{app:lomo}), but the 2026 model is not: only \R{arxiv_lomo.claude-opus-5.5.recall_on_unseen_model}\%
+of its abstracts and \R{essay_lomo.claude-opus-5.5.recall_on_unseen_model}\% of its essays fall in a region
+built without it. At least one current model writes outside the region defined by its predecessors.
 
-\subsection{Pre-LLM overlap is structured, not noise (H1)}
+\subsection{Pre-ChatGPT overlap is structured (H1)}
 Before ChatGPT, \R{arxiv_baseline_pre2022.all.mso}\% (95\% CI \R{arxiv_baseline_pre2022.all.lo}--%
-\R{arxiv_baseline_pre2022.all.hi}) of arXiv abstracts already fell in the LLM region, as did
-\R{hansard_baseline_pre2022.all.mso}\% of parliamentary speeches and \R{essay_mso_by_group.all.mso}\% of student
-essays. The arXiv baseline differs sharply by field (Figure~\ref{fig:fields}, left; $\chi^2$ test
-$p\R{arxiv_its.baseline_field_heterogeneity.p}$), from \R{arxiv_baseline_pre2022.astro-ph.mso}\% in astrophysics
-to \R{arxiv_baseline_pre2022.cs.mso}\% in computer science and \R{arxiv_baseline_pre2022.econ.mso}\% in
-economics. Estimator noise would be uniform across fields; this structure is what a property of the writing
-predicts. It was also rising slowly before ChatGPT (\R{arxiv_its.all.pre_slope_per_year} points per year).
+\R{arxiv_baseline_pre2022.all.hi}) of arXiv abstracts fell in the LLM region, as did
+\R{hansard_baseline_pre2022.all.mso}\% of speeches and \R{essay_mso_by_group.all.mso}\% of student essays. The
+arXiv baseline varies by archive (Figure~\ref{fig:fields}; $\chi^2$ $p\R{arxiv_its.baseline_field_heterogeneity.p}$),
+from \R{arxiv_baseline_pre2022.astro-ph.mso}\% in astrophysics to \R{arxiv_baseline_pre2022.cs.mso}\% in
+computer science and \R{arxiv_baseline_pre2022.econ.mso}\% in economics. The ordering is similar under the
+gradient-boosted instrument and among abstracts without math (astrophysics
+\R{arxiv_baseline_pre2022.nomath astro-ph.mso}\%, economics \R{arxiv_baseline_pre2022.nomath econ.mso}\%), so
+it is not an artefact of notation. Field differences far exceed sampling error; they may reflect the writing,
+classifier fit that varies by field, or both. Overall \mso{} was also rising slowly before ChatGPT
+(\R{arxiv_its.all.pre_slope_per_year}\pp{} per year).
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/fields.pdf}
-\caption{Left: pre-ChatGPT \mso{} by arXiv field. Right: excess over the field's pre-2022 trend in June 2025.
-Bars are 95\% intervals.}
+\caption{Left: pre-ChatGPT \mso{} by arXiv archive. Right: trend gap in June 2025. Lines are 95\% intervals.
+The baseline does not predict the shift: economics has the highest baseline but a middling gap.}
 \label{fig:fields}
 \end{figure}
 
-\subsection{Abstracts moved into the region after 2022 (H2--H4)}
-Yearly arXiv \mso{} was \R{arxiv_yearly.2018.mso}\% in 2018 and \R{arxiv_yearly.2022.mso}\% in 2022, then
-\R{arxiv_yearly.2023.mso}\%, \R{arxiv_yearly.2024.mso}\% and \R{arxiv_yearly.2025.mso}\% in 2023--2025
-(Figure~\ref{fig:ts}a). In June 2025 the series sat \R{arxiv_its.all.excess_at_2025-06} points above its
-extrapolated pre-2022 trend (95\% CI \R{arxiv_its.all.excess_lo}--\R{arxiv_its.all.excess_hi}). Placebo breaks
-in the pre-LLM period show no comparable shift (level shifts \R{arxiv_its.all.placebo.2019-11.level_shift} and
-\R{arxiv_its.all.placebo.2020-11.level_shift} points, $p=\R{arxiv_its.all.placebo.2019-11.level_shift_p}$ and
-$\R{arxiv_its.all.placebo.2020-11.level_shift_p}$).
-\emph{Control.} Parliamentary speech moved far less (\R{hansard_its.all.excess_at_2025-06} points, CI
-\R{hansard_its.all.excess_lo}--\R{hansard_its.all.excess_hi}); the difference between genres is
-\R{control_difference.difference} points (CI \R{control_difference.lo}--\R{control_difference.hi},
-$p\R{control_difference.p}$).
-\emph{Dose.} The excess is largest in computer science (\R{arxiv_its.cs.excess_at_2025-06} points) and
-smallest in mathematics (\R{arxiv_its.math.excess_at_2025-06}) and astrophysics
-(\R{arxiv_its.astro-ph.excess_at_2025-06}) (Figure~\ref{fig:fields}, right), the same ordering reported for
-LLM use by prevalence studies \citep{liang2024mapping}. The rise continued into 2026
-(\R{arxiv_yearly.2026.mso}\% through September).
+\subsection{Abstracts moved into the region (H2--H4)}
+\label{sec:shift}
+Yearly arXiv \mso{} ranged from \R{arxiv_yearly.2016.mso}\% to \R{arxiv_yearly.2019.mso}\% in 2015--2021 and
+was \R{arxiv_yearly.2022.mso}\% in 2022, then \R{arxiv_yearly.2023.mso}\%, \R{arxiv_yearly.2024.mso}\%,
+\R{arxiv_yearly.2025.mso}\% and \R{arxiv_yearly.2026.mso}\% in 2023--2026 (Figure~\ref{fig:ts}a). The trend gap
+in June 2025 is \R{arxiv_its.all.excess}\pp{} (95\% CI \R{arxiv_its.all.excess_lo}--\R{arxiv_its.all.excess_hi}).
+Table~\ref{tab:robust} shows it under every check we ran: other thresholds, abstracts without math, abstracts
+that never mention language models, a length-reweighted series (median abstract length grew from
+\R{arxiv_length_by_year.2015.median_words} to \R{arxiv_length_by_year.2026.median_words} words), and an
+instrument without any dash feature. Placebo breaks show no comparable gap, and the drift placebo, which would
+reveal an instrument that simply ages, finds none ($\R{arxiv_drift_placebo.excess}$\pp{}, CI
+$\R{arxiv_drift_placebo.excess_lo}$ to \R{arxiv_drift_placebo.excess_hi}).
+\emph{Comparison genre (H3).} Parliamentary speech did not move measurably (\R{hansard_its.all.excess}\pp{}, CI
+$\R{hansard_its.all.excess_lo}$ to \R{hansard_its.all.excess_hi}). With both regions built from the same
+eight generators, the arXiv gap exceeds the Hansard gap by \R{control_difference.difference}\pp{} (CI
+\R{control_difference.lo}--\R{control_difference.hi}).
+\emph{Field gradient (H4).} The gap is largest in quantitative biology (\R{arxiv_its.q-bio.excess}\pp) and
+computer science (\R{arxiv_its.cs.excess}) and smallest in mathematics (\R{arxiv_its.math.excess}) and
+astrophysics (\R{arxiv_its.astro-ph.excess}) (Figure~\ref{fig:fields}), the same high-CS, low-mathematics
+ordering that prevalence studies report \citep{liang2024mapping}.
 
-\paragraph{The region must include current models.}
-A 2026 frontier model writes largely outside the region defined by older generators: with it held out, the
-region captures only \R{arxiv_lomo.claude-opus-5.5.recall_on_unseen_model}\% of its abstracts, against
-\R{arxiv_lomo.raid-gpt4.recall_on_unseen_model}\% for held-out GPT-4. In a preliminary run without the
-frontier model, arXiv \mso{} appeared to fall in 2026; with it, the rise continues. Newer models no longer
-sound like ``classic'' LLM text, so an overlap measure defined only by older models will understate recent
-movement. We therefore include the newest generator available to us and report leave-one-out results for all.
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Variant & Trend gap (pp) & 95\% CI \\
+\midrule
+Primary & \R{arxiv_its.all.excess} & \R{arxiv_its.all.excess_lo}--\R{arxiv_its.all.excess_hi} \\
+Threshold 0.4 & \R{arxiv_its.threshold_04.excess} & \R{arxiv_its.threshold_04.excess_lo}--\R{arxiv_its.threshold_04.excess_hi} \\
+Threshold 0.6 & \R{arxiv_its.threshold_06.excess} & \R{arxiv_its.threshold_06.excess_lo}--\R{arxiv_its.threshold_06.excess_hi} \\
+No math notation & \R{arxiv_its.no_math.excess} & \R{arxiv_its.no_math.excess_lo}--\R{arxiv_its.no_math.excess_hi} \\
+No LLM-topic abstracts & \R{arxiv_its.no_llm_topic.excess} & \R{arxiv_its.no_llm_topic.excess_lo}--\R{arxiv_its.no_llm_topic.excess_hi} \\
+Length-reweighted & \R{arxiv_its.length_adjusted.excess} & \R{arxiv_its.length_adjusted.excess_lo}--\R{arxiv_its.length_adjusted.excess_hi} \\
+No dash features & \R{arxiv_nodash_its.all.excess} & \R{arxiv_nodash_its.all.excess_lo}--\R{arxiv_nodash_its.all.excess_hi} \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Generator set defining the region}} \\
+All but the 2026 model & \R{arxiv_gensets_its.no_frontier.excess} & \R{arxiv_gensets_its.no_frontier.excess_lo}--\R{arxiv_gensets_its.no_frontier.excess_hi} \\
+Local open models only & \R{arxiv_gensets_its.local.excess} & \R{arxiv_gensets_its.local.excess_lo}--\R{arxiv_gensets_its.local.excess_hi} \\
+RAID (2023) only & \R{arxiv_gensets_its.raid.excess} & \R{arxiv_gensets_its.raid.excess_lo}--\R{arxiv_gensets_its.raid.excess_hi} \\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Placebos (no LLM writing assistance)}} \\
+Break Nov 2019 & $\R{arxiv_its.all.placebo.2019-11.excess}$ & $p=\R{arxiv_its.all.placebo.2019-11.excess_p}$ \\
+Break Nov 2020 & $\R{arxiv_its.all.placebo.2020-11.excess}$ & $p=\R{arxiv_its.all.placebo.2020-11.excess_p}$ \\
+Drift (2015--18 instrument) & $\R{arxiv_drift_placebo.excess}$ & $p=\R{arxiv_drift_placebo.excess_p}$ \\
+\bottomrule
+\end{tabular}
+\caption{arXiv trend gap in June 2025 (percentage points above the extrapolated pre-ChatGPT trend) under
+robustness variants; placebo gaps are evaluated in mid-2022.}
+\label{tab:robust}
+\end{table}
 
 \subsection{Marker words recede; style overlap does not}
-The share of abstracts with a marker word also jumped after 2022 (Figure~\ref{fig:ts}c), but it peaked in 2024
-and fell back towards its pre-2022 trend (excess \R{arxiv_marker_its.excess_at_2025-06} points in June 2025),
-consistent with authors avoiding publicised markers \citep{geng2025}. \mso{} remained far above trend. The two
-measures are weakly related at the document level (point-biserial $r=\R{arxiv_marker_vs_mso.corr_marker_inregion}$;
-only \R{arxiv_marker_vs_mso.share_inregion_with_marker}\% of in-region abstracts contain a marker word):
-lexical counts capture the visible tip of a broader stylistic shift.
+\label{sec:markers}
+The share of abstracts with a marker word rose from \R{arxiv_yearly.2022.marker}\% in 2022 to
+\R{arxiv_yearly.2024.marker}\% in 2024 and fell to \R{arxiv_yearly.2026.marker}\% in 2026
+(Figure~\ref{fig:ts}c), its June 2025 trend gap only \R{arxiv_its.marker.excess}\pp{}, consistent with authors
+avoiding publicised markers \citep{geng2025}. Over the same period \mso{} kept rising. At the document level the
+two are related but largely distinct (point-biserial $r=\R{arxiv_marker_vs_mso.corr_marker_inregion}$;
+\R{arxiv_marker_vs_mso.share_inregion_with_marker}\% of in-region versus
+\R{arxiv_marker_vs_mso.share_outregion_with_marker}\% of out-of-region abstracts contain a marker): marker
+words and \mso{} mostly pick out different documents.
 
-\subsection{Chat tuning makes the style}
-A region defined only by chat-tuned generators captures \R{arxiv_base_vs_chat.raid-gpt2.share_in_region}\% of
-GPT-2 abstracts and \R{arxiv_base_vs_chat.raid-mistral.share_in_region}\% of base Mistral abstracts, but
-\R{arxiv_base_vs_chat.raid-mistral-chat.share_in_region}\% of the same model after chat tuning. What humans hear
-as ``sounding like AI'' is largely a product of instruction and preference tuning, in line with
-\citet{kirk2024} and \citet{juzek2025}.
-
-\subsection{Learners are the least machine-like writers (H5)}
-Essays by English-language learners are less likely to fall in the LLM region than essays by their peers
-(\R{essay_mso_by_group.ELL.mso}\% vs \R{essay_mso_by_group.non-ELL.mso}\%; Figure~\ref{fig:learners}). Because
-few learner essays cross the threshold, the thresholded contrast is fragile: across ten training draws the
-learner share is always lower (\R{essay_seed_stability.share_seeds_ell_lower}\% of draws), but the
-prompt- and grade-adjusted odds ratio (median \R{essay_seed_stability.odds_ratio_median}, range
-\R{essay_seed_stability.odds_ratio_min}--\R{essay_seed_stability.odds_ratio_max}) reaches $p<0.05$ in only
-\R{essay_seed_stability.share_seeds_p_below_05}\% of draws. The continuous classifier margin, which uses every
-essay, gives a clear answer: relative to peers' essays on the same prompt and grade, learner essays differ by
-\R{essay_ell_continuous.ell_coef_sd} standard deviations on the margin, away from the LLM region (95\% CI
-\R{essay_ell_continuous.coef_lo} to \R{essay_ell_continuous.coef_hi}). A different instrument built on sentence
-embeddings agrees (\R{essay_embedding_instrument.ELL.mso}\% vs \R{essay_embedding_instrument.non-ELL.mso}\%).
-Perplexity-based detectors flag non-native writing because it is predictable \citep{liang2023detectors}; the
-style region is defined by richer vocabulary, longer words and more uniform sentences, which learners use
-less. The same text can be ``AI-like'' to one instrument and ``human-like'' to another.
+\subsection{Sensitivity to the generator set}
+\label{sec:gensets}
+Because \mso{} is defined relative to reference generators, we rebuilt the region from five generator sets
+(Figure~\ref{fig:gensets}, Table~\ref{tab:robust}). All show the rise from 2022 to 2025 and a positive trend
+gap. They diverge in 2026: a region built only from RAID's 2023 models gives \R{arxiv_gensets.raid.y2025}\% in
+2025 and \R{arxiv_gensets.raid.y2026}\% in 2026, retracing the marker-word curve, while regions that include
+2024--2026 models keep rising (\R{arxiv_gensets.local_frontier.y2026}\% in 2026 with the seven local models
+plus the 2026 model). Without the 2026 model the series levels off
+(\R{arxiv_gensets.no_frontier.y2025}\% to \R{arxiv_gensets.no_frontier.y2026}\%). The pattern is consistent
+with abstracts moving away from 2023-era LLM style toward the style of later models, and it implies that any
+overlap or detection measure built on older models will understate recent movement. We added the 2026 model
+after a preliminary run without it; both versions are reported here.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.8\columnwidth]{figures/learners.pdf}
-\caption{\mso{} of held-out pre-LLM student essays by English-language-learner status, under the primary
-style instrument and a sentence-embedding instrument. Bars are 95\% bootstrap intervals.}
+\includegraphics[width=\columnwidth]{figures/gensets.pdf}
+\caption{Yearly arXiv \mso{} with the LLM region defined by different generator sets.}
+\label{fig:gensets}
+\end{figure}
+
+\subsection{Chat tuning amplifies the style}
+A region defined only by chat-tuned generators captures
+\R{arxiv_base_models.raid-mistral.share_in_region}--\R{arxiv_base_models.raid-mpt.share_in_region}\% of base-model
+abstracts (GPT-2, GPT-3, and base Cohere, Mistral and MPT), against \R{arxiv_baseline_pre2022.all.mso}\% of
+pre-ChatGPT human abstracts. Chat versions of the same families, held out from training, are captured at
+\R{arxiv_lomo.raid-cohere-chat.recall_on_unseen_model}\% (Cohere, base
+\R{arxiv_base_models.raid-cohere.share_in_region}\%), \R{arxiv_lomo.raid-mistral-chat.recall_on_unseen_model}\%
+(Mistral, base \R{arxiv_base_models.raid-mistral.share_in_region}\%) and
+\R{arxiv_lomo.raid-mpt-chat.recall_on_unseen_model}\% (MPT, base \R{arxiv_base_models.raid-mpt.share_in_region}\%).
+Base models already lie partly inside the region, and chat tuning moves them much further in, in line with
+reports that preference tuning narrows output style \citep{kirk2024, juzek2025}. RAID's base and chat
+generations also differ in prompting and length, so this comparison is indicative.
+
+\subsection{Dispersion: steady, not sudden}
+\label{sec:dispersion}
+To connect overlap to homogenization we measured, for 1,500 abstracts per year, the mean distance to the year's
+centroid in the standardised feature space. Dispersion fell from \R{arxiv_dispersion.2015.dispersion} in 2015 to
+\R{arxiv_dispersion.2022.dispersion} in 2022 and \R{arxiv_dispersion.2026.dispersion} in 2026: abstracts have
+grown stylistically more uniform, but the decline began well before ChatGPT and did not visibly accelerate
+after it. Movement toward LLM style, not loss of variety, is what changed sharply.
+
+\subsection{Learner essays (H5, not supported)}
+\label{sec:learners}
+We pre-registered that essays by English-language learners would show \emph{higher} \mso{}. They show lower:
+\R{essay_mso_by_group.ELL.mso}\% versus \R{essay_mso_by_group.non-ELL.mso}\%
+(\R{essay_ell_counts.ell_in_region} of \R{essay_ell_counts.n_ell} learner essays in the region; adjusted odds
+ratio \R{essay_ell_adjusted.odds_ratio}, CI \R{essay_ell_adjusted.or_lo}--\R{essay_ell_adjusted.or_hi},
+lower in all \R{essay_seed_stability.n_seeds} training draws). The difference is mostly proficiency: adjusting
+for the holistic essay score reduces the odds ratio to \R{essay_ell_adjusted.odds_ratio_prof} (CI
+\R{essay_ell_adjusted.or_lo_prof}--\R{essay_ell_adjusted.or_hi_prof}) and the continuous classifier margin
+from $\R{essay_ell_continuous.ell_coef_sd}$ to $\R{essay_ell_continuous.ell_coef_sd_prof}$ standard
+deviations (CI $\R{essay_ell_continuous.coef_lo_prof}$ to $\R{essay_ell_continuous.coef_hi_prof}$). In essays
+the LLM region is largely a region of fluent, lexically diverse writing (top LLM-typical features: MTLD,
+word length, em dashes). Two other instruments agree in direction (Figure~\ref{fig:learners}): a
+sentence-embedding classifier (\R{essay_embedding_instrument.ELL.mso}\% vs
+\R{essay_embedding_instrument.non-ELL.mso}\%) and a perplexity-based instrument of the kind used by zero-shot
+detectors (\R{essay_perplexity_instrument.ELL.mso}\% vs \R{essay_perplexity_instrument.non-ELL.mso}\%; odds
+ratio \R{essay_perplexity_adjusted.odds_ratio}), because these learner essays are \emph{less} predictable
+(mean token log-perplexity \R{essay_perplexity_adjusted.mean_logppl_ell} vs
+\R{essay_perplexity_adjusted.mean_logppl_nonell} under Qwen2.5-0.5B). The detector bias reported for TOEFL
+essays \citep{liang2023detectors} therefore does not carry over to this school population, which suggests that
+such bias depends on the population and the detector's calibration rather than on non-native authorship alone.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\columnwidth]{figures/learners.pdf}
+\caption{Share of held-out pre-ChatGPT student essays flagged by three instruments, by ELL status (lines: 95\%
+bootstrap intervals). The instruments differ in level but agree in direction.}
 \label{fig:learners}
 \end{figure}
 
-\subsection{Instrument agreement and genre specificity}
-The two classifier families agree on population-level \mso{} (\R{arxiv_instrument.mso_logreg}\% vs
-\R{arxiv_instrument.mso_gbm}\% for abstracts) more than on individual documents (Cohen's
-$\kappa=\R{arxiv_instrument.kappa_logreg_vs_gbm}$ for abstracts, \R{essay_instrument.kappa_logreg_vs_gbm} for
-essays). \mso{} is also genre-specific: the essay instrument applied to the out-of-genre human essays released
-by \citet{liang2023detectors} places \R{essay_liang.Real TOEFL.mso}\% of TOEFL and
-\R{essay_liang.Real College Essays.mso}\% of US college essays in the region, near chance. Population-level
-overlap is stable; any single document's label is not, which bears directly on judging individual writers.
-
 \section{Discussion}
 
-\paragraph{What ``sounds like AI'' means.}
-Three results jointly reframe the perception that everything now sounds like AI. First, a measurable share of
-human writing sat in the LLM region before LLMs existed, and that share depends on genre and field: formal,
-noun-heavy registers were closest to what instruction-tuned models produce. Second, scientific abstracts
-moved substantially further into the region after 2022 while parliamentary speech did not, so the perception
-reflects a real change in some writing, not only heightened suspicion. Third, the style region is created by
-chat tuning rather than by language modelling as such, which is consistent with LLM style amplifying
-preferences that human raters already held \citep{juzek2025}.
+\paragraph{What ``sounding like AI'' measures.}
+Three results bear on the common impression that writing increasingly sounds like AI. A measurable share of
+human writing sat in the LLM region before ChatGPT, and that share depends on genre and field. Scientific
+abstracts moved substantially further into the region after 2022 while parliamentary speech did not measurably
+move, so at least part of the change is in the writing itself. And the style region is strongly amplified by
+chat tuning, though base models already lie partly inside it.
 
 \paragraph{Why marker words mislead.}
-Marker words are what readers notice and what authors can edit out. Their rise and fall alongside a persistent
-rise in \mso{} suggests that the visible markers were removed while the underlying register remained. Studies
-that track markers may therefore understate continued LLM influence in 2025--2026. The frontier-model result
-points the same way from the other side: current models no longer produce the markers, or the classic register,
-that readers learned to associate with AI, so ``sounds like AI'' is itself a moving target.
-
-\paragraph{A self-test.}
-This paper was drafted by an AI system (see AI Use). Scored by the abstract instrument,
-\R{selftest.share_paragraphs_in_region}\% of its own prose paragraphs fall in the LLM region, compared with
-\R{selftest.mso_cs_2026_humans}\% of human-attributed computer-science abstracts from 2026. Paragraphs of a paper
-are not abstracts, so this comparison is illustrative only, but it makes the paper's point concrete: by this
-measure, most 2026 computer-science abstracts read as more machine-like than an AI-drafted paper about them.
+Marker words are what readers notice and what authors can edit out. Two explanations fit their rise and fall:
+authors removing publicised markers, and newer models no longer producing them. Our data cannot separate the
+two, but both imply that marker-based tracking may understate how far writing style has moved toward LLM
+output in 2025--2026. The generator-set result points the same way: the region of 2023-era LLM style is
+emptying while the region of current models is filling.
 
 \paragraph{A feedback loop, as a hypothesis.}
-If human writing moves into the LLM region and later models are trained on it, ``human'' training data stops
-being an independent anchor. Model collapse under recursive training is documented in controlled settings
-\citep{shumailov2024}, but accumulating real data limits it \citep{gerstgrasser2024}. Our results show the
-human side of such a loop moving in one genre; they do not show the loop.
+If writing moves into the LLM region and later models are trained on it, ``human'' training data stops being
+an independent anchor. Model collapse under recursive training is documented in controlled settings
+\citep{shumailov2024}, but accumulating real data limits it \citep{gerstgrasser2024}. Our results are
+consistent with the human-written side of such a loop moving in one genre; they do not show the loop.
 
 \paragraph{Implications for detection.}
-Population-level \mso{} is stable across instruments while document-level labels are not, and the writers most
-exposed to perplexity-detector false positives are the least machine-like on style. Both findings argue
-against using any single score to judge an individual writer, in education or elsewhere.
+Population-level \mso{} is similar across classifier families (\R{arxiv_instrument.mso_logreg}\% vs
+\R{arxiv_instrument.mso_gbm}\% of scored abstracts) and held-out-generator regions, but document-level labels
+agree only moderately (Cohen's $\kappa=\R{arxiv_instrument.kappa_logreg_vs_gbm}$), and every instrument we
+tried flags fluent student writing more than learner writing. Both findings argue against using any single
+score to judge an individual writer.
+
+\section{Conclusion}
+Machine-Style Overlap measures how much of a genre's writing sits on the LLM side of a stylistic boundary. In
+arXiv abstracts it rose from about \R{arxiv_baseline_pre2022.all.mso}\% before ChatGPT to
+\R{arxiv_yearly.2026.mso}\% in 2026, far beyond trend and robust to the controls we could devise, while marker
+words came and went and parliamentary speech held still. Measuring that shift requires reference generators as
+current as the writing being measured.
 
 \section*{Limitations}
-\mso{} depends on the feature map: a document can be inside the region under style features and outside it
-under perplexity, as the learner result shows. Post-2022 ``human'' documents may be partly LLM-written, so
-\mso{} cannot separate LLM use from human adoption of LLM style, and no causal claim is made. Most local
-generators are mid-sized open-weight models; commercial models enter through RAID abstracts and one frontier
-model, whose decoding settings we could not control. The arXiv sample is a stratified random sample, not the
-full archive. The learner analysis is cross-sectional and rests on few in-region learner essays at the
-threshold. Parliamentary speech is less exposed to LLM writing but not unexposed.
+\mso{} is defined relative to a feature map and a researcher-chosen generator set; adding one model changed the
+2026 trajectory, and one generator is the system that drafted this paper, run without decoding control.
+Punctuation, including dashes, is among the features, although removing dash features leaves the result
+unchanged. Post-ChatGPT ``human'' documents may be partly LLM-written, so \mso{} cannot separate LLM use from
+human adoption of LLM style, and no causal claim is made. Changes in arXiv's composition (author population,
+subfields, submission volume) may contribute despite stratified sampling and the topic and length checks.
+The arXiv sample is stratified, not the full archive; all text is English and truncated to 250 words.
+Parliamentary speech is less exposed to LLM writing, not unexposed, and differs from abstracts in many ways.
+The learner analysis is cross-sectional, rests on \R{essay_ell_counts.ell_in_region} in-region learner essays,
+and concerns US school learners. The analysis plan was committed to our own repository, not a third-party
+registry.
 
 \section*{Ethics Statement}
 The study uses only public datasets under their licences (arXiv metadata CC0; Australian Hansard CC~BY~4.0;
-PERSUADE~2.0 CC~BY-NC-SA~4.0; RAID and the \citealp{liang2023detectors} data, MIT) and involves no human
+PERSUADE~2.0 CC~BY-NC-SA~4.0; RAID and the data of \citet{liang2023detectors}, MIT) and involves no human
 participants. The learner analysis compares groups, never individuals, and we caution against using any
 overlap or detector score to judge an individual writer.
 
 \section*{AI Use and Authorship}
-This study was carried out with an AI system (Claude, Anthropic) acting as an agent on the author's computer.
-The author conceived the research question and the goal of a fully documented AI-assisted study, directed the
-work and approved every decision with external effect, and verified the citations and results. The AI system
-wrote the code, ran the analyses and drafted the text; every human edit to AI-drafted text is a separately
-labelled commit in the public repository, and every number in this paper is inserted automatically from the
-analysis outputs. No AI system is listed as an author.
+An AI system (Claude Opus~5.5, Anthropic, used as an agent through Claude Code) carried out most of this study.
+The human author chose the topic, the goal of a fully disclosed AI-conducted study, and the constraints (public
+data only, no human participants, local compute), and approved the analysis plan and its deviations. The AI
+system proposed the specific research question and hypotheses, searched the literature, wrote all code,
+generated the local-model texts, ran the analyses, made the figures and drafted all text. The same system also
+produced the ``2026 model'' texts (\S\ref{sec:data}), so its own outputs are part of the reference set. Three
+rounds of simulated peer review by separate AI sessions informed revisions. \TODO{state citation-verification
+outcome once completed} Every number in the paper is inserted automatically from the analysis outputs. AI-written
+and human-edited changes are labelled separately in the version history, which will be released with the code
+and data. No AI system is listed as an author.
 
 \bibliography{references}
 
 \appendix
-\section{Leave-one-generator-out recall}
+\section{Held-out-generator recall}
 \label{app:lomo}
-\TODO{table from results/arxiv\_lomo.csv, hansard\_lomo.csv, essay\_lomo.csv}
+\begin{table}[h]
+\centering\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Held-out generator & Recall (\%) & arXiv \mso{} (\%) \\
+\midrule
+Claude Opus 5.5 & \R{arxiv_lomo.claude-opus-5.5.recall_on_unseen_model} & \R{arxiv_lomo.claude-opus-5.5.mso_scored_humans} \\
+gpt-oss 20B & \R{arxiv_lomo.gpt-oss:20b.recall_on_unseen_model} & \R{arxiv_lomo.gpt-oss:20b.mso_scored_humans} \\
+Qwen3 8B & \R{arxiv_lomo.qwen3:8b.recall_on_unseen_model} & \R{arxiv_lomo.qwen3:8b.mso_scored_humans} \\
+Llama 3.1 8B & \R{arxiv_lomo.llama3.1:8b.recall_on_unseen_model} & \R{arxiv_lomo.llama3.1:8b.mso_scored_humans} \\
+Mistral 7B & \R{arxiv_lomo.mistral:7b.recall_on_unseen_model} & \R{arxiv_lomo.mistral:7b.mso_scored_humans} \\
+Phi-4 14B & \R{arxiv_lomo.phi4:14b.recall_on_unseen_model} & \R{arxiv_lomo.phi4:14b.mso_scored_humans} \\
+Gemma 3 12B & \R{arxiv_lomo.gemma3:12b.recall_on_unseen_model} & \R{arxiv_lomo.gemma3:12b.mso_scored_humans} \\
+Granite 3.3 8B & \R{arxiv_lomo.granite3.3:8b.recall_on_unseen_model} & \R{arxiv_lomo.granite3.3:8b.mso_scored_humans} \\
+RAID Cohere-chat & \R{arxiv_lomo.raid-cohere-chat.recall_on_unseen_model} & \R{arxiv_lomo.raid-cohere-chat.mso_scored_humans} \\
+RAID Mistral-chat & \R{arxiv_lomo.raid-mistral-chat.recall_on_unseen_model} & \R{arxiv_lomo.raid-mistral-chat.mso_scored_humans} \\
+RAID Llama-chat & \R{arxiv_lomo.raid-llama-chat.recall_on_unseen_model} & \R{arxiv_lomo.raid-llama-chat.mso_scored_humans} \\
+RAID ChatGPT & \R{arxiv_lomo.raid-chatgpt.recall_on_unseen_model} & \R{arxiv_lomo.raid-chatgpt.mso_scored_humans} \\
+RAID MPT-chat & \R{arxiv_lomo.raid-mpt-chat.recall_on_unseen_model} & \R{arxiv_lomo.raid-mpt-chat.mso_scored_humans} \\
+RAID GPT-4 & \R{arxiv_lomo.raid-gpt4.recall_on_unseen_model} & \R{arxiv_lomo.raid-gpt4.mso_scored_humans} \\
+\bottomrule
+\end{tabular}
+\caption{Recall on each generator when it is held out of training, and the resulting \mso{} of all scored
+arXiv abstracts (2015--2026; \R{arxiv_instrument.mso_logreg}\% with all generators).}
+\end{table}
+
+\section{Deviations from the analysis plan}
+\label{app:deviations}
+(1)~arXiv was sampled through the API with a stratified design instead of full harvesting; the first sampler
+truncated large windows and was replaced (the paper uses only the second). (2)~Learner data: PERSUADE~2.0
+replaced ELLIPSE, which could not be obtained; the \citet{liang2023detectors} release lacks the 8th-grade
+essays, so it is used only as an out-of-genre check (TOEFL \R{essay_liang.Real TOEFL.mso}\%, US college essays
+\R{essay_liang.Real College Essays.mso}\% in the essay region). (3)~The self-test of the paper's own text was
+dropped. (4)~Added after review: LaTeX and encoding normalisation, grouped calibration, Phi-4, Granite and the
+2026 model, generator-set, drift, math, topic, length and dash analyses, the proficiency adjustment, the
+perplexity instrument and the dispersion measure. (5)~The plan named cs.CL for one comparison; all of cs is
+used. (6)~The June 2025 evaluation month was fixed in code, not in the plan. (7)~Hansard was restricted to
+2015--2025 to match the arXiv period. H5 was not supported.
 
 \end{document}
