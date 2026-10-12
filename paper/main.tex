@@ -44,17 +44,18 @@ Marker-word counts therefore understate how far scientific abstracts have moved 
 LLM influence on writing is easy to detect in aggregate but hard to detect in individual documents. Corpus
 studies find clear traces of LLM-assisted writing in scientific abstracts, peer reviews, press releases and
 encyclopedia articles \citep{kobak2025, liang2024mapping, liang2024monitoring, liang2025widespread,
-brooks2024}, and LLM-favoured words have entered unscripted speech \citep{yakura2024, anderson2025spoken}. Yet
+brooks2024}, and LLM-associated words have become more frequent in unscripted speech \citep{yakura2024, anderson2025spoken}. Yet
 readers are poor at telling human from machine text \citep{clark2021, jakesch2023, casal2023}, detectors can be
-evaded \citep{sadasivan2023, krishna2023, dugan2024raid}, and detectors have flagged non-native writers' human
-text as AI-generated at high rates \citep{liang2023detectors, park2026}. No existing measure says how much
+evaded \citep{sadasivan2023, krishna2023, dugan2024raid}, and some detectors have flagged non-native writers'
+human text as AI-generated at high rates \citep{liang2023detectors}. No existing measure says how much
 writing falls on the machine side of that boundary, in which genres, or since when.
 
 Existing measurements answer a \emph{prevalence} question: what fraction of a corpus was produced or modified
 with an LLM? We answer an \emph{overlap} question: what fraction of a genre's writing is stylistically
 closer to LLM output than to pre-ChatGPT human writing? The two questions read one number differently: the
-small ``LLM share'' that prevalence estimators report for text written before ChatGPT, which several studies
-calibrate away as estimator error \citep{liang2024mapping, lin2025, brooks2024}. For a fixed feature map and
+small ``LLM share'' that prevalence estimators report for text written before ChatGPT, which studies treat as
+consistent with false positives \citep{liang2024mapping}, subtract as baseline misclassification
+\citep{lin2025}, or use to calibrate detector thresholds \citep{brooks2024}. For a fixed feature map and
 a fixed set of reference generators, that share is a property of the two text distributions, and its change
 over time is our object of study.
 
@@ -91,17 +92,18 @@ itself of interest, and in excluding content words from the features: authors re
 \citep{geng2025}, so lexical markers are a moving target.
 
 \paragraph{Homogenization and human adoption.}
-Writing with instruction-tuned models reduces content diversity \citep{padmakumar2024, doshi2024,
-anderson2024homog}; LLM rewriting compresses stylistic variance \citep{sourati2025}; preference tuning reduces
+Writing or ideating with instruction-tuned models reduces content diversity across users
+\citep{padmakumar2024, doshi2024, anderson2024homog}; LLM rewriting compresses stylistic variance \citep{sourati2025}; preference tuning reduces
 output diversity \citep{kirk2024, wu2025monoculture} and plausibly produces LLM-overused words
-\citep{juzek2025}. Humans adopt LLM vocabulary in speech \citep{yakura2024, anderson2025spoken} and academic
-writing \citep{geng2025, lin2025}. \mso{} quantifies how much human writing shares LLM style at a given time;
+\citep{juzek2025}. LLM-associated vocabulary has grown in human speech \citep{yakura2024, anderson2025spoken}, academic authors
+adapt their LLM use once overused words are publicised \citep{geng2025}, and adoption of LLM revision varies
+across disciplines and author groups \citep{lin2025}. \mso{} quantifies how much human writing shares LLM style at a given time;
 a non-zero pre-ChatGPT value is necessary for, but not evidence of, a preference-amplification account.
 
 \paragraph{Style of human and LLM text.}
 LLM text differs systematically from human text in lexico-grammatical features \citep{reinhart2025,
 munozortiz2024, berbersardinha2024, herbold2023} and in recurring part-of-speech templates \citep{shaib2024},
-but genre explains more stylistic variance than source \citep{rallapalli2026}, so any overlap measure must be
+but genre shapes stylistic features more strongly than source does \citep{rallapalli2026}, so any overlap measure must be
 genre-specific. Distribution-level comparisons such as MAUVE \citep{pillutla2021} and coverage frameworks
 \citep{yang2026coverage} evaluate models against human text; we reverse the direction and track where human
 documents fall relative to an LLM region over time.
@@ -109,10 +111,12 @@ documents fall relative to an LLM region over time.
 \paragraph{Detection and perception.}
 Untrained readers judge GPT-3 text at chance \citep{clark2021}; people rely on flawed cues
 \citep{jakesch2023}; linguists and scientific reviewers misclassify abstracts \citep{casal2023, gao2023}.
-Zero-shot detectors use perplexity-based statistics \citep{hans2024binoculars, bao2024fastdetectgpt}, can be
-evaded \citep{sadasivan2023, krishna2023, dugan2024raid}, face limits that grow as distributions converge
+Zero-shot detectors use token-likelihood statistics such as perplexity ratios and probability curvature
+\citep{hans2024binoculars, bao2024fastdetectgpt}, can be evaded \citep{sadasivan2023, krishna2023,
+dugan2024raid}, need more text to succeed as machine and human distributions converge
 \citep{chakraborty2024}, and have produced false positives concentrated on non-native writing
-\citep{liang2023detectors, park2026, mizumoto2026}. We rely on published studies for claims about human
+\citep{liang2023detectors}; on non-native academic manuscripts their false-positive rates range widely and
+shift with professional editing \citep{park2026}. We rely on published studies for claims about human
 perception and collect no human judgements.
 
 \section{Machine-Style Overlap}
@@ -157,12 +161,13 @@ all papers submitted in one randomly placed window of consecutive days (length s
 the arXiv API and drew up to 200 at random, so every archive-month has the same design weight. Because the API
 returns the latest abstract version, papers first submitted before ChatGPT but revised after it are excluded.
 After removing abstracts under 50 words, \R{corpus_stats.arxiv_n_docs} abstracts remain.
-\emph{Parliamentary speech.} The Australian Hansard database \citep{katz2025hansard}, restricted to spoken
+\emph{Parliamentary speech.} The Australian House of Representatives Hansard database
+\citep{katz2023scidata, katz2025hansard}, restricted to spoken
 speeches (no interjections or written questions), up to 150 per month from January 2015 to July 2025
 (\R{corpus_stats.hansard_n_docs} speeches). Hansard is a lightly edited transcript; we treat it as less exposed
 to LLM writing, not unexposed.
 \emph{Student essays.} PERSUADE~2.0 \citep{crossley2024persuade}: \R{corpus_stats.essay_n_docs} argumentative
-essays by US students in grades 6--12 on \R{essay_ell_counts.n_prompts} prompts, written before 2020, with
+essays by US students in grades 6--12 on \R{essay_ell_counts.n_prompts} prompts, written before ChatGPT, with
 English-language-learner (ELL) status and a holistic quality score for each essay. These are school learners,
 not the TOEFL population of \citet{liang2023detectors}.
 In every genre half of the pre-ChatGPT documents (the \emph{train pool}) train the classifier and seed LLM
@@ -354,7 +359,8 @@ pre-ChatGPT human abstracts. Chat versions of the same families, held out from t
 (Mistral, base \R{arxiv_base_models.raid-mistral.share_in_region}\%) and
 \R{arxiv_lomo.raid-mpt-chat.recall_on_unseen_model}\% (MPT, base \R{arxiv_base_models.raid-mpt.share_in_region}\%).
 Base models already lie partly inside the region, and chat tuning moves them much further in, in line with
-reports that preference tuning narrows output style \citep{kirk2024, juzek2025}. RAID's base and chat
+reports that preference tuning reduces output diversity \citep{kirk2024} and may contribute to LLM-overused
+words \citep{juzek2025}. RAID's base and chat
 generations also differ in prompting and length, so this comparison is indicative.
 
 \subsection{Dispersion: steady, not sudden}
@@ -414,7 +420,8 @@ emptying while the region of current models is filling.
 \paragraph{A feedback loop, as a hypothesis.}
 If writing moves into the LLM region and later models are trained on it, ``human'' training data stops being
 an independent anchor. Model collapse under recursive training is documented in controlled settings
-\citep{shumailov2024}, but accumulating real data limits it \citep{gerstgrasser2024}. Our results are
+\citep{shumailov2024}, but is avoided when synthetic data accumulate alongside the original real data
+rather than replacing it \citep{gerstgrasser2024}. Our results are
 consistent with the human-written side of such a loop moving in one genre; they do not show the loop.
 
 \paragraph{Implications for detection.}
@@ -456,9 +463,11 @@ The human author chose the topic, the goal of a fully disclosed AI-conducted stu
 data only, no human participants, local compute), and approved the analysis plan and its deviations. The AI
 system proposed the specific research question and hypotheses, searched the literature, wrote all code,
 generated the local-model texts, ran the analyses, made the figures and drafted all text. The same system also
-produced the ``2026 model'' texts (\S\ref{sec:data}), so its own outputs are part of the reference set. Three
-rounds of simulated peer review by separate AI sessions informed revisions. \TODO{state citation-verification
-outcome once completed} Every number in the paper is inserted automatically from the analysis outputs. AI-written
+produced the ``2026 model'' texts (\S\ref{sec:data}), so its own outputs are part of the reference set. Simulated peer review by separate AI sessions informed revisions. Every citation was checked against its source
+by separate AI verification sessions, which led to rewording several sentences, removing one citation and
+replacing preprints with published versions; the human author then checked a random sample of five citations
+against their sources. \TODO{confirm after the author's spot-check} Every number in the paper is inserted
+automatically from the analysis outputs. AI-written
 and human-edited changes are labelled separately in the version history, which will be released with the code
 and data. No AI system is listed as an author.
 
