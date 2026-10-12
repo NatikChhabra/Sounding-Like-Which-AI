@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite it as below."
+title: "Sounding Like AI Before AI: Machine-Style Overlap in Human Writing"
+authors:
+  - family-names: Chhabra
+    given-names: Natik
+    orcid: "https://orcid.org/0009-0004-8786-7703"
+date-released: 2026-10-12
+license: MIT
+repository-code: "https://github.com/NatikChhabra/machine-style-overlap"
