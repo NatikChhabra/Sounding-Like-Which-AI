@@ -36,7 +36,9 @@ punctuation controls and is absent in placebo and drift tests; Australian parlia
 measurably. Marker words such as \emph{delve} peaked in 2024 and returned almost to trend, while \mso{} kept
 rising. The measured trajectory depends on which generators define the LLM side: a region built only from 2023
 models shows the shift receding in 2026, whereas regions that include current models show it continuing.
-Marker-word counts therefore understate how far scientific abstracts have moved toward LLM style.
+Marker-word counts therefore understate how far scientific abstracts have moved toward LLM style. A secondary
+analysis finds that a perplexity-based detector reproduces a published bias against TOEFL essays yet flags US
+school learners less than their peers: detector bias depends on the population, not on non-native authorship.
 \end{abstract}
 
 \section{Introduction}
@@ -389,9 +391,15 @@ sentence-embedding classifier (\R{essay_embedding_instrument.ELL.mso}\% vs
 detectors (\R{essay_perplexity_instrument.ELL.mso}\% vs \R{essay_perplexity_instrument.non-ELL.mso}\%; odds
 ratio \R{essay_perplexity_adjusted.odds_ratio}), because these learner essays are \emph{less} predictable
 (mean token log-perplexity \R{essay_perplexity_adjusted.mean_logppl_ell} vs
-\R{essay_perplexity_adjusted.mean_logppl_nonell} under Qwen2.5-0.5B). The detector bias reported for TOEFL
-essays \citep{liang2023detectors} therefore does not carry over to this school population, which suggests that
-such bias depends on the population and the detector's calibration rather than on non-native authorship alone.
+\R{essay_perplexity_adjusted.mean_logppl_nonell} under Qwen2.5-0.5B). The same perplexity instrument does
+reproduce the bias reported by \citet{liang2023detectors} on their own data: it flags
+\R{essay_liang_perplexity.Real TOEFL.mso}\% of TOEFL essays by non-native test-takers, whose text is highly
+predictable (log-perplexity \R{essay_liang_perplexity.Real TOEFL.mean_logppl}), but only
+\R{essay_liang_perplexity.Real US 8th grade.mso}\% of US 8th-grade essays
+(\R{essay_liang_perplexity.Real US 8th grade.mean_logppl}). One detector thus shows opposite biases in two
+learner populations: what it penalises is predictable, formulaic text, which test-takers produce and school
+learners, whose essays contain more errors, do not. Detector bias depends on the population, not on
+non-native authorship as such.
 
 \begin{figure}[t]
 \centering
@@ -506,9 +514,12 @@ arXiv abstracts (2015--2026; \R{arxiv_instrument.mso_logreg}\% with all generato
 \label{app:deviations}
 (1)~arXiv was sampled through the API with a stratified design instead of full harvesting; the first sampler
 truncated large windows and was replaced (the paper uses only the second). (2)~Learner data: PERSUADE~2.0
-replaced ELLIPSE, which could not be obtained; the \citet{liang2023detectors} release lacks the 8th-grade
-essays, so it is used only as an out-of-genre check (TOEFL \R{essay_liang.Real TOEFL.mso}\%, US college essays
-\R{essay_liang.Real College Essays.mso}\% in the essay region). (3)~The self-test of the paper's own text was
+replaced ELLIPSE, which could not be obtained; the human essays of \citet{liang2023detectors} (TOEFL, US
+8th-grade and US college essays; the 8th-grade set is distributed only in the authors' GitHub repository and was
+added after review) are a different genre from PERSUADE and are used only for the perplexity replication. The
+style instrument places \R{essay_liang.Real TOEFL.mso}\% of TOEFL, \R{essay_liang.Real US 8th grade.mso}\% of
+8th-grade and \R{essay_liang.Real College Essays.mso}\% of college essays in the PERSUADE-defined region, which
+shows how genre-specific the region is. (3)~The self-test of the paper's own text was
 dropped. (4)~Added after review: LaTeX and encoding normalisation, grouped calibration, Phi-4, Granite and the
 2026 model, generator-set, drift, math, topic, length and dash analyses, the proficiency adjustment, the
 perplexity instrument and the dispersion measure. (5)~The plan named cs.CL for one comparison; all of cs is
