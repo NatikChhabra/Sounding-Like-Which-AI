@@ -69,7 +69,8 @@ MSO value was computed. Git timestamps are self-reported, so this is weaker than
    speaker, not the speech. Speeches are now keyed by date + order, and cross-validation groups by speaker.
    Some speakers' speeches were sampled more than once as generation seeds; all generations are kept.
 5. **Pilot run.** An essay analysis was run once on partial generations (3 of 5 models) to test the code.
-   No analysis choices were changed after seeing it.
+   No analysis choices were changed after seeing it. The same was done once for arXiv (RAID + ~30% of local
+   generations) to test the pipeline at scale; again no analysis choice was changed afterwards.
 
 ## 6. Self-test
 The paper's own text is scored by the same pipeline and compared with human-written cs.CL abstracts.

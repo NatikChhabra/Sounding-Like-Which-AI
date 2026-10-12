@@ -64,9 +64,14 @@ def make_model(kind="logreg"):
     return CalibratedClassifierCV(base, method="isotonic", cv=5)
 
 
+PER_MODEL = 450  # = 3 prompts x 150 for each local model; equal weight per generator (pre-registered)
+
+
 def training_set(human, llm, exclude_model=None):
-    """Balanced: equal numbers of pre-2022 human (train pool) and LLM docs."""
+    """Balanced: equal numbers of pre-2022 human (train pool) and LLM docs; each generator capped at
+    PER_MODEL so large external sets (RAID) cannot dominate the LLM region."""
     L = llm if exclude_model is None else llm[llm.model != exclude_model]
+    L = pd.concat([g.sample(n=min(len(g), PER_MODEL), random_state=SEED) for _, g in L.groupby("model")])
     H = human[human.pool == "train"]
     H = H.sample(n=min(len(H), len(L)), random_state=SEED)
     L = L.sample(n=len(H), random_state=SEED)
@@ -82,7 +87,12 @@ def fit(X, y, kind="logreg"):
     Xv = np.nan_to_num(vec.fit_transform(X))
     keep = (Xv != 0).mean(0) >= 0.01  # drop features present in <1% of training docs
     model = make_model(kind).fit(Xv[:, keep], y)
-    return lambda F: model.predict_proba(np.nan_to_num(vec.transform(F))[:, keep])[:, 1], vec, keep, model
+
+    def score(F, chunk=5000):  # chunked: scoring 100k+ docs at once does not fit in memory
+        F = list(F)
+        return np.concatenate([model.predict_proba(np.nan_to_num(vec.transform(F[i:i + chunk])[:, keep]))[:, 1]
+                               for i in range(0, len(F), chunk)] or [np.array([])])
+    return score, vec, keep, model
 
 
 def cv_auc(X, y, groups, kind="logreg"):

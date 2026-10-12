@@ -1,4 +1,4 @@
-"""All tables and figures. Usage: python analysis.py DATA_DIR {essay|arxiv|hansard|all}
+﻿"""All tables and figures. Usage: python analysis.py DATA_DIR {essay|arxiv|hansard|all}
 
 Writes results/<genre>_*.csv|json. Every number in the paper must come from these files.
 """
@@ -85,6 +85,38 @@ def essay(data):
     save("essay_ell_adjusted", {"odds_ratio": float(np.exp(fit.params["ell"])),
                                 "or_lo": float(np.exp(ci[0])), "or_hi": float(np.exp(ci[1])),
                                 "p_value": float(fit.pvalues["ell"]), "n": int(fit.nobs)})
+    # continuous margin (more power than the rare thresholded event). Calibrated probabilities pile up at
+    # exactly 0, so use the uncalibrated logistic decision score instead; standardized to SD units of the
+    # scored humans. Model: margin ~ ELL + prompt + grade, robust (HC3) errors.
+    from sklearn.feature_extraction import DictVectorizer
+    X, y, _, _ = mso.training_set(human, llm[llm.model.map(CHAT)])
+    vec = DictVectorizer(sparse=False)
+    Xv = np.nan_to_num(vec.fit_transform(X))
+    kp = (Xv != 0).mean(0) >= 0.01
+    lin = mso.make_pipeline(mso.StandardScaler(), mso.LogisticRegression(C=0.1, max_iter=3000)).fit(Xv[:, kp], y)
+    s["lp"] = lin.decision_function(np.nan_to_num(vec.transform(list(s.f)))[:, kp])
+    s["lp"] = (s.lp - s.lp.mean()) / s.lp.std()
+    ols = smf.ols("lp ~ ell + C(title) + C(grade)", data=s).fit(cov_type="HC3")
+    ci = ols.conf_int().loc["ell"]
+    save("essay_ell_continuous", {"ell_coef_sd": float(ols.params["ell"]), "coef_lo": float(ci[0]),
+                                  "coef_hi": float(ci[1]), "p_value": float(ols.pvalues["ell"]), "n": int(ols.nobs)})
+    # seed stability: re-draw the balanced training sample 10 times
+    rows, keep_seed = [], mso.SEED
+    for seed in range(10):
+        mso.SEED = seed
+        X, y, _, _ = mso.training_set(human, llm[llm.model.map(CHAT)])
+        ps = mso.fit(X, y)[0](list(s.f))
+        d = s.assign(in_region=(ps >= 0.5).astype(int))
+        f = smf.logit("in_region ~ ell + C(title) + C(grade)", data=d).fit(disp=0)
+        rows.append({"seed": seed, "mso_all": d.in_region.mean(), "mso_ell": d[d.ell == 1].in_region.mean(),
+                     "mso_nonell": d[d.ell == 0].in_region.mean(), "odds_ratio": float(np.exp(f.params["ell"])),
+                     "p_value": float(f.pvalues["ell"])})
+    mso.SEED = keep_seed
+    seeds = pd.DataFrame(rows)
+    save("essay_seed_stability", {"n_seeds": len(seeds), **{f"{c}_{st}": float(getattr(seeds[c], st)())
+                                  for c in ("mso_all", "mso_ell", "mso_nonell", "odds_ratio") for st in ("min", "median", "max")},
+                                  "share_seeds_p_below_05": float((seeds.p_value < 0.05).mean()),
+                                  "share_seeds_ell_lower": float((seeds.mso_ell < seeds.mso_nonell).mean())})
     # robustness 1: does the ELL contrast survive other thresholds?
     save("essay_thresholds", pd.DataFrame([
         {"group": f"{g}@{t}", "n": len(d), "mso": float((d.p >= t).mean())}
