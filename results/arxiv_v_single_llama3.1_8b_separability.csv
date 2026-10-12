@@ -1,0 +1,2 @@
+model,prompt,n,auc
+llama3.1:8b,P1,150,0.9632888888888888

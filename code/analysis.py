@@ -165,7 +165,9 @@ def essay_perplexity(data):
     from sklearn.calibration import CalibratedClassifierCV
     from sklearn.linear_model import LogisticRegression
     human, llm = mso.load(data, "essay")
-    ppl = pd.read_json(Path(data) / "ppl_essay.jsonl", lines=True).set_index("id").logppl
+    import perplexity
+    T = perplexity.TAG
+    ppl = pd.read_json(Path(data) / f"ppl_essay{T}.jsonl", lines=True).set_index("id").logppl
     llm = llm[llm.model.map(CHAT)]
     _, _, _, L = mso.training_set(human, llm)
     H = human[human.pool == "train"].sample(n=len(L), random_state=mso.SEED)
@@ -182,17 +184,16 @@ def essay_perplexity(data):
     s["band"] = pd.cut(s.grade, [0, 8, 10, 12], labels=["6-8", "9-10", "11-12"]).astype(str)
     f = smf.logit("flag ~ ell + C(title) + C(band)", data=s).fit(disp=0)
     ci = f.conf_int().loc["ell"]
-    save("essay_perplexity_instrument", pd.DataFrame([ci_row(g, d.p) for g, d in [("all", s), *s.groupby("group")]]))
-    save("essay_perplexity_adjusted", {"odds_ratio": float(np.exp(f.params["ell"])), "or_lo": float(np.exp(ci[0])),
+    save(f"essay_perplexity_instrument{T}", pd.DataFrame([ci_row(g, d.p) for g, d in [("all", s), *s.groupby("group")]]))
+    save(f"essay_perplexity_adjusted{T}", {"odds_ratio": float(np.exp(f.params["ell"])), "or_lo": float(np.exp(ci[0])),
                                        "or_hi": float(np.exp(ci[1])), "p_value": float(f.pvalues["ell"]),
                                        "mean_logppl_ell": float(s[s.ell == 1].lp.mean()),
                                        "mean_logppl_nonell": float(s[s.ell == 0].lp.mean())})
     # Liang et al. (2023) original contrast, out of genre: TOEFL essays vs US 8th-grade essays
-    import perplexity
     lg = liang_essays(data)
     lp = np.array(perplexity.scorer()(lg.text.tolist()))
     pl = clf.predict_proba(lp.reshape(-1, 1))[:, 1]
-    save("essay_liang_perplexity", pd.DataFrame([{**ci_row(g, pl[(lg.name == g).values]),
+    save(f"essay_liang_perplexity{T}", pd.DataFrame([{**ci_row(g, pl[(lg.name == g).values]),
                                                   "mean_logppl": float(np.nanmean(lp[(lg.name == g).values]))}
                                                  for g in sorted(lg.name.unique())]))
 
@@ -375,9 +376,145 @@ def drift_placebo(data, genre="arxiv"):
     save(f"{genre}_drift_placebo", segmented(monthly(s), t0=pd.Period("2019-01", "M"), eval_at=pd.Period("2022-06", "M")))
 
 
+# ----------------------------------------------------------------------------------------- v3: generator vintage
+PRE2022_DATA = ("raid-gpt4", "raid-chatgpt")  # training data predate ChatGPT's release (GPT-4 report: Sep 2021)
+WORD = re.compile(r"[a-z]+")
+
+
+def mined_markers(llm_texts, human_texts, k=20, min_df=0.05):
+    """Words most over-represented in LLM output vs pre-ChatGPT human abstracts (smoothed log-odds of document
+    frequency), so the lexical comparison uses markers of the SAME generators that define the style region."""
+    def df(texts):
+        c = pd.Series([w for t in texts for w in set(WORD.findall(t.lower()))]).value_counts()
+        return c / len(texts)
+    a, b = df(llm_texts), df(human_texts)
+    words = a[a >= min_df].index
+    lo = np.log((a[words] + 1e-3) / (b.reindex(words).fillna(0) + 1e-3))
+    return list(lo.sort_values(ascending=False).index[:k])
+
+
+def nonparam_gap(m, start="2025-01", end="2025-06"):
+    """Mean observed monthly value in [start, end] minus the extrapolated linear pre-ChatGPT trend (WLS)."""
+    pre = m[m.month < T0]
+    t = np.array([(p - T0).n for p in pre.month])
+    b = np.polyfit(t, pre.mso, 1, w=np.sqrt(pre.n))
+    win = m[(m.month >= pd.Period(start, "M")) & (m.month <= pd.Period(end, "M"))]
+    tw = np.array([(p - T0).n for p in win.month])
+    return float((win.mso - np.polyval(b, tw)).mean())
+
+
+def vintage(data):
+    """Per-generator-vintage regions on a matched task: each local/2026 generator on title-only prompts (P1), RAID
+    generators (title-based) as they are, plus a region from generators whose training data predate ChatGPT."""
+    human, llm = mso.load(data, "arxiv")
+    train_h = human[(human.pool == "train") & (human.date < CUTOFF)].text.sample(3000, random_state=mso.SEED).tolist()
+    s0 = human[human.pool == "score"].copy()
+    chat = llm[llm.model.map(CHAT)]
+    p1 = chat[(chat.prompt == "P1") | chat.model.str.startswith("raid-")]
+    sets = {f"single:{g}": p1[p1.model == g] for g in sorted(p1.model.unique())}
+    sets |= {"pre2022data": chat[chat.model.isin(PRE2022_DATA)],
+             "raid_all": chat[chat.model.str.startswith("raid-")],
+             "local_p1": p1[~p1.model.str.startswith("raid-") & (p1.model != FRONTIER)],
+             "frontier_p1": p1[p1.model == FRONTIER],
+             "all_no_revision": chat[chat.prompt != "P2"],
+             "all": chat}
+    rows, its = [], {}
+    for name, sub in sets.items():
+        score, _ = region(human, sub, f"arxiv_v_{name.replace(':', '_')}", lomo_runs=False)
+        s = s0.assign(in_region=(score(list(s0.f)) >= 0.5).astype(int))
+        words = mined_markers(sub.text.tolist(), train_h)
+        pat = re.compile(r"\b(" + "|".join(map(re.escape, words)) + r")\b", re.I)
+        s["mk"] = s.text.map(lambda t: bool(pat.search(t))).astype(int)
+        m, mm = monthly(s), monthly(s, "mk")
+        r, rm = segmented(m), segmented(mm)
+        its[name] = {"style": r, "markers": rm, "marker_words": words}
+        yr = s.groupby(s.date.dt.year)[["in_region", "mk"]].mean()
+        rows.append({"group": name, "n_llm": len(sub), "gap": r["excess"], "gap_lo": r["excess_lo"],
+                     "gap_hi": r["excess_hi"], "gap_nonparam": nonparam_gap(m),
+                     "marker_gap": rm["excess"], **{f"y{y}": float(v) for y, v in yr.in_region.items()},
+                     **{f"m{y}": float(v) for y, v in yr.mk.items()}})
+    save("arxiv_vintage", pd.DataFrame(rows))
+    save("arxiv_vintage_its", its)
+
+
+def placebo_grid(m, start="2016-06", end="2021-12", eval_months=12):
+    """Every 2 months: fake break; share of fake breaks whose 'gap' (eval_months later) has p < 0.05."""
+    pre = m[m.month < T0]
+    out = []
+    for f in pd.period_range(start, end, freq="2M"):
+        r = segmented(pre, t0=f, eval_at=min(f + eval_months, T0 - 1))
+        out.append({"break": str(f), "gap": r["excess"], "p": r["excess_p"]})
+    g = pd.DataFrame(out)
+    return {"n_breaks": len(g), "share_p_below_05": float((g.p < 0.05).mean()),
+            "median_abs_gap": float(g.gap.abs().median()), "max_abs_gap": float(g.gap.abs().max())}
+
+
+def robustness_v3(data):
+    """Placebo grids for both genres, event study, field tests (Holm; cs vs math), length-standardised field
+    baselines, length-fixed dispersion, revision overlap with sources."""
+    from statsmodels.stats.multitest import multipletests
+    out = {}
+    for genre in ("arxiv", "hansard"):
+        m = pd.read_csv(OUT / f"{genre}_monthly.csv")
+        m["month"] = pd.PeriodIndex(m.month, freq="M")
+        out[f"{genre}_placebo_grid"] = placebo_grid(m)
+        pre = m[m.month < T0]
+        t = np.array([(p - T0).n for p in pre.month])
+        b = np.polyfit(t, pre.mso, 1, w=np.sqrt(pre.n))
+        m["resid"] = m.mso - np.polyval(b, [(p - T0).n for p in m.month])
+        ev = m.groupby(m.month.dt.year).apply(lambda d: pd.Series({
+            "resid": np.average(d.resid, weights=d.n), "n": d.n.sum()}), include_groups=False).reset_index()
+        save(f"{genre}_event", ev.rename(columns={"month": "group"}).assign(group=lambda d: d.group.astype(str)))
+    its = json.loads((OUT / "arxiv_its.json").read_text())
+    fields = ["astro-ph", "cond-mat", "cs", "econ", "eess", "math", "q-bio", "stat"]
+    p = [its[f]["excess_p"] for f in fields]
+    out["field_holm"] = dict(zip(fields, multipletests(p, method="holm")[1].tolist()))
+    a, b = its["cs"], its["math"]
+    d = a["excess"] - b["excess"]
+    se = (a["excess_se"] ** 2 + b["excess_se"] ** 2) ** 0.5
+    out["cs_minus_math"] = {"diff": d, "lo": d - 1.96 * se, "hi": d + 1.96 * se, "p": float(2 * norm.sf(abs(d / se)))}
+    save("robustness_v3", out)
+    # length-standardised pre-ChatGPT baselines by field (reweight to the overall pre-period length distribution)
+    human, llm = mso.load(data, "arxiv")
+    score, _ = region(human, llm[llm.model.map(CHAT)], "arxiv_lenstd", lomo_runs=False)
+    pre = human[(human.pool == "score") & (human.date < CUTOFF)].copy()
+    pre["in_region"] = (score(list(pre.f)) >= 0.5).astype(int)
+    pre["lbin"] = pd.qcut(pre.text.str.split().str.len(), 5, labels=False, duplicates="drop")
+    target = pre.lbin.value_counts(normalize=True)
+    rows = []
+    for g, d in pre.groupby("group"):
+        w = d.lbin.map(target / d.lbin.value_counts(normalize=True))
+        rows.append({"group": g, "mso_lenstd": float(np.average(d.in_region, weights=w)),
+                     "median_words": float(d.text.str.split().str.len().median())})
+    save("arxiv_baseline_lenstd", pd.DataFrame(rows))
+    # dispersion with length fixed: abstracts of >= 150 words, features recomputed on the first 150 words
+    s = human[(human.pool == "score")].copy()
+    s = s[s.text.str.split().str.len() >= 150]
+    smp = s.groupby(s.date.dt.year, group_keys=False).apply(lambda d: d.sample(n=min(1200, len(d)), random_state=mso.SEED))
+    smp = smp.assign(f=features.extract([" ".join(t.split()[:150]) for t in smp.text]))
+    dispersion(smp, "arxiv_len150")
+
+
+def revision_overlap(data):
+    """Share of each generator's revision (P2) outputs that keep >30% of the source's word 6-grams."""
+    rows = []
+    for genre in ("arxiv", "hansard", "essay"):
+        human = pd.read_parquet(Path(data) / f"human_{genre}.parquet").set_index("id").text
+        llm = pd.read_json(Path(data) / f"llm_{genre}.jsonl", lines=True)
+        if genre == "arxiv":
+            llm["src_id"] = llm.src_id.str.replace(r"v\d+$", "", regex=True)
+        p2 = llm[(llm.prompt == "P2") & llm.src_id.isin(human.index)]
+        grams = lambda t: {tuple(w[i:i + 6]) for w in [t.lower().split()] for i in range(len(w) - 5)}
+        for g, d in p2.groupby("model"):
+            keep = [len(grams(o) & grams(human[s])) / max(1, len(grams(human[s]))) for o, s in zip(d.text, d.src_id)]
+            rows.append({"group": f"{genre}:{g}", "n": len(d), "share_over_30pct": float(np.mean(np.array(keep) > 0.3)),
+                         "median_retained": float(np.median(keep))})
+    save("revision_overlap", pd.DataFrame(rows))
+
+
 def nodash(data):
     """Ablation: drop every dash feature so punctuation typography cannot drive MSO."""
-    mso.EXCLUDE = ("pun:—", "pun:–", "pun:-")
+    mso.EXCLUDE = ("pun:â€”", "pun:â€“", "pun:-")
     try:
         timeseries(data, "arxiv", True, "_nodash", (), False)
     finally:
@@ -414,6 +551,8 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
+            "vintage": lambda: vintage(data), "robust3": lambda: robustness_v3(data),
+            "overlap": lambda: revision_overlap(data),
             "control": control}
     for j in (jobs if which == "all" else [which]):
         jobs[j]()

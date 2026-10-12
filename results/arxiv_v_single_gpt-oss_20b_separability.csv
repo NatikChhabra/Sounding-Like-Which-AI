@@ -1,0 +1,2 @@
+model,prompt,n,auc
+gpt-oss:20b,P1,150,0.9749555555555556

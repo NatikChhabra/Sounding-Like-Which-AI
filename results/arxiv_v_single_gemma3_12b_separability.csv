@@ -1,0 +1,2 @@
+model,prompt,n,auc
+gemma3:12b,P1,150,0.9920888888888888
