@@ -38,7 +38,8 @@ def its_panel(ax, name, color, label, ylabel="MSO (%)", legend=False):
     ax.text(T0.to_timestamp(), ax.get_ylim()[0], " ChatGPT", color=INK, va="bottom", fontsize=6.5)
     ax.set_ylabel(ylabel)
     if legend:
-        ax.legend(loc="upper left", fontsize=6)
+        ax.legend(loc="upper left", bbox_to_anchor=(0, 1.02), fontsize=5.6, framealpha=0.9, facecolor="white",
+                  frameon=True, edgecolor="none")
 
 
 def fig_timeseries():
@@ -67,7 +68,7 @@ def fig_fields():
     y = np.arange(len(base))
     axes[0].errorbar(100 * base.mso, y, xerr=[100 * (base.mso - base.lo), 100 * (base.hi - base.mso)],
                      fmt="o", ms=4, color=BLUE, ecolor=BLUE, elinewidth=1, capsize=0)
-    axes[0].set_yticks(y, base.group)
+    axes[0].set_yticks(y, [f"{g} ({n:,})" for g, n in zip(base.group, base.n)])
     axes[0].set_xlabel("Pre-ChatGPT MSO (%)", fontsize=7)
     e = np.array([100 * d[k] for d in ex])
     lo = np.array([100 * d["excess_lo"] for d in ex])
@@ -117,9 +118,51 @@ def fig_gensets():
     fig.savefig(FIG / "gensets.pdf")
 
 
+# generators in release order (year of release; RAID's are 2023 systems)
+VINTAGE = [("raid-cohere-chat", "Cohere chat", 2023), ("raid-mpt-chat", "MPT chat", 2023),
+           ("raid-llama-chat", "Llama 2 chat (RAID)", 2023), ("raid-mistral-chat", "Mistral chat", 2023),
+           ("raid-chatgpt", "ChatGPT", 2023), ("raid-gpt4", "GPT-4", 2023), ("llama2:7b", "Llama 2 chat 7B", 2023),
+           ("vicuna:7b", "Vicuna 7B v1.5", 2023), ("mistral:7b", "Mistral 7B v0.3", 2024),
+           ("llama3.1:8b", "Llama 3.1 8B", 2024), ("phi4:14b", "Phi-4 14B", 2024), ("gemma3:12b", "Gemma 3 12B", 2025),
+           ("qwen3:8b", "Qwen3 8B", 2025), ("granite3.3:8b", "Granite 3.3 8B", 2025), ("gpt-oss:20b", "gpt-oss 20B", 2025),
+           ("claude-opus-5.5", "2026 model", 2026)]
+YEAR_COLOR = {2023: "#e87ba4", 2024: "#eda100", 2025: AQUA, 2026: ORANGE}
+
+
+def fig_vintage():
+    v = pd.read_csv(RES / "arxiv_vintage.csv").set_index("group")
+    years = [int(c[1:]) for c in v.columns if c.startswith("y")]
+    fig, (a, b) = plt.subplots(1, 2, figsize=(6.6, 2.4), gridspec_kw={"width_ratios": [1, 1.25]})
+    sets = [("pre2022data_matched", "Pre-ChatGPT training data", BLUE), ("raid_all", "RAID 2023 chat models", "#e87ba4"),
+            ("local_p1", "Open models 2024-25", AQUA), ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", "#eda100"),
+            ("frontier_p1", "2026 model", ORANGE)]
+    for k, label, c in sets:
+        if k in v.index:
+            a.plot(years, [100 * v.loc[k, f"y{y}"] for y in years], color=c, lw=1.8, marker="o", ms=2.5, label=label)
+    a.axvline(2022.9, color=INK, lw=0.6)
+    a.set_ylabel("arXiv MSO (%)")
+    a.set_xticks([2015, 2018, 2021, 2024, 2026])
+    a.legend(fontsize=5.6, loc="upper left")
+    a.set_title("(a) Region defined by", fontsize=7.5, loc="left")
+    rows = [(lab, yr, 100 * (v.loc[f"single:{m}", "y2026"] - v.loc[f"single:{m}", "y2025"]))
+            for m, lab, yr in VINTAGE if f"single:{m}" in v.index]
+    x = np.arange(len(rows))
+    b.bar(x, [r[2] for r in rows], color=[YEAR_COLOR[r[1]] for r in rows], width=0.7)
+    b.axhline(0, color=INK, lw=0.6)
+    b.set_xticks(x, [r[0] for r in rows], rotation=60, ha="right", fontsize=5.6)
+    b.set_ylabel("Change 2025 to 2026 (pp)")
+    b.set_title("(b) Single-generator regions, in release order", fontsize=7.5, loc="left")
+    b.grid(axis="x", visible=False)
+    for yr, c in YEAR_COLOR.items():
+        b.bar([0], [0], color=c, label=str(yr))
+    b.legend(fontsize=5.6, title="Released", title_fontsize=5.6, loc="upper left", ncol=2)
+    fig.tight_layout()
+    fig.savefig(FIG / "vintage.pdf")
+
+
 if __name__ == "__main__":
     FIG.mkdir(parents=True, exist_ok=True)
-    for f in (fig_learners, fig_timeseries, fig_fields, fig_gensets):
+    for f in (fig_learners, fig_timeseries, fig_fields, fig_gensets, fig_vintage):
         try:
             f()
             print("ok", f.__name__)

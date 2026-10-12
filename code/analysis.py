@@ -314,7 +314,7 @@ def timeseries(data, genre, by_field=False, tag="", drop_models=(), lomo_runs=Tr
     return tests
 
 
-def dispersion(s, name, per_year=1500):
+def dispersion(s, name, per_year=1500, n_boot=300):
     """Homogenization check: per-year stylistic dispersion of human documents = mean Euclidean distance to
     the year's centroid in the feature space standardized on pre-ChatGPT documents (same per-year n)."""
     from sklearn.feature_extraction import DictVectorizer
@@ -327,11 +327,27 @@ def dispersion(s, name, per_year=1500):
     mu, sd = X[pre].mean(0), X[pre].std(0) + 1e-9
     Z = (X - mu) / sd
     years = smp.date.dt.year.values
-    rows = []
-    for y in sorted(set(years)):
-        z = Z[years == y]
-        rows.append({"group": str(y), "n": len(z), "dispersion": float(np.linalg.norm(z - z.mean(0), axis=1).mean())})
+    ys = sorted(set(years))
+    disp = lambda z: float(np.linalg.norm(z - z.mean(0), axis=1).mean())
+    rng = np.random.default_rng(mso.SEED)
+    boot = np.array([[disp(Z[years == y][rng.integers(0, (years == y).sum(), (years == y).sum())]) for y in ys]
+                     for _ in range(n_boot)])
+    pre_y = [y for y in ys if y <= 2022]
+
+    def gap(v, at):  # observed minus linear 2015-2022 trend, extrapolated to year `at`
+        b = np.polyfit(pre_y, v[:len(pre_y)], 1)
+        return v[ys.index(at)] - np.polyval(b, at)
+    point = np.array([disp(Z[years == y]) for y in ys])
+    rows = [{"group": str(y), "n": int((years == y).sum()), "dispersion": point[i],
+             "lo": float(np.percentile(boot[:, i], 2.5)), "hi": float(np.percentile(boot[:, i], 97.5))}
+            for i, y in enumerate(ys)]
     save(f"{name}_dispersion", pd.DataFrame(rows))
+    g = {}
+    for at in (2025, 2026):
+        bg = [gap(b, at) for b in boot]
+        g[f"gap_{at}"] = {"est": gap(point, at), "ci_lo": float(np.percentile(bg, 2.5)),
+                          "ci_hi": float(np.percentile(bg, 97.5)), "trend_per_year": float(np.polyfit(pre_y, point[:len(pre_y)], 1)[0])}
+    save(f"{name}_dispersion_trend", g)
 
 
 GENSETS = {  # which generators define the LLM region
@@ -377,7 +393,10 @@ def drift_placebo(data, genre="arxiv"):
 
 
 # ----------------------------------------------------------------------------------------- v3: generator vintage
-PRE2022_DATA = ("raid-gpt4", "raid-chatgpt")  # training data predate ChatGPT's release (GPT-4 report: Sep 2021)
+# Pretraining data predate ChatGPT's release, per primary sources: GPT-4 (gpt-4-0613; GPT-4 report: Sep 2021) and
+# RAID's Llama-2-70b-chat (Llama 2 model card: Sep 2022). ChatGPT (gpt-3.5-turbo-0613) only as a sensitivity set,
+# since its cutoff is documented only by secondary sources.
+PRE2022_DATA = ("raid-gpt4", "raid-llama-chat")
 # Open models whose pretraining data predate ChatGPT, run locally on the same prompts (added after review round 2;
 # kept out of every other analysis): Llama 2 chat (pretraining cutoff Sep 2022) and Vicuna (Llama + ShareGPT).
 OLD = ("llama2:7b", "vicuna:7b")
@@ -450,7 +469,8 @@ def vintage_sets(llm):
     sets = {f"single:{g}": p1[p1.model == g] for g in sorted(p1.model.unique())}
     old, raid_pre = chat[chat.model.isin(OLD)], chat[chat.model.isin(PRE2022_DATA)]
     new = chat[~chat.model.isin(OLD)]  # every set below except the pre-ChatGPT-data ones is as before
-    sets |= {"pre2022data": raid_pre,
+    raid_pre_c = chat[chat.model.isin(PRE2022_DATA + ("raid-chatgpt",))]
+    sets |= {"pre2022data": raid_pre, "pre2022data_plus_chatgpt": raid_pre_c,
              "pre2022data_abstract_register": raid_pre[~raid_pre.text.str.contains(SUMMARY)],
              "raid_all": new[new.model.str.startswith("raid-")],
              "local_p1": p1[~p1.model.str.startswith("raid-") & (p1.model != FRONTIER) & ~p1.model.isin(OLD)],
