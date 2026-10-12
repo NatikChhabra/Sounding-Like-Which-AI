@@ -248,8 +248,16 @@ $p\R{control_difference.p}$).
 \emph{Dose.} The excess is largest in computer science (\R{arxiv_its.cs.excess_at_2025-06} points) and
 smallest in mathematics (\R{arxiv_its.math.excess_at_2025-06}) and astrophysics
 (\R{arxiv_its.astro-ph.excess_at_2025-06}) (Figure~\ref{fig:fields}, right), the same ordering reported for
-LLM use by prevalence studies \citep{liang2024mapping}. In 2026 the series turned down
-(\R{arxiv_yearly.2026.mso}\% through September), a pattern we return to below.
+LLM use by prevalence studies \citep{liang2024mapping}. The rise continued into 2026
+(\R{arxiv_yearly.2026.mso}\% through September).
+
+\paragraph{The region must include current models.}
+A 2026 frontier model writes largely outside the region defined by older generators: with it held out, the
+region captures only \R{arxiv_lomo.claude-opus-5.5.recall_on_unseen_model}\% of its abstracts, against
+\R{arxiv_lomo.raid-gpt4.recall_on_unseen_model}\% for held-out GPT-4. In a preliminary run without the
+frontier model, arXiv \mso{} appeared to fall in 2026; with it, the rise continues. Newer models no longer
+sound like ``classic'' LLM text, so an overlap measure defined only by older models will understate recent
+movement. We therefore include the newest generator available to us and report leave-one-out results for all.
 
 \subsection{Marker words recede; style overlap does not}
 The share of abstracts with a marker word also jumped after 2022 (Figure~\ref{fig:ts}c), but it peaked in 2024
@@ -313,9 +321,16 @@ preferences that human raters already held \citep{juzek2025}.
 \paragraph{Why marker words mislead.}
 Marker words are what readers notice and what authors can edit out. Their rise and fall alongside a persistent
 rise in \mso{} suggests that the visible markers were removed while the underlying register remained. Studies
-that track markers may therefore understate continued LLM influence in 2025--2026; the late downturn in
-\mso{} itself could reflect less detectable newer models, deliberate editing, or a true decline, and our data
-cannot yet distinguish these.
+that track markers may therefore understate continued LLM influence in 2025--2026. The frontier-model result
+points the same way from the other side: current models no longer produce the markers, or the classic register,
+that readers learned to associate with AI, so ``sounds like AI'' is itself a moving target.
+
+\paragraph{A self-test.}
+This paper was drafted by an AI system (see AI Use). Scored by the abstract instrument,
+\R{selftest.share_paragraphs_in_region}\% of its own prose paragraphs fall in the LLM region, compared with
+\R{selftest.mso_cs_2026_humans}\% of human-attributed computer-science abstracts from 2026. Paragraphs of a paper
+are not abstracts, so this comparison is illustrative only, but it makes the paper's point concrete: by this
+measure, most 2026 computer-science abstracts read as more machine-like than an AI-drafted paper about them.
 
 \paragraph{A feedback loop, as a hypothesis.}
 If human writing moves into the LLM region and later models are trained on it, ``human'' training data stops
