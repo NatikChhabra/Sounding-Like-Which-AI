@@ -99,9 +99,27 @@ def fig_learners():
     fig.savefig(FIG / "learners.pdf")
 
 
+def fig_gensets():
+    g = pd.read_csv(RES / "arxiv_gensets.csv").set_index("group")
+    years = [int(c[1:]) for c in g.columns if c.startswith("y")]
+    sets = [("all", "All 14 generators", BLUE), ("local_frontier", "Local 7 + 2026 model", ORANGE),
+            ("local", "Local 7 (2024-25 open models)", AQUA), ("no_frontier", "All except 2026 model", "#eda100"),
+            ("raid", "RAID only (2023 models)", "#e87ba4")]
+    fig, ax = plt.subplots(figsize=(3.3, 2.3))
+    for k, label, c in sets:
+        y = [100 * g.loc[k, f"y{yr}"] for yr in years]
+        ax.plot(years, y, color=c, lw=2, marker="o", ms=3, label=label)
+    ax.axvline(2022.9, color=INK, lw=0.6)
+    ax.set_ylabel("arXiv MSO (%)")
+    ax.set_xticks([2015, 2018, 2021, 2024, 2026])
+    ax.legend(fontsize=5.8, loc="upper left")
+    fig.tight_layout()
+    fig.savefig(FIG / "gensets.pdf")
+
+
 if __name__ == "__main__":
     FIG.mkdir(parents=True, exist_ok=True)
-    for f in (fig_learners, fig_timeseries, fig_fields):
+    for f in (fig_learners, fig_timeseries, fig_fields, fig_gensets):
         try:
             f()
             print("ok", f.__name__)
