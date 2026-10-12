@@ -26,7 +26,11 @@ _MD = [(re.compile(r"\*\*|__|`|^#+\s*", re.M), ""),
 # typographic variants that are rendering artefacts, not style: curly quotes, non-breaking/figure
 # hyphens, non-breaking and narrow spaces. Em/en dashes are kept: they are a real stylistic choice.
 _QUOTES = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"',
-                         "‐": "-", "‑": "-", "‒": "-", " ": " ", " ": " "})
+                         "‐": "-", "‑": "-", "‒": "-", " ": " ", " ": " ",
+                         # Windows-1252 bytes mis-decoded as C1 controls (a few PERSUADE essays)
+                         "\x91": "'", "\x92": "'", "\x93": '"', "\x94": '"', "\x96": "–",
+                         "\x97": "—", "\x85": "…"})
+_C1 = re.compile(r"[\x80-\x9f]|Ã|Â")  # remaining mojibake debris
 _WRAPPER = re.compile(r"^\W*(here'?s|here is|below is|sure|okay|certainly|of course)\b"
                       r"(.*:\s*$|.*\b(essay|abstract|speech|version|revis\w*|rewrit\w*|response)\b)", re.I | re.S)
 _NOTE = re.compile(r"^\s*(\*?\(?note|word count|i hope|let me know)", re.I)
@@ -52,7 +56,9 @@ def delatex(text):
 def unwrap(text):
     """Drop chat wrappers: 'Here's the essay:' intro, '---' rules, markdown headings,
     all-bold title lines, trailing notes. Applied to human text too (rarely matches)."""
-    paras = [p.strip() for p in re.split(r"\n\s*\n", text.translate(_QUOTES)) if p.strip()]
+    text = text.replace("�", " ")  # mojibake replacement chars exist only in some human source texts
+    text = _C1.sub("", text.translate(_QUOTES)).replace("´", "'")
+    paras = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]
     if paras and len(paras[0].split()) < 40 and _WRAPPER.search(paras[0]):
         paras = paras[1:]
     keep = []
@@ -131,6 +137,9 @@ if __name__ == "__main__":
     g2 = "Okay, here's an essay responding to the prompt, aiming for a student voice.\n\nCars are bad."
     assert clean(g2) == "Cars are bad.", clean(g2)
     assert clean("Here we present a method.\n\nIt works.").startswith("Here we")  # human abstracts kept
+    assert "�" not in clean("Motion ��� that the House notes the report.")
+    assert clean("\x93I\x92m fine\x97really. They wonÃ\x82Â´t go.") == '"I\'m fine—really. They won\'t go.', \
+        clean("\x93I\x92m fine\x97really. They wonÃ\x82Â´t go.")
     h = r"We prove that $f(x)\le 1$ --- a \emph{sharp} bound~\cite{a} --- holds for $n$--$m$ pairs."
     assert clean(h) == "We prove that X — a sharp bound — holds for X – X pairs.", clean(h)
     g3 = "**Abstract**  \nLong‑document work. We introduce *Sparse Attention* (SA), 2 * 3 = 6."
