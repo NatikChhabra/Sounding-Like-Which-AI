@@ -18,11 +18,15 @@ PUNCT = list(",;:()\"'!?") + ["—", "–", "-"]  # em dash, en dash, hyphen
 MAX_WORDS = 250  # every text is cut to its first 250 words so length can't drive results
 
 _MD = [(re.compile(r"\*\*|__|`|^#+\s*", re.M), ""),
+       (re.compile(r"(?<![\w*])\*(?=\S)([^*\n]+?)(?<=\S)\*(?![\w*])"), r"\1"),  # *italic*
        (re.compile(r"^\s*(abstract|title|speech|essay)\s*:\s*", re.I | re.M), ""),
        (re.compile(r"^\s*([-*•]|\d+[.)])\s+", re.M), "")]
 
 
-_QUOTES = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"'})
+# typographic variants that are rendering artefacts, not style: curly quotes, non-breaking/figure
+# hyphens, non-breaking and narrow spaces. Em/en dashes are kept: they are a real stylistic choice.
+_QUOTES = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"',
+                         "‐": "-", "‑": "-", "‒": "-", " ": " ", " ": " "})
 _WRAPPER = re.compile(r"^\W*(here'?s|here is|below is|sure|okay|certainly|of course)\b"
                       r"(.*:\s*$|.*\b(essay|abstract|speech|version|revis\w*|rewrit\w*|response)\b)", re.I | re.S)
 _NOTE = re.compile(r"^\s*(\*?\(?note|word count|i hope|let me know)", re.I)
@@ -110,6 +114,8 @@ if __name__ == "__main__":
     g2 = "Okay, here's an essay responding to the prompt, aiming for a student voice.\n\nCars are bad."
     assert clean(g2) == "Cars are bad.", clean(g2)
     assert clean("Here we present a method.\n\nIt works.").startswith("Here we")  # human abstracts kept
+    g3 = "**Abstract**  \nLong‑document work. We introduce *Sparse Attention* (SA), 2 * 3 = 6."
+    assert clean(g3) == "Long-document work. We introduce Sparse Attention (SA), 2 * 3 = 6.", clean(g3)
     feats = extract([a, "The cat sat on the mat. It was happy, and so was I."], n_process=1)
     assert feats[0]["pun:—"] > 0 and feats[1]["fw:the"] > 0
     assert not any(k.startswith("fw:novel") for k in feats[0])  # content words excluded
