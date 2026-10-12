@@ -41,3 +41,4 @@ yang2026coverage arxiv:2608.05576
 wu2025monoculture arxiv:2407.02209
 crossley2024persuade doi:10.1016/j.asw.2024.100865
 katz2025hansard doi:10.5281/zenodo.17351233
+gray2024 arxiv:2403.16887

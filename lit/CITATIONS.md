@@ -44,3 +44,4 @@ Each entry was resolved automatically from its DOI or arXiv id. Before submissio
 - [ ] `wu2025monoculture` (2024) [Generative Monoculture in Large Language Models](https://arxiv.org/abs/2407.02209)
 - [ ] `crossley2024persuade` (2024) [A large-scale corpus for assessing written argumentation: PERSUADE 2.0](https://doi.org/10.1016/j.asw.2024.100865)
 - [ ] `katz2025hansard` (2025) [A new, comprehensive database of all proceedings of the Australian Parliamentary Debates (1998-2025)](https://doi.org/10.5281/zenodo.17351233)
+- [ ] `gray2024` (2024) [ChatGPT "contamination": estimating the prevalence of LLMs in the scholarly literature](https://arxiv.org/abs/2403.16887)

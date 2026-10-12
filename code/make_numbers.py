@@ -22,7 +22,7 @@ def fmt(key, v):
         return r"{<}0.001" if v < 0.001 else f"{v:.3f}"
     if leaf in ("n", "months", "n_train_per_class", "dof"):
         return f"{int(v):,}"
-    if leaf.startswith(("or_", "odds")):
+    if leaf.startswith(("or_", "odds", "coef", "ell_coef", "corr")):
         return f"{v:.2f}"
     if "auc" in leaf:
         return f"{v:.3f}"
