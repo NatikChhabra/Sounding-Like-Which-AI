@@ -60,19 +60,21 @@ def fig_fields():
     base = base[base.group != "all"].sort_values("mso")
     ex = [its[g] for g in base.group]
     k = next(k for k in ex[0] if k.startswith("excess_at"))
-    fig, axes = plt.subplots(1, 2, figsize=(6.3, 2.2), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(3.3, 2.1), sharey=True, gridspec_kw={"wspace": 0.08})
     y = np.arange(len(base))
     axes[0].errorbar(100 * base.mso, y, xerr=[100 * (base.mso - base.lo), 100 * (base.hi - base.mso)],
                      fmt="o", ms=4, color=BLUE, ecolor=BLUE, elinewidth=1, capsize=0)
     axes[0].set_yticks(y, base.group)
-    axes[0].set_xlabel("Baseline MSO, 2015 to Nov 2022 (%)")
+    axes[0].set_xlabel("Pre-ChatGPT MSO (%)", fontsize=7)
     e = np.array([100 * d[k] for d in ex])
     lo = np.array([100 * d["excess_lo"] for d in ex])
     hi = np.array([100 * d["excess_hi"] for d in ex])
     axes[1].errorbar(e, y, xerr=[e - lo, hi - e], fmt="o", ms=4, color=BLUE, ecolor=BLUE, elinewidth=1, capsize=0)
     axes[1].axvline(0, color=MUTED, lw=0.6)
-    axes[1].set_xlabel(f"Excess over pre-trend, {k[-7:]} (pp)")
-    fig.tight_layout()
+    axes[1].set_xlabel(f"Excess, {k[-7:]} (pp)", fontsize=7)
+    for ax in axes:
+        ax.tick_params(labelsize=6.5)
+    fig.subplots_adjust(left=0.2, right=0.98, bottom=0.2, top=0.97)
     fig.savefig(FIG / "fields.pdf")
 
 

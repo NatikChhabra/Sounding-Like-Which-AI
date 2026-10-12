@@ -18,7 +18,7 @@ def fmt(key, v):
         return v.replace("_", r"\_").replace("&", r"\&")
     if v is None or (isinstance(v, float) and math.isnan(v)):
         return "--"
-    if leaf.startswith("p") and (leaf == "p" or leaf.endswith("_p") or leaf == "p_value"):
+    if leaf == "p" or leaf.endswith("_p") or leaf == "p_value":
         return r"{<}0.001" if v < 0.001 else f"{v:.3f}"
     if leaf in ("n", "months", "n_train_per_class", "dof"):
         return f"{int(v):,}"
@@ -70,4 +70,5 @@ if __name__ == "__main__":
     assert fmt("x.mso", 0.0351) == "3.5" and fmt("x.p_value", 0.0001) == r"{<}0.001"
     assert fmt("x.odds_ratio", 0.356) == "0.36" and fmt("x.n", 7424) == "7,424"
     assert fmt("x.or_lo", 0.1656) == "0.17" and fmt("x.cv_auc_all", 0.98763) == "0.988"
+    assert fmt("x.level_shift_p", 0.894) == "0.894" and fmt("x.level_shift", 0.0465) == "4.7"
     main()

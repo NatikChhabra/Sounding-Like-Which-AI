@@ -1,0 +1,9 @@
+{
+  "cv_auc_all": 0.934372256515775,
+  "n_train_per_class": 5400,
+  "mso_logreg": 0.21480865077327574,
+  "mso_gbm": 0.20954134612830977,
+  "kappa_logreg_vs_gbm": 0.6062856444946518,
+  "spearman_scores_logreg_vs_gbm": 0.7742879786003094,
+  "share_flagged_by_both": 0.1463602482272643
+}
