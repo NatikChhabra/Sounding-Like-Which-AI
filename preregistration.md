@@ -52,5 +52,21 @@ excluded. Marker-word frequencies are analysed separately, never as an MSO featu
 - Sensitivity: thresholds 0.4/0.5/0.6; embedding-based classifier; excluding any one LLM.
 - Wording rule: results are "consistent with" LLM influence; no causal claim.
 
+## Deviations from this plan (logged as they happen)
+Honesty note: this plan was committed to the project's git repository (commit ef4fa21, 2026-10-12) before any
+MSO value was computed. Git timestamps are self-reported, so this is weaker than a third-party registry.
+1. **Learner data.** ELLIPSE could not be downloaded (Git LFS); PERSUADE 2.0 (ELL vs non-ELL on identical
+   prompts) is the primary learner contrast instead. The public Liang et al. release contains TOEFL and US
+   *college* essays, not the 8th-grade essays described in their paper; it is used as a secondary,
+   out-of-genre check only.
+2. **arXiv sampling.** Full OAI-PMH harvesting was infeasible (~40 h), so abstracts were drawn as a
+   stratified random sample via the arXiv API: one random window per field-month, 8 fields, 2015-01 to 2026-09.
+3. **LLM side.** RAID abstracts are restricted to chat/instruction-tuned generators for the main region;
+   base models are analysed separately.
+4. **Added diagnostics (not in the plan):** agreement between the two classifiers on which documents are in
+   the region (Cohen's kappa, Spearman), and recall on held-out (unseen) models.
+5. **Pilot run.** An essay analysis was run once on partial generations (3 of 5 models) to test the code.
+   No analysis choices were changed after seeing it.
+
 ## 6. Self-test
 The paper's own text is scored by the same pipeline and compared with human-written cs.CL abstracts.
