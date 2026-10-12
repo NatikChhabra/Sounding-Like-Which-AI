@@ -68,6 +68,11 @@ MSO value was computed. Git timestamps are self-reported, so this is weaker than
 6. **Hansard identifiers (bug fix, before any Hansard result).** The corpus field `uniqueID` identifies the
    speaker, not the speech. Speeches are now keyed by date + order, and cross-validation groups by speaker.
    Some speakers' speeches were sampled more than once as generation seeds; all generations are kept.
+7. **More generators (added to strengthen the LLM side, before the final run).** Two further open-weight
+   families (Microsoft Phi-4 14B, IBM Granite 3.3 8B) with the same prompts and sampling rule, and one 2026
+   frontier model (Claude Opus 5.5) for arXiv abstracts, produced by sub-agent sessions answering the same
+   prompt instances (no temperature/seed control is available for it; disclosed as such). Each generator is
+   capped at 450 texts so no single source dominates the region.
 5. **Pilot run.** An essay analysis was run once on partial generations (3 of 5 models) to test the code.
    No analysis choices were changed after seeing it. The same was done once for arXiv (RAID + ~30% of local
    generations) to test the pipeline at scale; again no analysis choice was changed afterwards.
