@@ -12,17 +12,17 @@ at the end).
 
 ### B1. The pre-rewrite commits, including the withheld Hansard P2 revisions, are still public on GitHub
 - The rewritten history is clean (see Verified). GitHub still serves the old, unreachable commits by SHA, though:
-  - `https://github.com/NatikChhabra/Sounding-Like-Which-AI-/commit/<sha>` returns 200 for `5f285c4`, `a2372da`,
-    `5720997` and `cde9132`, and also for the short SHA `5f285c4`. A made-up SHA returns 404.
-  - `/raw/a2372da8f9a6440d7af535b754a205a8131adbc4/data/generated/llm_hansard.jsonl.gz` redirects (302) to
+  - `https://github.com/NatikChhabra/Sounding-Like-Which-AI-/commit/<sha>` returns 200 for [pre-rewrite commit], [pre-rewrite commit],
+    `5720997` and `cde9132`, and also for the short SHA [pre-rewrite commit]. A made-up SHA returns 404.
+  - `/raw/[pre-rewrite commit]/data/generated/llm_hansard.jsonl.gz` redirects (302) to
     raw.githubusercontent.com, which returns 200 with Content-Length 2,076,911. That is the file with 3,630 rows,
-    1,202 of them P2 revisions of real speeches. `5f285c4` holds the same rows.
+    1,202 of them P2 revisions of real speeches. [pre-rewrite commit] holds the same rows.
   - `cde9132` and the other old commits listed in `prerelease3_package.md` still contain the local Windows username.
 - These SHAs are easy to find:
-  - `paper/reviews/prerelease3_package.md` lines 22–23 (in HEAD) name `5f285c4` and `a2372da` as the commits that
+  - `paper/reviews/prerelease3_package.md` lines 22–23 (in HEAD) name [pre-rewrite commit] and [pre-rewrite commit] as the commits that
     contain the 1,202 P2 rows.
   - The public Events API (`api.github.com/repos/NatikChhabra/Sounding-Like-Which-AI-/events`) lists the old SHAs
-    in its PushEvents (`head 5f285c4…`, `before a2372da…`, `head 0795e4b…`).
+    in its PushEvents (`head [pre-rewrite commit]…`, `before [pre-rewrite commit]…`, `head 0795e4b…`).
 - This contradicts the Ethics statement ("we do not release the LLM revisions of speeches (P2)") and the README and
   AI_DISCLOSURE accounts of the rewrite. Hansard is CC BY-NC-ND, and the purpose of the rewrite was to stop releasing
   these adaptations.
@@ -66,7 +66,7 @@ Suggested wording: "removed the speech-generation file from the two commits that
 username from file paths; nothing else changed."
 
 ### M5. HEAD files cite 14 commit ids that are not in the public history
-The files cite `5f285c4`, `a2372da`, `0795e4b`, `cde9132`, `1012d6b`, `0a878f5`, `74837a7`, `f344b02`, `67594ce`,
+The files cite [pre-rewrite commit], [pre-rewrite commit], `0795e4b`, `cde9132`, `1012d6b`, `0a878f5`, `74837a7`, `f344b02`, `67594ce`,
 `74902b3`, `c1a5193`, `80e1355`, `c63ada2` and `0ec57b6`. They appear in `paper/reviews/*.md`,
 `lit/verification/v6_changed_sentences.md` and the docstring of `code/queues/invalidate_changed.py`. All are
 pre-rewrite ids. The README promises unchanged ids only for the paper and the analysis plan, which holds. A one-line
@@ -99,7 +99,7 @@ anyone cites the repository. Otherwise, drop the field until the tag exists.
   - `f586d6c` to `01ef90f` (15:44:42, Claude abstracts merged) is "nine minutes".
   - `6675865` ("Strip BOM") is the only commit without "(AI-written)". There are 54 Co-Authored-By trailers and no
     HUMAN-EDIT commits.
-- Pre-rewrite history: exactly two commits (`5f285c4`, `a2372da`) held the 1,202 P2 rows, as the README and
+- Pre-rewrite history: exactly two commits ([pre-rewrite commit], [pre-rewrite commit]) held the 1,202 P2 rows, as the README and
   AI_DISCLOSURE state.
 
 **2. Build**
