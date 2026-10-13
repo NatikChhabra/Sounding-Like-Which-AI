@@ -1,5 +1,5 @@
 {
-  "upload_type": "publication",
+  "upload_type": "software",
   "title": "Sounding Like Which AI? Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages: code, data and paper",
   "creators": [
     {
@@ -22,5 +22,12 @@
   "notes": "AI use is disclosed in full in paper/AI_DISCLOSURE.md and in the paper's Acknowledgements section.",
   "version": "v1.0",
   "publication_date": "2026-10-13",
-  "publication_type": "preprint"
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.23344296",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-preprint",
+      "scheme": "doi"
+    }
+  ]
 }
