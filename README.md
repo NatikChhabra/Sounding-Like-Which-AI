@@ -3,6 +3,10 @@
 **Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages**
 Natik Chhabra · ORCID [0009-0004-8786-7703](https://orcid.org/0009-0004-8786-7703)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23343987.svg)](https://doi.org/10.5281/zenodo.23343987)
+Archived on Zenodo: [10.5281/zenodo.23343987](https://doi.org/10.5281/zenodo.23343987) (all versions; v1.0 is
+[10.5281/zenodo.23343988](https://doi.org/10.5281/zenodo.23343988)).
+
 How much human writing sounds like AI, how much already did before ChatGPT, and *which* AI does it sound like?
 
 This repository holds the paper (`paper/preprint.pdf`), its source, every analysis, all generated data and the full
