@@ -592,6 +592,15 @@ def vintage_peak():
     fixed = d[~d.group.str[7:].isin(NEW)]  # without the 2026 open models, added after the pattern was seen
     out |= {"n_no_new": len(fixed), "rho_no_new": float(sp(fixed.release, fixed.peak_x).statistic),
             "rho_no_new_p": float(sp(fixed.release, fixed.peak_x).pvalue)}
+
+    def perm_p(a, b, n=20000):  # two-sided permutation p of Spearman's rho (ties make the t-approximation rough)
+        from scipy.stats import rankdata
+        x, y = rankdata(a), rankdata(b)
+        obs = abs(np.corrcoef(x, y)[0, 1])
+        rng = np.random.default_rng(0)
+        perm = np.array([abs(np.corrcoef(x, rng.permutation(y))[0, 1]) for _ in range(n)])
+        return float((1 + (perm >= obs - 1e-12).sum()) / (n + 1))
+    out |= {"rho_perm_p": perm_p(d.release, d.peak_x), "rho_no_new_perm_p": perm_p(fixed.release, fixed.peak_x)}
     late = d[d.release >= 2024]  # without the 2023 models
     out |= {"n_no2023": len(late), "rho_no2023": float(sp(late.release, late.peak_x).statistic)}
     c = d.assign(cutoff=d.group.str[7:].map(PRETRAIN_CUTOFF)).dropna(subset=["cutoff"])
@@ -916,6 +925,38 @@ def robustness_v7(data, n_seeds=5):
     save("robustness_v7", out)
 
 
+def robustness_v8(data, n_seeds=5):
+    """Code review 6: single regions trained on equal sizes. RAID regions otherwise use 450 texts per class and the
+    local ones 150, which confounds instrument precision with vintage; cap every single region at 150 and redo the
+    release-peak correlation for each training draw."""
+    from scipy.stats import spearmanr as sp
+    human, llm = mso.load(data, "arxiv")
+    llm = load_old(data, llm)
+    late = human[(human.pool == "score") & (human.date.dt.year >= 2023)]
+    q = late.date.dt.to_period("Q").astype(str).values
+    sets = {k: v for k, v in vintage_sets(llm).items() if k.startswith("single:")}
+    rel = pd.Series({k: RELEASE.get(k[7:], np.nan) for k in sets})
+    qx = lambda p: pd.Period(p, "Q").year + (pd.Period(p, "Q").quarter - 1) / 4
+    out, cap = {}, mso.PER_MODEL
+    mso.PER_MODEL = 150
+    try:
+        for seed in range(n_seeds):
+            mso.SEED = seed
+            peaks = {}
+            for name, sub in sets.items():
+                X, y, groups, _ = mso.training_set(human, sub)
+                peaks[name] = pd.Series(mso.fit(X, y, groups=groups)[0](list(late.f)) >= 0.5).groupby(q).mean().idxmax()
+            d = pd.DataFrame({"rel": rel, "pk": pd.Series(peaks).map(qx)}).dropna()
+            f = d[~d.index.str[7:].isin(NEW)]
+            out[f"seed{seed}"] = {"rho": float(sp(d.rel, d.pk).statistic), "rho_no_new": float(sp(f.rel, f.pk).statistic)}
+    finally:
+        mso.PER_MODEL, mso.SEED = cap, 0
+    for k in ("rho", "rho_no_new"):
+        v = [out[f"seed{s}"][k] for s in range(n_seeds)]
+        out[f"{k}_min"], out[f"{k}_max"], out[f"{k}_median"] = min(v), max(v), float(np.median(v))
+    save("robustness_v8", out)
+
+
 # Release month (decimal year) from developer pages / model cards; RAID's from its model list (2023 snapshots).
 # The 2026 model's release month is not used (not documented in a citable source).
 RELEASE = {"raid-gpt4": 2023.45, "raid-chatgpt": 2023.45, "raid-mpt-chat": 2023.45, "raid-llama-chat": 2023.55,
@@ -1108,7 +1149,7 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
-            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data), "robust6": robustness_v6, "robust7": lambda: robustness_v7(data),
+            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data), "robust6": robustness_v6, "robust7": lambda: robustness_v7(data), "robust8": lambda: robustness_v8(data),
             "vquarter": lambda: vintage_quarterly(data), "ablate": lambda: ablation(data), "fastdetect": lambda: fastdetect(data), "robust3": lambda: robustness_v3(data),
             "overlap": lambda: revision_overlap(data),
             "control": control}

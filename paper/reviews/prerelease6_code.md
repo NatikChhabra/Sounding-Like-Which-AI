@@ -96,7 +96,7 @@ or agreement to 1e-16), and the independent re-implementations below agree with 
 - **Seed 0 of `robustness_v7` reproduces `arxiv_vintage_quarterly.csv`.** All 19 single-region peaks agree
   (`arxiv_vintage_peak_checks.peak` = `arxiv_vintage_quarterly.peak`), and `robustness_v7.seed0`
   (rho 0.7851, 0.6616) equals `arxiv_vintage_peak` (rho, rho_no_new). A full scratch re-run of `robust7`
-  (5 seeds + GBM) gave robustness_v7.json and arxiv_vintage_peak_checks.csv byte-identical to the committed files. ROBUST7_STATUS
+  (5 seeds + GBM) gave robustness_v7.json and arxiv_vintage_peak_checks.csv byte-identical to the committed files.
 - **Quarterly series recomputed independently.** With `training_set`/`fit` at SEED 0 on the 2023+ scored abstracts,
   every `mso_YYYYQn` of all 19 regions matches the file to at most 9.7e-17. The annual 2025-to-2026 changes equal
   both `arxiv_vintage.y2026 - y2025` and `arxiv_vintage_uncertainty.change_seed0` for all 19 regions.
