@@ -71,7 +71,7 @@ Each entry was resolved automatically from its DOI or arXiv id. Before submissio
 - [ ] `gemma4card` (2026) [Gemma 4 12{B} Model Card](https://huggingface.co/google/gemma-4-12B-it)
 - [ ] `phi4card` (2024) [Phi-4 Model Card](https://huggingface.co/microsoft/phi-4)
 - [ ] `qwen35card` (2026) [Qwen3.5-9{B} Model Card](https://huggingface.co/Qwen/Qwen3.5-9B)
-- [ ] `granitecards` (2026) [Granite 3.3 8{B} Instruct and Granite 4.2 8{B} Model Cards](https://huggingface.co/ibm-granite/granite-4.2-8b)
+- [ ] `granitecards` (2026) [{Granite} 3.3 8{B} Instruct and {Granite} 4.2 8{B} Model Cards](https://huggingface.co/ibm-granite/granite-4.2-8b)
 - [ ] `pu2023zeroshot` (2023) [On the Zero-Shot Generalization of Machine-Generated Text Detectors](https://aclanthology.org/2023.findings-emnlp.318)
 - [ ] `li2024mage` (2024) [{MAGE}: Machine-generated Text Detection in the Wild](https://aclanthology.org/2024.acl-long.3)
 - [ ] `sun2025idiosyncrasies` (2025) [Idiosyncrasies in Large Language Models](https://proceedings.mlr.press/v267/sun25z.html)

@@ -898,7 +898,7 @@ def revision_overlap(data):
 
 def nodash(data):
     """Ablation: drop every dash feature so punctuation typography cannot drive MSO."""
-    mso.EXCLUDE = ("pun:â€”", "pun:â€“", "pun:-")
+    mso.EXCLUDE = ("pun:—", "pun:–", "pun:-")  # escapes: a Windows shell once mojibaked these
     try:
         timeseries(data, "arxiv", True, "_nodash", (), False)
     finally:

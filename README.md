@@ -38,7 +38,7 @@ python code/claude_prompts.py DATA <genre>                     # 2026-model prom
 python code/perplexity.py DATA                                 # Qwen2.5-0.5B; set PPL_MODEL=gpt2 for GPT-2
 python code/analysis.py DATA <job>                             # corpus, essay, essay_perplexity, arxiv, hansard,
                                                                # gensets, drift, nodash, control, vintage,
-                                                               # vsummary, robust3, robust4, robust5, vquarter,
+                                                               # vsummary, robust3, robust4, robust5, vquarter, vpeak,
                                                                # ablate, fastdetect, overlap
 python code/make_numbers.py && python code/figures.py
 ```

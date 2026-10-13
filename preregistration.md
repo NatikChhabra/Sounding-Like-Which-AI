@@ -92,7 +92,8 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
    math, topic, length, threshold and dash analyses; proficiency adjustment; perplexity instrument;
    dispersion; the self-test (section 6) dropped as circular; Hansard restricted to 2015-2025.
 9. **Review round 2 (2026-10-13) changes:** generator-vintage analysis on a matched title-only task; a region
-   from generators whose training data predate ChatGPT (RAID GPT-4 and ChatGPT, and two locally run open
+   from generators whose pretraining data predate ChatGPT (RAID GPT-4 and Llama-2-70B-chat, with ChatGPT only
+   as a sensitivity set because its cutoff is documented only by secondary sources, and two locally run open
    models, Llama 2 chat and Vicuna, added for this purpose only); three 2026 open models (Qwen3.5 9B, Gemma 4 12B,
    Granite 4.2 8B), added for the vintage analysis only after the single-generator pattern of the other 16
    generators had been seen (post hoc); vintage-matched, topic-matched mined marker
@@ -103,6 +104,14 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
    while adding generators: lines of the form "Title: ..." in LLM outputs (mostly Mistral 7B; 13% of local arXiv
    and 18% of LLM essay texts) had only their label removed, leaving the echoed title glued to the first
    sentence; the whole line is now dropped and every analysis was re-run.
+10a. **Review round 3 (2026-10-13) changes:** a second cleaning fix (keyword lines, word-count notes, inline labels)
+   with a full re-run; seed ranges and document-bootstrap intervals for each single-generator 2025-to-2026 change;
+   quarterly single-generator series. Order matters here: the rank correlation of release date with the 2025-to-2026
+   change was computed first (0.66 on annual means; 0.22, not significant, from 2025Q4); the correlation of release
+   date with the quarter of peak MSO (0.83) was added after seeing it. Also: drift placebos for the pre-ChatGPT-data
+   region, a 30-month placebo grid, a never-revised check, feature-family ablations, a zero-shot detector baseline
+   (Fast-DetectGPT criterion with GPT-2), field-specific detection rates, and a fix to the dash-ablation feature names
+   (mis-encoded by an earlier patch, so that ablation had removed only hyphens; re-run).
 10. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
 11. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
     (commit 50e2a17), not in this plan. The plan named cs.CL for one comparison; all of cs is used.

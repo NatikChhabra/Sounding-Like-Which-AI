@@ -38,7 +38,7 @@ def its_panel(ax, name, color, label, ylabel="MSO (%)", legend=False):
     ax.text(T0.to_timestamp(), ax.get_ylim()[0], " ChatGPT", color=INK, va="bottom", fontsize=6.5)
     ax.set_ylabel(ylabel)
     if legend:
-        ax.legend(loc="center left", bbox_to_anchor=(0, 0.62), fontsize=5.6, framealpha=0.9, facecolor="white",
+        ax.legend(loc="upper left", fontsize=5.6, framealpha=0.9, facecolor="white",
                   frameon=True, edgecolor="none")
 
 
@@ -134,12 +134,16 @@ def fig_vintage():
     v = pd.read_csv(RES / "arxiv_vintage.csv").set_index("group")
     years = [int(c[1:]) for c in v.columns if c.startswith("y")]
     fig, (a, b) = plt.subplots(1, 2, figsize=(6.6, 2.4), gridspec_kw={"width_ratios": [1, 1.25]})
-    sets = [("pre2022data_matched", "Pre-ChatGPT pretraining data", BLUE), ("raid_all", "RAID 2023 chat models", "#e87ba4"),
-            ("local_p1", "Open models 2024-25", AQUA), ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", "#eda100"),
-            ("open2026_p1", "Open models 2026", "#8b5cf6"), ("frontier_p1", "Claude (2026 model)", ORANGE)]
-    for k, label, c in sets:
+    sets = [("pre2022data_matched", "Pre-ChatGPT pretraining data", BLUE, "-"),
+            ("raid_all", "RAID 2023 chat models", YEAR_COLOR[2023], "-"),
+            ("local_p1", "Open models 2024-25", YEAR_COLOR[2025], "-"),
+            ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", YEAR_COLOR[2025], "--"),
+            ("open2026_p1", "Open models 2026", YEAR_COLOR[2026], "--"),
+            ("frontier_p1", "Claude (2026 model)", YEAR_COLOR[2026], "-")]
+    for k, label, c, ls in sets:
         if k in v.index:
-            a.plot(years, [100 * v.loc[k, f"y{y}"] for y in years], color=c, lw=1.8, marker="o", ms=2.5, label=label)
+            a.plot(years, [100 * v.loc[k, f"y{y}"] for y in years], color=c, lw=1.8, ls=ls, marker="o", ms=2.5,
+                   label=label)
     a.axvline(2022.9, color=INK, lw=0.6)
     a.set_ylabel("arXiv MSO (%)")
     a.set_xticks([2015, 2018, 2021, 2024, 2026])
@@ -153,24 +157,35 @@ def fig_vintage():
     q["peak_x"] = pk.year + (pk.quarter - 1) / 4 + 0.125
     label = {m: lab for m, lab, _ in VINTAGE}
     show = {"raid-gpt4", "vicuna:7b", "phi4:14b", "qwen3:8b", "gpt-oss:20b", "qwen3.5:9b", "gemma4:12b", "granite4.2:8b"}
+    seen = {}
     for g, r in q.iterrows():
         m = g[7:]
+        key = (analysis.RELEASE.get(m), r.peak_x)
+        r = r.copy()
+        r["peak_x"] += 0.05 * seen.get(key, 0)  # offset points that would coincide
+        seen[key] = seen.get(key, 0) + 1
         yr = next(y for mm, _, y in VINTAGE if mm == m)
         if m in analysis.RELEASE:
             x = analysis.RELEASE[m]
             b.scatter(x, r.peak_x, s=16, color=YEAR_COLOR[yr], zorder=3)
             if m in show:
-                b.annotate(label[m], (x, r.peak_x), xytext=(3, -6 if m == "gemma4:12b" else 2),
+                off = {"gemma4:12b": (3, -6), "qwen3.5:9b": (-40, 3)}.get(m, (3, 2))
+                b.annotate(label[m], (x, r.peak_x), xytext=off,
                            textcoords="offset points", fontsize=5.2, color=MUTED)
-        else:  # release month not documented: drawn at the right edge, peak right-censored at the last quarter
-            b.scatter(2026.85, r.peak_x, s=16, facecolors="none", edgecolors=YEAR_COLOR[yr], zorder=3)
-            b.annotate("2026 model (still rising)", (2026.85, r.peak_x), xytext=(-78, 4),
+        else:  # release month not used: drawn in a separate "n/a" column; peak right-censored at the last quarter
+            b.scatter(2027.0, r.peak_x, s=16, facecolors="none", edgecolors=YEAR_COLOR[yr], zorder=3)
+            b.annotate("2026 model\n(still rising)", (2027.0, r.peak_x), xytext=(0, -26), ha="center",
                        textcoords="offset points", fontsize=5.2, color=MUTED)
     rho = json.loads((RES / "arxiv_vintage_peak.json").read_text())
-    b.text(0.03, 0.95, f"Spearman $\\rho$ = {rho['rho']:.2f}", transform=b.transAxes, fontsize=6.5, va="top", color=INK)
+    b.text(0.03, 0.95, f"Spearman $\\rho$ = {rho['rho']:.2f} (n = {rho['n']}; 2026 model excluded)",
+           transform=b.transAxes, fontsize=6, va="top", color=INK)
+    for yr, c in YEAR_COLOR.items():
+        b.scatter([], [], s=16, color=c, label=str(yr))
+    b.legend(fontsize=5.6, title="Released", title_fontsize=5.6, loc="lower right", ncol=2)
     b.set_xlabel("Generator release date")
     b.set_ylabel("Quarter of peak MSO")
-    b.set_xticks([2023.5, 2024, 2024.5, 2025, 2025.5, 2026, 2026.5], ["", "2024", "", "2025", "", "2026", ""])
+    b.set_xticks([2023.5, 2024, 2024.5, 2025, 2025.5, 2026, 2026.5, 2027.0],
+                 ["", "2024", "", "2025", "", "2026", "", "n/a"])
     ticks = [y + (k - 1) / 4 + 0.125 for y in (2024, 2025, 2026) for k in (1, 3)]
     b.set_yticks(ticks, [f"{y}Q{k}" for y in (2024, 2025, 2026) for k in (1, 3)])
     b.set_ylim(2024.4, 2026.9)

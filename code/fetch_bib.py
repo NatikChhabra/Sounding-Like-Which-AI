@@ -101,15 +101,25 @@ def retitle(key, bib):
 def tidy(bib):
     """ACL's style lower-cases titles: brace acronyms (>=2 capitals, e.g. ChatGPT, LLMs, AI) and proper nouns so
     they survive; give page ranges a LaTeX en dash."""
+    def keep(w):  # acronym (>=2 capitals) or proper noun
+        return len(re.findall(r"[A-Z]", w)) >= 2 or w.strip(".,:;?!()") in PROPER
+
+    def brace(w):
+        if "{" in w or not keep(w):
+            return w
+        if "-" in w:  # AI-Associated -> {AI}-Associated, so the style still lowercases "associated"
+            return "-".join("{" + p + "}" if keep(p) else p for p in w.split("-"))
+        return "{" + w + "}"
+
     def protect(m):
-        words = re.split(r"(\s+)", m.group(2))
-        out = [w if ("{" in w or not (len(re.findall(r"[A-Z]", w)) >= 2 or w.strip(".,:;?!()") in PROPER))
-               else "{" + w + "}" for w in words]
-        return m.group(1) + "".join(out) + m.group(3)
+        return m.group(1) + "".join(brace(w) for w in re.split(r"(\s+)", m.group(2))) + m.group(3)
     # title = {...} with at most one level of nested braces; works for one-line (Crossref) and multi-line entries
     bib = re.sub(r"((?<![a-z])title\s*=\s*\{)((?:[^{}]|\{[^{}]*\})*)(\})", protect, bib)
     bib = html.unescape(bib)  # Crossref sometimes returns HTML entities (Computers &amp; Education)
     bib = re.sub(r"(?<!\\)&", r"\\&", bib)  # arXiv titles can contain a bare & (e.g. the gpt-oss model card)
+    bib = bib.replace("Mcfarland", "McFarland")  # PMLR's author list
+    if "International Conference on Learning Representations" in bib:  # OpenReview gives volume = year
+        bib = re.sub(r"\s*volume\s*=\s*\{\d{4}\},?", "", bib)
     return re.sub(r"(pages\s*=\s*\{\s*\d+)\s*[–—-]+\s*(\d+)", r"\1--\2", bib)
 
 
