@@ -1,4 +1,4 @@
-"""All tables and figures. Usage: python analysis.py DATA_DIR JOB   (JOB: see `jobs` at the bottom, or "all")
+"""All tables and figures. Usage: python analysis.py DATA_DIR JOB   (JOB: see `jobs` at the bottom; code/run_all.ps1 gives the order)
 
 Writes results/<name>.csv|json. Every number in the paper comes from these files via make_numbers.py.
 """
@@ -514,7 +514,7 @@ def vintage(data, markers_only=False):
         rm = segmented(mm)
         if markers_only:
             row = old.loc[name].to_dict() | {"group": name}
-            r = old_its[name]["style"]  # ponytail: markers_only needs every set in the last full run
+            r = old_its[name]["style"]  # markers_only needs every set in the last full run
         else:
             score, _ = region(human, sub, f"arxiv_v_{name.replace(':', '_')}", lomo_runs=False)
             s["in_region"] = (score(list(s.f)) >= 0.5).astype(int)
@@ -543,6 +543,15 @@ def vintage_summary():
         "n_single": len(s), "n_fell_2026": int((s.y2026 < s.y2025).sum()), "n_rose_2026": len(rose),
         "rose": ", ".join(rose), "n_marker_fell_2026": int((s.m2026 < s.m2025).sum()),
         "n_style_rose_marker_fell": int(((s.y2026 > s.y2025) & (s.m2026 < s.m2025)).sum())})
+
+
+def generator_lengths(data):
+    """Median length (words, after cleaning and the 250-word cut) of each generator's title-only arXiv outputs."""
+    _, llm = mso.load(data, "arxiv")
+    llm = load_old(data, llm)
+    rows = [{"group": g, "n": len(d), "median_words": float(d.text.map(lambda t: len(features.clean(t).split())).median())}
+            for g, d in vintage_sets(llm).items() if g.startswith("single:")]
+    save("arxiv_generator_lengths", pd.DataFrame(rows))
 
 
 def vintage_peak():
@@ -898,7 +907,8 @@ def revision_overlap(data):
 
 def nodash(data):
     """Ablation: drop every dash feature so punctuation typography cannot drive MSO."""
-    mso.EXCLUDE = ("pun:—", "pun:–", "pun:-")  # escapes: a Windows shell once mojibaked these
+    mso.EXCLUDE = ("pun:\u2014", "pun:\u2013", "pun:-")  # escapes: a Windows shell once mojibaked these
+    assert mso.EXCLUDE[0] == "pun:" + chr(0x2014) and mso.EXCLUDE[1] == "pun:" + chr(0x2013)
     try:
         timeseries(data, "arxiv", True, "_nodash", (), False)
     finally:
@@ -935,9 +945,8 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
-            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "robust5": lambda: robustness_v5(data),
+            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data),
             "vquarter": lambda: vintage_quarterly(data), "ablate": lambda: ablation(data), "fastdetect": lambda: fastdetect(data), "robust3": lambda: robustness_v3(data),
             "overlap": lambda: revision_overlap(data),
             "control": control}
-    for j in (jobs if which == "all" else [which]):
-        jobs[j]()
+    jobs[which]()

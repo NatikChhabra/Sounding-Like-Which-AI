@@ -1,12 +1,12 @@
 cff-version: 1.2.0
-message: "If you use this code or these results, please cite the paper as below."
-title: "Sounding Like Which AI? Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages"
+message: "If you use this code, data or results, please cite the paper as below."
+title: "Sounding Like Which AI? Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages: code, data and paper"
 authors:
   - family-names: Chhabra
     given-names: Natik
     orcid: "https://orcid.org/0009-0004-8786-7703"
+version: "v1.0"
 date-released: 2026-10-13
-version: "v5"
 license: MIT
 repository-code: "https://github.com/NatikChhabra/Sounding-Like-Which-AI-"
 keywords:
@@ -15,3 +15,13 @@ keywords:
   - stylometry
   - scientific writing
   - arXiv
+preferred-citation:
+  type: article
+  status: preprint
+  title: "Sounding Like Which AI? Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages"
+  authors:
+    - family-names: Chhabra
+      given-names: Natik
+      orcid: "https://orcid.org/0009-0004-8786-7703"
+  year: 2026
+  url: "https://github.com/NatikChhabra/Sounding-Like-Which-AI-"

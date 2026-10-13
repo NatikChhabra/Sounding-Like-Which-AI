@@ -87,6 +87,7 @@ TITLES = {
     "bao2024fastdetectgpt": r"{Fast-DetectGPT}: {E}fficient Zero-Shot Detection of Machine-Generated Text via Conditional Probability Curvature",
     "pillutla2021": r"{MAUVE}: {M}easuring the Gap Between Neural Text and Human Text using Divergence Frontiers",
     "clark2021": r"All That{'}s {`}{H}uman{'} Is Not Gold: {E}valuating Human Evaluation of Generated Text",
+    "zheng2023judging": r"Judging {LLM}-as-a-Judge with {MT-Bench} and {Chatbot} {Arena}",
 }
 
 
@@ -108,8 +109,9 @@ def retitle(key, bib):
 def tidy(bib):
     """ACL's style lower-cases titles: brace acronyms (>=2 capitals, e.g. ChatGPT, LLMs, AI) and proper nouns so
     they survive; give page ranges a LaTeX en dash."""
-    def keep(w):  # acronym (>=2 capitals) or proper noun
-        return len(re.findall(r"[A-Z]", w)) >= 2 or w.strip(".,:;?!()") in PROPER
+    def keep(w):  # acronym (>=2 capitals), model size such as 7B, or proper noun
+        return (len(re.findall(r"[A-Z]", w)) >= 2 or re.search(r"\d[A-Z]", w) is not None
+                or w.strip(".,:;?!()") in PROPER)
 
     def brace(w):
         if "{" in w or not keep(w):
@@ -124,7 +126,12 @@ def tidy(bib):
     bib = re.sub(r"((?<![a-z])title\s*=\s*\{)((?:[^{}]|\{[^{}]*\})*)(\})", protect, bib)
     bib = html.unescape(bib)  # Crossref sometimes returns HTML entities (Computers &amp; Education)
     bib = re.sub(r"(?<!\\)&", r"\\&", bib)  # arXiv titles can contain a bare & (e.g. the gpt-oss model card)
-    bib = bib.replace("Mcfarland", "McFarland")  # PMLR's author list
+    bib = bib.replace("Mcfarland", "McFarland").replace("’", "'")  # PMLR author list; curly apostrophes vanish
+    # initials need a full stop ("Christopher D Manning" -> "Christopher D. Manning")
+    bib = re.sub(r"(author\s*=\s*\{)([^}]*)\}",
+                 lambda m: m.group(1) + re.sub(r"(?<=[\s{])([A-Z])(?=\s)", r"\1.", m.group(2)) + "}", bib)
+    # year ranges in titles get an en dash (1998-2022 -> 1998--2022)
+    bib = re.sub(r"((?<![a-z])title\s*=\s*\{[^\n]*?\d{4})-(\d{4})", r"\1--\2", bib)
     if "International Conference on Learning Representations" in bib:  # OpenReview gives volume = year
         bib = re.sub(r"\s*volume\s*=\s*\{\d{4}\},?", "", bib)
     return re.sub(r"(pages\s*=\s*\{\s*\d+)\s*[–—-]+\s*(\d+)", r"\1--\2", bib)

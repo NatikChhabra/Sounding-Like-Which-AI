@@ -19,10 +19,12 @@ disclosed in `paper/AI_DISCLOSURE.md`. **Field:** computational linguistics. **B
 - [x] Generations: 12 local open models, the 2026 model, RAID's 2023 models
 - [x] Analyses (`code/analysis.py`) and figures; four rounds of simulated peer review (`paper/reviews/`)
 - [x] Paper v5 (8 pages + appendices)
-- [x] Full citation verification of every reference (`lit/verification/v5_*.md`)
+- [x] Full citation verification of every reference, two passes (`lit/verification/`)
+- [x] Public repository with generated data, exact samples and pinned requirements
+- [ ] Five pre-release audit rounds (`paper/reviews/prerelease_*.md`)
 
 ## Remaining
 - [ ] Final read-through by the author (any edits as `HUMAN-EDIT:` commits)
-- [ ] Release v1.0 on GitHub, archived on Zenodo (DOI)
+- [ ] Release v1.0 on GitHub, archived on Zenodo (DOI), after the author's read-through
 - [ ] EACL 2027 Student Research Workshop: pre-submission mentorship (deadline 2026-11-06)
 - [ ] Submit: EACL 2027 SRW (2026-12-15) and/or ACL Rolling Review for ACL 2027 (2027-01-04)

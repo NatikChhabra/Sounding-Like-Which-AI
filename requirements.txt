@@ -1,0 +1,13 @@
+# Exact versions used for the paper (Python 3.12.10, Windows 11). Local generation used Ollama 0.40.3.
+matplotlib==3.11.2
+numpy==2.5.4
+pandas==3.0.6
+pyarrow==26.0.0
+scikit-learn==1.9.1
+scipy==1.18.1
+sentence-transformers==6.1.0
+spacy==3.8.16
+statsmodels==0.15.0
+torch==2.14.1
+transformers==5.19.0
+# then: python -m spacy download en_core_web_sm

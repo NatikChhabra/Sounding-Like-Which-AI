@@ -20,7 +20,9 @@ def fmt(key, v):
         return "--"
     if leaf == "p" or leaf.endswith("_p") or leaf == "p_value" or ".field_holm." in key:
         return r"{<}0.001" if v < 0.001 else f"{v:.3f}"
-    if "dispersion" in key or leaf in ("logit_gap", "relative_gap"):  # distances and ratios, not shares
+    if leaf == "relative_gap":  # "about 2.1 times the trend": one decimal is the honest precision
+        return f"{v:.1f}"
+    if "dispersion" in key or leaf == "logit_gap":  # distances, not shares
         return f"{v:.2f}"
     if leaf in ("n", "months", "dof", "ell_in_region", "median_words", "n_breaks") or leaf.startswith("n_") or "_n_" in leaf:
         return f"{int(v):,}"
@@ -110,5 +112,5 @@ if __name__ == "__main__":
     assert fmt("x.arxiv_n_fields", 8.0) == "8" and fmt("x.n_generators", 8.0) == "8" and fmt("x.y2025", 0.3644) == "36.4" and fmt("x.excess_p", 0.2) == "0.200"
     assert fmt("robustness_v3.field_holm.cs", 0.0123) == "0.012" and fmt("x.m2016", 0.05) == "5.0"
     assert fmt("a_dispersion_trend.gap_2025.ci_lo", -0.36) == "-0.36" and fmt("x.logit_gap", 0.28) == "0.28"
-    assert fmt("x.cs_2024_alpha_cv", 0.12) == "12.0" and fmt("x.relative_gap", 2.31) == "2.31"
+    assert fmt("x.cs_2024_alpha_cv", 0.12) == "12.0" and fmt("x.relative_gap", 2.31) == "2.3"
     main()

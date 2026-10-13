@@ -104,7 +104,7 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
    while adding generators: lines of the form "Title: ..." in LLM outputs (mostly Mistral 7B; 13% of local arXiv
    and 18% of LLM essay texts) had only their label removed, leaving the echoed title glued to the first
    sentence; the whole line is now dropped and every analysis was re-run.
-10a. **Review round 3 (2026-10-13) changes:** a second cleaning fix (keyword lines, word-count notes, inline labels)
+10. **Review round 3 (2026-10-13) changes:** a second cleaning fix (keyword lines, word-count notes, inline labels)
    with a full re-run; seed ranges and document-bootstrap intervals for each single-generator 2025-to-2026 change;
    quarterly single-generator series. Order matters here: the rank correlation of release date with the 2025-to-2026
    change was computed first (0.66 on annual means; 0.22, not significant, from 2025Q4); the correlation of release
@@ -112,10 +112,10 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
    region, a 30-month placebo grid, a never-revised check, feature-family ablations, a zero-shot detector baseline
    (Fast-DetectGPT criterion with GPT-2), field-specific detection rates, and a fix to the dash-ablation feature names
    (mis-encoded by an earlier patch, so that ablation had removed only hyphens; re-run).
-10. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
-11. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
+11. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
+12. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
     (commit 50e2a17), not in this plan. The plan named cs.CL for one comparison; all of cs is used.
-12. **Never frozen.** The plan was intended to be frozen with a DOI; it was not. "Pre-registered" is therefore
+13. **Never frozen.** The plan was intended to be frozen with a DOI; it was not. "Pre-registered" is therefore
     not used in the paper.
 
 ## 6. Self-test (dropped; see deviation 8)

@@ -77,5 +77,5 @@ Each entry was resolved automatically from its DOI or arXiv id. Before submissio
 - [ ] `sun2025idiosyncrasies` (2025) [Idiosyncrasies in Large Language Models](https://proceedings.mlr.press/v267/sun25z.html)
 - [ ] `vicuna15card` (2023) [Vicuna-7{B} v1.5 Model Card](https://huggingface.co/lmsys/vicuna-7b-v1.5)
 - [ ] `qwen3card` (2025) [Qwen3-8{B} Model Card](https://huggingface.co/Qwen/Qwen3-8B)
-- [ ] `gemmareleases` (2026) [Gemma Releases](https://ai.google.dev/gemma/docs/releases)
-- [ ] `mistralv03card` (2024) [Mistral-7{B}-Instruct-v0.3 Model Card](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3)
+- [ ] `gemmareleases` (2026) [{Gemma} Releases](https://ai.google.dev/gemma/docs/releases)
+- [ ] `mistralv03card` (2024) [{Mistral-7B-Instruct-v0.3} Model Card](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3)

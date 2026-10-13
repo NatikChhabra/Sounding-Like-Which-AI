@@ -2,7 +2,7 @@
 # Stages: data, generate, perplexity, analysis, paper. Each stage is resumable (caches are keyed by document id).
 # Run GPU stages (generate) and heavy CPU stages separately on a desktop machine; the scripts in code\queues are the
 # exact batches used for the paper, kept for the record.
-param([Parameter(Mandatory = $true)][string]$Data, [string]$Stage = "all")
+param([Parameter(Mandatory = $true)][string]$Data, [string]$Stage = "all", [switch]$RefreshBibliography)
 $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
 $py = Join-Path $root ".venv\Scripts\python.exe"
@@ -31,15 +31,14 @@ if ($Stage -in "all", "analysis") {
     foreach ($job in "corpus", "essay", "essay_perplexity") { Step $job { & $py analysis.py $Data $job } }
     $env:PPL_MODEL = "gpt2"; Step "essay_perplexity gpt2" { & $py analysis.py $Data essay_perplexity }; Remove-Item Env:\PPL_MODEL
     foreach ($job in "hansard", "arxiv", "gensets", "drift", "nodash", "control", "vintage", "vsummary", "robust3",
-                     "robust4", "vquarter", "vpeak", "ablate", "robust5", "fastdetect", "overlap") {
+                     "robust4", "vquarter", "vpeak", "genlen", "ablate", "robust5", "fastdetect", "overlap") {
         Step $job { & $py analysis.py $Data $job }
     }
 }
 if ($Stage -in "all", "paper") {
-    Step "numbers" { & $py make_numbers.py }
-    Step "figures" { & $py figures.py }
-    Step "bibliography" { & $py fetch_bib.py (Join-Path $root "lit\citations.txt") }
-    Set-Location (Join-Path $root "paper")
-    Step "compile" { tectonic main.tex }
+    # the verified bibliography is committed; re-resolving it from the web is opt-in
+    if ($RefreshBibliography) { Step "bibliography" { & $py fetch_bib.py (Join-Path $root "lit\citations.txt") } }
+    Step "build paper" { powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root "paper\build.ps1") }
+    Step "export release data" { & $py export_data.py $Data (Join-Path $root "data") }
 }
 "done"
