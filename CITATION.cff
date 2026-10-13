@@ -6,8 +6,11 @@ authors:
     given-names: Natik
     orcid: "https://orcid.org/0009-0004-8786-7703"
 version: "v1.0"
-date-released: 2026-10-13
-license: MIT
+license:
+  - MIT
+  - CC-BY-4.0
+  - CC-BY-NC-4.0
+  - CC-BY-NC-SA-4.0
 repository-code: "https://github.com/NatikChhabra/Sounding-Like-Which-AI-"
 keywords:
   - machine-style overlap

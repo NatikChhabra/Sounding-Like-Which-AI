@@ -9,7 +9,8 @@ This repository holds the paper (`paper/preprint.pdf`), its source, every analys
 audit trail for a study of **Machine-Style Overlap (MSO)**: the share of documents that a calibrated classifier on
 content-word-free style features judges at least as likely to be LLM output as pre-ChatGPT human writing.
 
-**Status:** release v1.0 (preprint, not yet peer reviewed).
+**Status:** pre-release draft: not yet read or approved by the author, not peer reviewed. v1.0 will be tagged
+after the author's read-through.
 
 ## Main findings
 - In 131,448 arXiv abstracts from eight fields (2015–2026), MSO was **9.2%** before ChatGPT and stood
@@ -17,11 +18,14 @@ content-word-free style features judges at least as likely to be LLM output as p
   trend specifications, thresholds and feature-family ablations, yearly values barely change when only
   never-revised papers are counted, and it is far larger than any placebo or instrument-drift gap. It is smaller, though still large, when the generators that write closest to
   human abstracts are left out (22.2 pp without the 2026 model, 17.9 pp without revisions of human drafts).
-- Against generators whose pretraining data predate ChatGPT the gap is smaller but clear (**7.5 pp**), so part of
-  the shift is unlikely to come from newer models learning from newer abstracts.
-- Measured against one generator at a time, overlap rises and then turns down, and the turn **tends to come later
-  for later-released models** (exploratory rank correlation 0.83, n = 18). A reference set that is not refreshed,
-  like a fixed list of words such as *delve*, will eventually show the shift "fading".
+- Against generators whose pretraining data predate ChatGPT the gap is smaller but clear (**7.5 pp**; 11.9 pp
+  measured nonparametrically, against 22.1 pp for recent open models), so part of the shift is unlikely to come
+  from newer models learning from newer abstracts.
+- Measured against one generator at a time, overlap with all but the newest rises and then turns down, and the
+  turn **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; bootstrap
+  0.64–0.86). The three 2026 open models peaked before or as they were released, so authors using them cannot
+  explain it. If the pattern persists, a reference set that is not refreshed, like a fixed list of words such as
+  *delve*, will show the shift "fading".
 - A zero-shot detector statistic computed with a small, older scoring model (Fast-DetectGPT criterion with GPT-2)
   does not see the shift; the larger scoring models of the original method might.
 - In student essays, English learners' writing is *less* machine-like than their peers' (2.3% vs 4.2%), even under
@@ -32,7 +36,8 @@ The study was carried out by an AI system (Claude Opus 5.5, via Claude Code) und
 wrote the code, ran the analyses and drafted the text; the author chose the topic and constraints and is
 responsible for the content. "The 2026 model" in the paper is that same system, used as one of the reference
 generators. Details, including what has and has not been checked by a human, are in
-[`paper/AI_DISCLOSURE.md`](paper/AI_DISCLOSURE.md). The git history is the complete record: AI-written commits say
+[`paper/AI_DISCLOSURE.md`](paper/AI_DISCLOSURE.md). The git history is the complete record of changes to the
+files: AI-written commits say
 so, and any human edit is a separate commit labelled `HUMAN-EDIT:`. Simulated peer-review rounds and the citation
 verification reports are included (`paper/reviews/`, `lit/verification/`).
 
@@ -40,7 +45,7 @@ verification reports are included (`paper/reviews/`, `lit/verification/`).
 | Path | What |
 |---|---|
 | `paper/` | `preprint.pdf`, LaTeX source (`main.tex`; `build.ps1` rebuilds both PDFs from the results), figures, AI disclosure, review rounds |
-| `data/` | Every LLM generation used, and the exact samples and train/score splits (see `data/README.md`) |
+| `data/` | The LLM generations used (all but the speech revisions), and the exact samples and train/score splits (see `data/README.md`) |
 | `code/` | All code; `run_all.ps1` runs the pipeline in order; `queues/` holds the exact batches used |
 | `results/` | Every table the analyses write; `numbers.tex` feeds each result into the paper |
 | `preregistration.md` | Analysis plan, committed before any result, with the full deviation log |
@@ -65,15 +70,18 @@ ids carry their version, so the abstracts are the ones analysed). To reproduce t
 texts, unpack `data/generated/*.gz` into the data folder: the 2026-model texts cannot be regenerated bit for bit
 (no decoding control), and local-model outputs depend on hardware and Ollama version (0.40.3 was used; models
 llama3.1:8b, qwen3:8b, gemma3:12b, mistral:7b, gpt-oss:20b, phi4:14b, granite3.3:8b, and for the vintage analysis
-only llama2:7b, vicuna:7b, qwen3.5:9b, gemma4:12b and granite4.2:8b; temperature 0.8, fixed seeds). The paper compiles with
+only llama2:7b, vicuna:7b, qwen3.5:9b, gemma4:12b and granite4.2:8b; temperature 0.8, fixed seeds). The Hansard results are the exception: the LLM revisions of real speeches are not
+released (Hansard text may not be adapted), so those results need the speech revisions regenerated. The paper compiles with
 [Tectonic](https://tectonic-typesetting.github.io): `powershell -File paper\build.ps1`.
 
 ## Licences
 - Code: MIT (`LICENSE`).
-- Paper text, figures and results: CC BY 4.0.
-- Generated data: see `data/README.md` (CC BY 4.0, except the essay generations: CC BY-NC-SA 4.0, as they derive
-  from PERSUADE 2.0).
-- Source datasets keep their own licences: arXiv metadata (CC0), Australian Hansard (CC BY 4.0), PERSUADE 2.0
+- Paper text, figures, results, review reports, literature notes and the analysis plan: CC BY 4.0.
+- Data: per file in `data/README.md`. Generated abstracts: CC BY 4.0; speech generations: CC BY-NC 4.0 (the
+  revisions of real speeches are not released); essay generations: CC BY-NC-SA 4.0, as they derive from
+  PERSUADE 2.0.
+- Source datasets keep their own licences: arXiv metadata, including titles and abstracts (CC0); Australian
+  Hansard (Parliament of Australia, CC BY-NC-ND 4.0), via the database of Katz and Alexander (CC BY 4.0); PERSUADE 2.0
   (CC BY-NC-SA 4.0), RAID and the Hugging Face release of Liang et al. 2023 (MIT). The Liang et al. US 8th-grade
   essays come from the authors' GitHub repository (no licence file; its README shows an MIT badge) and are not
   redistributed here.

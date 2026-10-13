@@ -1,5 +1,16 @@
 {
   "n": 18,
-  "rho": 0.8266786543400676,
-  "rho_p": 2.3403133338806646e-05
+  "rho": 0.7850502231098978,
+  "rho_p": 0.00011378629839342975,
+  "n_no2023": 10,
+  "rho_no2023": 0.8244866123205524,
+  "n_cutoff": 9,
+  "rho_cutoff": 0.591304347826087,
+  "rho_release_on_cutoff_set": 0.6154745444535429,
+  "n_peak_by_release": 4,
+  "peak_by_release": "gemma4:12b, granite4.2:8b, qwen3.5:9b, raid-cohere-chat",
+  "n_marker_earlier": 7,
+  "n_marker_later": 6,
+  "n_marker_same": 5,
+  "n_fell_last_quarter": 18
 }

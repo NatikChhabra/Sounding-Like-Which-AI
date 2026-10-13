@@ -108,14 +108,20 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
    with a full re-run; seed ranges and document-bootstrap intervals for each single-generator 2025-to-2026 change;
    quarterly single-generator series. Order matters here: the rank correlation of release date with the 2025-to-2026
    change was computed first (0.66 on annual means; 0.22, not significant, from 2025Q4); the correlation of release
-   date with the quarter of peak MSO (0.83) was added after seeing it. Also: drift placebos for the pre-ChatGPT-data
+   date with the quarter of peak MSO (0.83; 0.79 after the re-run in item 11) was added after seeing it. Also: drift placebos for the pre-ChatGPT-data
    region, a 30-month placebo grid, a never-revised check, feature-family ablations, a zero-shot detector baseline
    (Fast-DetectGPT criterion with GPT-2), field-specific detection rates, and a fix to the dash-ablation feature names
    (mis-encoded by an earlier patch, so that ablation had removed only hyphens; re-run).
-11. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
-12. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
+11. **Pre-release methods audit (2026-10-13) changes:** summary-style RAID outputs ("In the paper titled ...") are
+    now dropped from the single-generator regions too, not only from the pre-ChatGPT-data region, and the vintage
+    analyses were re-run. Added: the trend gap with the post-ChatGPT line fitted only up to June 2025, the main gap
+    with fixed field weights, a joint document bootstrap of each generator's peak quarter and of the release-peak
+    rank correlation, refits on 80% subsamples of each set's LLM texts, the rank correlation of pretraining cutoff
+    with peak quarter, and a comparison of each generator's mined-marker peak with its style peak.
+12. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
+13. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
     (commit 50e2a17), not in this plan. The plan named cs.CL for one comparison; all of cs is used.
-13. **Never frozen.** The plan was intended to be frozen with a DOI; it was not. "Pre-registered" is therefore
+14. **Never frozen.** The plan was intended to be frozen with a DOI; it was not. "Pre-registered" is therefore
     not used in the paper.
 
 ## 6. Self-test (dropped; see deviation 8)

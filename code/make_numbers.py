@@ -30,8 +30,10 @@ def fmt(key, v):
             leaf.startswith(("change", "gap", "marker_gap", "linear_", "quadratic_", "trend_at", "diff", "resid",
                              "median_abs", "max_abs", "tpr", "fpr", "median_retained")):
         return f"{100 * v:.1f}"
-    if leaf.startswith(("or_", "odds", "coef", "ell_coef", "corr")):
+    if leaf.startswith(("or_", "odds", "coef", "ell_coef", "corr", "rho")):  # rho_lo/rho_hi are correlations too
         return f"{v:.2f}"
+    if ".field_share." in key or leaf.startswith("summary_share"):
+        return f"{100 * v:.1f}"
     if "auc" in leaf:
         return f"{v:.3f}"
     if leaf.startswith(PCT) or leaf.endswith(PCT):

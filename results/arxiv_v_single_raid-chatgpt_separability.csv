@@ -1,3 +1,3 @@
 model,prompt,n,auc
-raid-chatgpt,raid-greedy-rpno,250,0.9958933333333334
-raid-chatgpt,raid-sampling-rpno,200,0.9923222222222222
+raid-chatgpt,raid-greedy-rpno,224,0.9930605158730159
+raid-chatgpt,raid-sampling-rpno,226,0.989306784660767
