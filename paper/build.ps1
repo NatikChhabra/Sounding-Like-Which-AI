@@ -14,7 +14,7 @@ Push-Location $PSScriptRoot
 $ErrorActionPreference = "Continue"  # tectonic writes harmless fontconfig notes to stderr
 foreach ($doc in "main", "preprint") {
     $start = Get-Date
-    $log = & $tec "$doc.tex" 2>&1 | ForEach-Object { "$_" }
+    $log = & $tec -Z deterministic-mode "$doc.tex" 2>&1 | ForEach-Object { "$_" }  # same input -> same PDF
     $log | Select-String -Pattern "error:|Overfull|undefined" | Where-Object { $_ -notmatch "Fontconfig" }
     if (-not (Test-Path "$doc.pdf") -or (Get-Item "$doc.pdf").LastWriteTime -lt $start) { throw "$doc.pdf was not rebuilt" }
 }

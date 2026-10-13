@@ -84,5 +84,47 @@ def main(out):
             print(cell, len(rows), "->", len(pick), flush=True)
 
 
+def fetch_ids(ids_csv, out, batch=100):
+    """Rebuild a sample exactly from its released id list (data/samples/*_sample_ids.csv.gz). Ids carry their
+    version, so the API returns the same abstract text that was analysed. Resumable."""
+    import pandas as pd
+    want = pd.read_csv(ids_csv)
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    f_out = out / "sample.jsonl"
+    have = {json.loads(l)["id"] for l in f_out.open(encoding="utf-8")} if f_out.exists() else set()
+    todo = want[~want.id.isin(have)]
+    with f_out.open("a", encoding="utf-8") as fo:
+        for i in range(0, len(todo), batch):
+            part = todo.iloc[i:i + batch].set_index("id")
+            url = API + "?" + urllib.parse.urlencode({"id_list": ",".join(part.index), "max_results": batch})
+            for attempt in range(8):
+                try:
+                    with urllib.request.urlopen(url, timeout=120) as r:
+                        root = ET.fromstring(r.read())
+                    break
+                except (urllib.error.URLError, TimeoutError, ET.ParseError):
+                    time.sleep(15 * (attempt + 1))
+            else:
+                raise RuntimeError(f"arXiv API failed for batch starting {part.index[0]}")
+            time.sleep(3.1)  # arXiv API terms: max 1 request / 3 s
+            for e in root.findall("a:entry", NS):
+                aid = e.findtext("a:id", "", NS).rsplit("/abs/", 1)[-1]
+                if aid not in part.index:
+                    continue
+                row = part.loc[aid]
+                fo.write(json.dumps({"id": aid, "field": row.field, "primary": row.primary,
+                                     "published": row.published, "updated": row.updated,
+                                     "title": " ".join(e.findtext("a:title", "", NS).split()),
+                                     "abstract": " ".join(e.findtext("a:summary", "", NS).split())}) + "\n")
+            fo.flush()
+            print(min(i + batch, len(todo)), "/", len(todo), flush=True)
+
+
 if __name__ == "__main__":
-    main(sys.argv[1])
+    # python fetch_arxiv.py OUT_DIR                 -> draw a new stratified sample (as in the paper)
+    # python fetch_arxiv.py ids IDS_CSV OUT_DIR     -> rebuild the paper's exact sample from released ids
+    if sys.argv[1] == "ids":
+        fetch_ids(sys.argv[2], sys.argv[3])
+    else:
+        main(sys.argv[1])

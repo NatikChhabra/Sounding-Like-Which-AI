@@ -11,7 +11,9 @@ Set-Location $PSScriptRoot
 function Step($name, [scriptblock]$cmd) { "=== $name"; & $cmd; if ($LASTEXITCODE) { throw "$name failed" } }
 
 if ($Stage -in "all", "data") {
-    Step "arXiv sample" { & $py fetch_arxiv.py "$Data\arxiv_v2" }
+    # the paper's exact sample, by released id and version (about an hour at the API's rate limit);
+    # `fetch_arxiv.py OUT_DIR` instead draws a new stratified sample the same way
+    Step "arXiv sample" { & $py fetch_arxiv.py ids (Join-Path $root "data\samples\arxiv_v2_sample_ids.csv.gz") "$Data\arxiv_v2" }
     Step "RAID generations" { & $py fetch_raid.py "$Data\raid_arxiv.jsonl" }
     Step "RAID human abstracts" { & $py fetch_raid.py "$Data\raid_arxiv_human.jsonl" human }
     # Hansard (Zenodo 17351233) and PERSUADE 2.0 / Liang et al. essays must be downloaded first; see README
