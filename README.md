@@ -18,9 +18,9 @@ after the author's read-through.
   trend specifications, thresholds and feature-family ablations, yearly values barely change when only
   never-revised papers are counted, and it is far larger than any placebo or instrument-drift gap. It is smaller, though still large, when the generators that write closest to
   human abstracts are left out (22.2 pp without the 2026 model, 17.9 pp without revisions of human drafts).
-- Against generators whose pretraining data predate ChatGPT the gap is smaller (**7.5 pp**; 3.5 pp for the two
-  models run on the paper's own prompts, 13.1 pp with the trend line fitted only to June 2025, against 22.7 pp for
-  the 2024–2025 open models), so part of the shift points towards models that could not have learned it from
+- Against generators whose pretraining data predate ChatGPT the gap is smaller (**7.5 pp**; GPT-4 alone gives the largest gap; 3.5 pp for the two
+  models run from titles on the paper's own prompts but 12.5 pp over all three prompt styles; 13.1 pp with the trend line fitted only to June 2025, against 22.7 pp for
+  the 2024–2025 open models), so part of the shift points towards models unlikely to have learned it from
   recent abstracts.
 - Measured against one generator at a time, overlap with most generators rises and then turns down, and the turn
   **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; 0.66 for the 15
@@ -31,7 +31,7 @@ after the author's read-through.
   release quarter, so authors using them can explain little of the timing. A fixed reference set, like a fixed
   list of words such as *delve*, can therefore show the shift "fading" while overlap with newer models still rises.
 - A zero-shot detector statistic computed with a small, older scoring model (Fast-DetectGPT criterion with GPT-2)
-  does not see the shift (its flag rate falls); the larger scoring models of the original method might.
+  does not see the shift (its flag rate falls after 2022); the larger scoring models of the original method might.
 - In US school essays (PERSUADE 2.0), English learners' writing falls in the region *less* often than their peers'
   (2.3% vs 4.2%), largely tracking essay scores, even under a GPT-2 perplexity instrument that reproduces a
   published bias against TOEFL essays (63.7% vs 8.0% flagged).

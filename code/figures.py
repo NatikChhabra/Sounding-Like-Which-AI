@@ -139,7 +139,7 @@ def fig_vintage():
     fig, (a, b) = plt.subplots(1, 2, figsize=(6.6, 2.4), gridspec_kw={"width_ratios": [1, 1.25]})
     sets = [("pre2022data_matched", "Pre-ChatGPT-data region", BLUE, "-"),
             ("raid_all", "RAID 2023 chat models", YEAR_COLOR[2023], "-"),
-            ("local_p1", "Open models 2024\u201325 (incl. gpt-oss)", YEAR_COLOR[2025], "-"),
+            ("local_p1", "Open models 2024\u20132025 (incl. gpt-oss)", YEAR_COLOR[2025], "-"),
             ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", YEAR_COLOR[2025], "--"),
             ("open2026_p1", "Open models 2026", YEAR_COLOR[2026], "--"),
             ("frontier_p1", "2026 model (Claude Opus 5.5)", YEAR_COLOR[2026], "-")]
@@ -151,7 +151,7 @@ def fig_vintage():
     a.set_ylabel("arXiv MSO (%)")
     a.set_xticks([2015, 2018, 2021, 2024, 2026])
     a.set_ylim(0, 62)  # headroom so the legend clears the 2026-model line
-    a.legend(fontsize=5.6, loc="upper left")
+    a.legend(fontsize=5.6, loc="upper left", framealpha=1)  # opaque: the ChatGPT line runs behind it
     a.set_title("(a) MSO by reference set", fontsize=7.5, loc="left")
     # (b) quarter of peak single-generator MSO against the generator's release date
     import analysis  # release months live with the analysis code
@@ -172,9 +172,8 @@ def fig_vintage():
             x = analysis.RELEASE[m]
             b.scatter(x, r.peak_x, s=16, color=YEAR_COLOR[yr], zorder=3)
             if m in show:
-                text = "Gemma 3, Granite 3.3,\nQwen3 (2025Q4)" if m == "qwen3:8b" else label[m]  # one label, three points
+                text = "Granite 4.2" if m == "granite4.2:8b" else label[m]  # short: clears the 2026-model circle
                 off, ha, va = {"gemma4:12b": ((3, -7), "left", "baseline"), "qwen3.5:9b": ((4, -1), "left", "center"),
-                               "qwen3:8b": ((-4, -6), "center", "top"),
                                "gpt-oss:20b": ((-4, 2), "right", "bottom")}.get(m, ((3, 2), "left", "baseline"))
                 b.annotate(text, (x, r.peak_x), xytext=off, ha=ha, va=va, linespacing=0.95,
                            textcoords="offset points", fontsize=6, color=MUTED)
