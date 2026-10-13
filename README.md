@@ -3,9 +3,16 @@
 **Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages**
 Natik Chhabra · ORCID [0009-0004-8786-7703](https://orcid.org/0009-0004-8786-7703)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23343987.svg)](https://doi.org/10.5281/zenodo.23343987)
-Archived on Zenodo: [10.5281/zenodo.23343987](https://doi.org/10.5281/zenodo.23343987) (all versions; v1.0 is
-[10.5281/zenodo.23343988](https://doi.org/10.5281/zenodo.23343988)).
+[![Paper DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23344296.svg)](https://doi.org/10.5281/zenodo.23344296)
+[![Code and data DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23343987.svg)](https://doi.org/10.5281/zenodo.23343987)
+
+- **Paper (preprint, read online):** [10.5281/zenodo.23344296](https://doi.org/10.5281/zenodo.23344296) (all versions;
+  v1.0 is [10.5281/zenodo.23344297](https://doi.org/10.5281/zenodo.23344297))
+- **Code, data and results:** [10.5281/zenodo.23343987](https://doi.org/10.5281/zenodo.23343987) (all versions; v1.0 is
+  [10.5281/zenodo.23343988](https://doi.org/10.5281/zenodo.23343988))
+
+**Cite as:** Chhabra, N. (2026). *Sounding Like Which AI? Machine-Style Overlap of arXiv Abstracts with Language
+Models of Different Vintages* [Preprint]. Zenodo. https://doi.org/10.5281/zenodo.23344296
 
 How much human writing sounds like AI, how much already did before ChatGPT, and *which* AI does it sound like?
 
