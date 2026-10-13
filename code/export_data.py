@@ -1,11 +1,21 @@
 """Write the release data folder: every LLM generation used in the paper, and the exact samples and train/score
-splits (ids only for human documents, so third-party texts are not redistributed).
+splits (ids only for most human documents, so third-party texts are not redistributed). Output is deterministic
+(gzip timestamps fixed), so re-running it does not change the committed files.
 Usage: python export_data.py DATA_DIR OUT_DIR
 """
-import gzip, shutil, sys
+import gzip, io, shutil, sys
 from pathlib import Path
 
 import pandas as pd
+
+
+def gz_write(path, data: bytes):
+    with open(path, "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=9, mtime=0, filename="") as g:
+        g.write(data)
+
+
+def gz_csv(df, path):
+    gz_write(path, df.to_csv(index=False).encode("utf-8"))
 
 
 def main(data, out):
@@ -14,18 +24,30 @@ def main(data, out):
     gen.mkdir(parents=True, exist_ok=True)
     ids.mkdir(parents=True, exist_ok=True)
     for f in ("llm_arxiv.jsonl", "llm_arxiv_old.jsonl", "llm_hansard.jsonl", "llm_essay.jsonl"):
-        with open(data / f, "rb") as src, gzip.open(gen / (f + ".gz"), "wb", compresslevel=9) as dst:
-            shutil.copyfileobj(src, dst)
+        gz_write(gen / (f + ".gz"), (data / f).read_bytes())
     for name in ("arxiv_v2", "arxiv"):  # the second (v1) sample seeded the original generators
-        a = pd.read_json(data / name / "sample.jsonl", lines=True)
-        cols = [c for c in ("id", "field", "primary", "published", "updated") if c in a]
-        a[cols].to_csv(ids / f"{name}_sample_ids.csv.gz", index=False, compression="gzip")
+        src = data / name / "sample.jsonl"
+        if src.exists():
+            a = pd.read_json(src, lines=True)
+            cols = [c for c in ("id", "field", "primary", "published", "updated") if c in a]
+            gz_csv(a[cols], ids / f"{name}_sample_ids.csv.gz")
     for g in ("arxiv", "hansard", "essay"):
         h = pd.read_parquet(data / f"human_{g}.parquet")
-        cols = [c for c in ("id", "date", "group", "grp", "pool", "score", "grade", "title") if c in h]
+        cols = [c for c in ("id", "date", "group", "grp", "pool", "title") if c in h]
         if g == "essay":  # PERSUADE fields beyond ids stay with the source dataset
-            cols = [c for c in ("id", "group", "pool") if c in h]
-        h[cols].to_csv(ids / f"{g}_split.csv.gz", index=False, compression="gzip")
+            cols = ["id", "group", "pool"]
+        gz_csv(h[cols], ids / f"{g}_split.csv.gz")
+    # source abstracts of generations seeded from the first sample but absent from the analysed corpus
+    # (arXiv metadata is CC0); analysis.source_texts falls back to this file when the first sample is not present
+    v1 = data / "arxiv" / "sample.jsonl"
+    if v1.exists():
+        llm = pd.concat([pd.read_json(data / f, lines=True) for f in ("llm_arxiv.jsonl", "llm_arxiv_old.jsonl")])
+        used = set(llm.src_id.str.replace(r"v\d+$", "", regex=True))
+        human = set(pd.read_parquet(data / "human_arxiv.parquet").id)
+        a = pd.read_json(v1, lines=True)
+        a["id"] = "arxiv:" + a.id.str.replace(r"v\d+$", "", regex=True)
+        a = a[a.id.isin(used - human)].drop_duplicates("id")[["id", "title", "abstract"]]
+        gz_write(ids / "arxiv_v1_seed_sources.jsonl.gz", a.to_json(orient="records", lines=True).encode("utf-8"))
     print("wrote", sorted(p.name for p in out.rglob("*.gz")))
 
 

@@ -16,6 +16,7 @@ FIG = Path(__file__).resolve().parent.parent / "paper" / "figures"
 BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 T0 = pd.Period("2022-12", "M")
+PDF_META = {"CreationDate": None}  # no timestamp: rebuilding unchanged figures leaves the files unchanged
 
 plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.edgecolor": MUTED, "axes.labelcolor": INK,
                      "xtick.color": MUTED, "ytick.color": MUTED, "axes.spines.top": False,
@@ -56,7 +57,7 @@ def fig_timeseries():
         ax.xaxis.set_major_locator(matplotlib.dates.YearLocator(3))
         ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%Y"))
     fig.tight_layout()
-    fig.savefig(FIG / "timeseries.pdf")
+    fig.savefig(FIG / "timeseries.pdf", metadata=PDF_META)
 
 
 def fig_fields():
@@ -81,7 +82,7 @@ def fig_fields():
     for ax in axes:
         ax.tick_params(labelsize=6.5)
     fig.subplots_adjust(left=0.29, right=0.98, bottom=0.2, top=0.97)
-    fig.savefig(FIG / "fields.pdf")
+    fig.savefig(FIG / "fields.pdf", metadata=PDF_META)
 
 
 def fig_learners():
@@ -99,7 +100,7 @@ def fig_learners():
     ax.set_xlabel("Held-out essays flagged as LLM-like (%)", fontsize=7)
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=2, fontsize=6.5)
     fig.tight_layout()
-    fig.savefig(FIG / "learners.pdf")
+    fig.savefig(FIG / "learners.pdf", metadata=PDF_META)
 
 
 def fig_gensets():
@@ -117,7 +118,7 @@ def fig_gensets():
     ax.set_xticks([2015, 2018, 2021, 2024, 2026])
     ax.legend(fontsize=5.8, loc="upper left")
     fig.tight_layout()
-    fig.savefig(FIG / "gensets.pdf")
+    fig.savefig(FIG / "gensets.pdf", metadata=PDF_META)
 
 
 # generators in release order (year of release; RAID's are 2023 systems)
@@ -192,7 +193,7 @@ def fig_vintage():
     b.set_ylim(2024.4, 2026.9)
     b.set_title("(b) Single-generator regions", fontsize=7.5, loc="left")
     fig.tight_layout()
-    fig.savefig(FIG / "vintage.pdf")
+    fig.savefig(FIG / "vintage.pdf", metadata=PDF_META)
 
 
 if __name__ == "__main__":

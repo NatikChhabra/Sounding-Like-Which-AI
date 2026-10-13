@@ -14,8 +14,8 @@ content-word-free style features judges at least as likely to be LLM output as p
 ## Main findings
 - In 131,448 arXiv abstracts from eight fields (2015–2026), MSO was **9.2%** before ChatGPT and stood
   **25.4 percentage points** (95% CI 23.2–27.7) above its pre-ChatGPT trend by June 2025. The gap holds across
-  trend specifications, thresholds, feature-family ablations and never-revised papers, and is far larger than any
-  placebo or instrument-drift gap. It is smaller, though still large, when the generators that write closest to
+  trend specifications, thresholds and feature-family ablations, yearly values barely change when only
+  never-revised papers are counted, and it is far larger than any placebo or instrument-drift gap. It is smaller, though still large, when the generators that write closest to
   human abstracts are left out (22.2 pp without the 2026 model, 17.9 pp without revisions of human drafts).
 - Against generators whose pretraining data predate ChatGPT the gap is smaller but clear (**7.5 pp**), so part of
   the shift is unlikely to come from newer models learning from newer abstracts.
@@ -23,7 +23,7 @@ content-word-free style features judges at least as likely to be LLM output as p
   for later-released models** (exploratory rank correlation 0.83, n = 18). A reference set that is not refreshed,
   like a fixed list of words such as *delve*, will eventually show the shift "fading".
 - A zero-shot detector statistic computed with a small, older scoring model (Fast-DetectGPT criterion with GPT-2)
-  does not see the shift.
+  does not see the shift; the larger scoring models of the original method might.
 - In student essays, English learners' writing is *less* machine-like than their peers' (2.3% vs 4.2%), even under
   a GPT-2 perplexity instrument that reproduces a published bias against TOEFL essays (63.7% vs 8.0% flagged).
 
@@ -52,7 +52,6 @@ The pipeline was run on Windows 11 (PowerShell scripts; Python 3.12.10).
 ```
 py -3.12 -m venv .venv
 .venv\Scripts\pip install -r requirements.txt
-.venv\Scripts\python -m spacy download en_core_web_sm
 powershell -File code\run_all.ps1 -Data D:\research-data         # or -Stage data|generate|perplexity|analysis|paper
 ```
 Put these downloads in the data folder first:
@@ -61,12 +60,12 @@ Put these downloads in the data folder first:
 - `learner\liang_toefl_all_data.json` (`all_data.json` from HF `WxWx/ChatGPT-Detector-Bias`) and
   `learner\liang_us8th.json` (`HewlettStudentEssay_real_88/data.json` from the authors' GitHub repository)
 
-The arXiv sample and RAID are fetched by the scripts. To reproduce the analyses exactly rather than regenerate the
+The scripts fetch RAID and rebuild the paper's exact arXiv sample from the released ids (`fetch_arxiv.py ids`; the
+ids carry their version, so the abstracts are the ones analysed). To reproduce the analyses exactly rather than regenerate the
 texts, unpack `data/generated/*.gz` into the data folder: the 2026-model texts cannot be regenerated bit for bit
 (no decoding control), and local-model outputs depend on hardware and Ollama version (0.40.3 was used; models
 llama3.1:8b, qwen3:8b, gemma3:12b, mistral:7b, gpt-oss:20b, phi4:14b, granite3.3:8b, and for the vintage analysis
-only llama2:7b, vicuna:7b, qwen3.5:9b, gemma4:12b and granite4.2:8b; temperature 0.8, fixed seeds). Re-fetching
-arXiv abstracts by id (`data/samples/`) returns their current version. The paper compiles with
+only llama2:7b, vicuna:7b, qwen3.5:9b, gemma4:12b and granite4.2:8b; temperature 0.8, fixed seeds). The paper compiles with
 [Tectonic](https://tectonic-typesetting.github.io): `powershell -File paper\build.ps1`.
 
 ## Licences

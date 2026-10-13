@@ -23,6 +23,11 @@ RAID generations are not repeated here; `code/fetch_raid.py` downloads them (MIT
 | `arxiv_split.csv.gz` | Every analysed abstract: id, date, field, title, train/score pool |
 | `hansard_split.csv.gz` | Every analysed speech: id (date:order), date, speaker id, opening sentence, pool |
 | `essay_split.csv.gz` | Every analysed PERSUADE essay: id, ELL status, pool (texts and scores stay with PERSUADE) |
+| `arxiv_v1_seed_sources.jsonl.gz` | The 434 source abstracts (CC0) of generations seeded from the first sample that are not in the analysed corpus; the vintage analysis needs them |
 
-The arXiv API returns the current version of each abstract, so re-fetching by id gives the same papers but, for
-papers revised since October 2026, possibly newer text.
+Notes:
+- arXiv ids: the `*_sample_ids` files hold the API's versioned id (e.g. `1501.02046v1`), and
+  `code/fetch_arxiv.py ids` re-fetches exactly that version. Split files and generations use `arxiv:` plus the
+  unversioned id.
+- Hansard: generations made before a bug fix carry the speaker id as `src_id` (2,167 rows) and 113 rows have
+  none (analysis plan, deviation 5); they are still grouped by speaker. Some speeches have an empty party field.

@@ -444,9 +444,13 @@ def source_texts(data, human):
     """id -> human source text for every generation: our arXiv sample plus RAID's own human abstracts."""
     pool = dict(zip(human.id, human.text))
     v1 = Path(data) / "arxiv" / "sample.jsonl"  # first sampler: seeds of the original generators, some not in v2
+    released = OUT.parent / "data" / "samples" / "arxiv_v1_seed_sources.jsonl.gz"  # the needed subset of it
     if v1.exists():
         a = pd.read_json(v1, lines=True)
         pool = dict(zip("arxiv:" + a.id.str.replace(r"v\d+$", "", regex=True), a.abstract)) | pool
+    elif released.exists():
+        a = pd.read_json(released, lines=True)
+        pool = dict(zip(a.id, a.abstract)) | pool
     raid = Path(data) / "raid_arxiv_human.jsonl"
     if raid.exists():
         r = pd.read_json(raid, lines=True)
