@@ -24,7 +24,7 @@ after the author's read-through.
   recent abstracts.
 - Measured against one generator at a time, overlap with most generators rises and then turns down, and the turn
   **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; 0.66 for the 15
-  generators chosen before the pattern was seen). The correlation holds across training draws (0.79–0.85; 0.73–0.84 with equal training sizes),
+  generators chosen before the annual single-generator pattern was seen). The correlation holds across training draws (0.79–0.85; 0.73–0.84 with equal training sizes),
   with abstract length or field mix held fixed (0.84, 0.81) and without the 2023 models (0.82). But newer models
   also write longer outputs, and output length predicts the peak about as well (0.73), so vintage and output length
   cannot be separated. Two of the three 2026 open models peaked before they were released and the third in its
