@@ -173,7 +173,7 @@ def fig_vintage():
             b.scatter(x, r.peak_x, s=16, color=YEAR_COLOR[yr], zorder=3)
             if m in show:
                 text = "Gemma 3, Granite 3.3,\nQwen3 (2025Q4)" if m == "qwen3:8b" else label[m]  # one label, three points
-                off, ha, va = {"gemma4:12b": ((3, -7), "left", "baseline"), "qwen3.5:9b": ((-5, -1), "right", "center"),
+                off, ha, va = {"gemma4:12b": ((3, -7), "left", "baseline"), "qwen3.5:9b": ((4, -1), "left", "center"),
                                "qwen3:8b": ((-4, -6), "center", "top"),
                                "gpt-oss:20b": ((-4, 2), "right", "bottom")}.get(m, ((3, 2), "left", "baseline"))
                 b.annotate(text, (x, r.peak_x), xytext=off, ha=ha, va=va, linespacing=0.95,
@@ -183,14 +183,15 @@ def fig_vintage():
             b.annotate("2026 model\n(still rising)", (2027.0, r.peak_x), xytext=(0, 5), ha="center", va="bottom",
                        linespacing=0.95, textcoords="offset points", fontsize=6, color=MUTED)
     rho = json.loads((RES / "arxiv_vintage_peak.json").read_text())
-    b.text(0.2, 0.34, f"Spearman $\\rho$ = {rho['rho']:.2f} (n = {rho['n']}; 2026 model excluded)",
-           transform=b.transAxes, fontsize=6, va="top", color=INK)
+    b.text(0.17, 0.34, f"$\\rho$ = {rho['rho']:.2f} (n = {rho['n']}); {rho['rho_no_new']:.2f} without "
+           f"2026 open models (n = {rho['n_no_new']})", transform=b.transAxes, fontsize=6, va="top", color=INK)
     for yr, c in YEAR_COLOR.items():
         b.scatter([], [], s=16, color=c, label=str(yr))
     b.legend(fontsize=5.6, title="Released", title_fontsize=5.6, loc="lower right", ncol=2)
     b.set_xlabel("Generator release date")
     b.set_ylabel("Quarter of peak MSO")
-    b.set_xticks([2024, 2025, 2026, 2027.0], ["2024", "2025", "2026", "n/a"])
+    b.set_xticks([2023, 2024, 2025, 2026, 2027.0], ["2023", "2024", "2025", "2026", "n/a"])
+    b.set_xlim(2022.85, 2027.3)
     years = range(int(q.peak_x.min()), 2027)  # every peak on the axis, however early
     ticks = [y + (k - 1) / 4 + 0.125 for y in years for k in (1, 3)]
     b.set_yticks(ticks, [f"{y}Q{k}" for y in years for k in (1, 3)])
