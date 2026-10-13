@@ -18,7 +18,7 @@
 - Title: {Fast-DetectGPT}: {E}fficient Zero-Shot Detection of Machine-Generated Text via Conditional Probability Curvature
 - Link: https://proceedings.iclr.cc/paper_files/paper/2024/file/6b8c6f846c3575e1d1ad496abea28826-Paper-Conference.pdf
 - Paper sentence: "Zero-shot detectors use token-likelihood statistics \citep{hans2024binoculars, bao2024fastdetectgpt}, need more text as machine and human distributions converge \citep{chakraborty2024}, and have flagged non-native writing \citep{liang2023detectors}, although detectors trained on a large writing assessment showed no such bias \citep{jiang2024} and false-positive rates on non-native manuscripts vary widely \citep{park2026}."
-- Paper sentence: "An off-the-shelf zero-shot statistic behaves differently: the analytic Fast-DetectGPT criterion \citep{bao2024fastdetectgpt} computed with GPT-2 small separates our human and LLM abstracts only moderately (AUC \R{arxiv_fastdetect_auc.heldin_auc}), and its calibrated flag rate on 600 abstracts per year does not rise (\R{arxiv_fastdetect.2015.share_flagged}\ 2022, \R{arxiv_fastdetect.2026.share_flagged}\ older model would miss the shift; larger scoring models, as in the original method, may not."
+- Paper sentence: "An off-the-shelf zero-shot statistic behaves differently: the analytic Fast-DetectGPT criterion \citep{bao2024fastdetectgpt} computed with GPT-2 small separates our human and LLM abstracts only moderately (AUC \R{arxiv_fastdetect_auc.heldin_auc}), and its calibrated flag rate on 600 abstracts per year does not rise (\R{arxiv_fastdetect.2015.share_flagged}\% in 2015, \R{arxiv_fastdetect.2022.share_flagged}\% in 2022, \R{arxiv_fastdetect.2026.share_flagged}\% in 2026)."
 
 ### bentley2026
 - Title: Human--{LLM} Collaboration Is Transforming Complexity Metrics in Scientific Texts
@@ -89,12 +89,17 @@
 ### gemma3card
 - Title: Gemma 3 Model Card
 - Link: https://ai.google.dev/gemma/docs/core/model_card_3
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
 
 ### gemma4card
 - Title: Gemma 4 12{B} Model Card
 - Link: https://huggingface.co/google/gemma-4-12B-it
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+
+### gemmareleases
+- Title: ?
+- Link: ?
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
 
 ### geng2024
 - Title: Is {ChatGPT} Transforming Academics' Writing Style?
@@ -116,4 +121,4 @@
 ### granitecards
 - Title: {Granite} 3.3 8{B} Instruct and {Granite} 4.2 8{B} Model Cards
 - Link: https://huggingface.co/ibm-granite/granite-4.2-8b
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"

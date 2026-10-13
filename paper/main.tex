@@ -99,8 +99,8 @@ PubMed, Wikipedia and Stack Exchange text became more predictable to small langu
 trend that began before generative AI; our pre-ChatGPT slope points the same way. We differ in the estimand, a
 thresholded overlap (the flag rate of a calibrated classifier) whose pre-ChatGPT level is itself of interest; in
 excluding content words from the features, since authors react to publicised markers \citep{geng2025}; and in
-comparing reference generators by training-data vintage. LLM adoption also changes how much scientists write
-\citep{kusumegi2025}.
+comparing reference generators by training-data vintage. LLM adoption also changes how many papers scientists
+produce \citep{kusumegi2025}.
 
 \paragraph{Homogenization and human adoption.}
 Writing or ideating with instruction-tuned models reduces content diversity across users \citep{padmakumar2024,
@@ -122,9 +122,9 @@ human text; we track where human documents fall relative to an LLM region.
 
 \paragraph{Detection and perception.}
 Readers misjudge machine text \citep{clark2021, jakesch2023, casal2023, gao2023}. Zero-shot detectors use
-token-likelihood statistics \citep{hans2024binoculars, bao2024fastdetectgpt}, need more text as machine and human
-distributions converge \citep{chakraborty2024}, and have flagged non-native writing \citep{liang2023detectors},
-although detectors trained on a large writing assessment showed no such bias \citep{jiang2024} and false-positive
+token-likelihood statistics \citep{hans2024binoculars, bao2024fastdetectgpt}, and detection needs more text as machine
+and human distributions converge \citep{chakraborty2024}; off-the-shelf detectors have flagged non-native writing
+\citep{liang2023detectors}, although detectors trained on a large writing assessment showed no such bias \citep{jiang2024} and false-positive
 rates on non-native manuscripts vary widely \citep{park2026}. Detectors transfer unevenly to unseen generators
 \citep{pu2023zeroshot, li2024mage}, and individual models have distinctive, identifiable output patterns
 \citep{sun2025idiosyncrasies}, so a style region depends on the models that define it. We collect no human judgements.
@@ -231,16 +231,17 @@ Claude Opus 5.5 (2026 model) & 2026 & \\
 \multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \\
 Llama-2-Chat 7B & 2023-07 & Sep 2022$^b$ \\
 Vicuna 7B v1.5$^d$ & 2023-08 & Sep 2022$^b$ \\
-Qwen3.5 9B & 2026-03 & \\
+Qwen3.5 9B & 2026-Q1 & \\
 Gemma 4 12B & 2026-06 & Jan 2025 \\
 Granite 4.2 8B & 2026-08 & \\
 \bottomrule
 \end{tabular}
 \caption{Reference generators, with release month and pretraining-data cutoff where the developer states one.
 $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in secondary sources, so ChatGPT
-enters the pre-ChatGPT-data region only as a sensitivity check; $^d$Llama~2 fine-tuned on user-shared ChatGPT
-conversations \citep{zheng2023judging}. Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card,
-yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.}
+enters the pre-ChatGPT-data region only as a sensitivity check; $^d$fine-tuned from Llama~2 \citep{vicuna15card}
+with the Vicuna recipe of training on user-shared ChatGPT conversations \citep{zheng2023judging}. Other dates:
+\citet{jiang2023mistral, mistralv03card, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card,
+gemmareleases, gemma4card}.}
 \label{tab:gens}
 \end{table}
 
@@ -579,7 +580,7 @@ analysis plan was committed to our own repository and never frozen with a third 
 The study uses only public datasets under their licences (arXiv metadata CC0; Australian Hansard CC~BY~4.0;
 PERSUADE~2.0 CC~BY-NC-SA~4.0, whose share-alike terms apply to derived data we release; RAID and the Hugging
 Face release of \citet{liang2023detectors}, MIT; their US 8th-grade essays come from the authors' GitHub
-repository, which states no licence, and derive from the Hewlett Foundation ASAP data, so we release only scores,
+repository, which has no licence file (its README shows an MIT badge), and derive from the Hewlett Foundation ASAP data, so we release only scores,
 not texts). It involves no human participants. The learner analysis compares groups, never individuals, and we
 caution against using any overlap or detector score to judge an individual writer.
 
@@ -591,10 +592,10 @@ the working conversation. The AI system proposed the research question, the term
 the hypotheses, wrote the analysis plan and all code, generated the local-model texts, ran the analyses, made the
 figures and drafted all text; no human has edited the text. The same system produced the 2026-model texts
 (\S\ref{sec:data}), so its own outputs are part of the reference set. Simulated peer review by separate sessions
-of the same model family, which share its blind spots, informed revisions. Citations were checked by separate AI
-sessions against each cited work's abstract or full text where accessible (some only through metadata or
-mirrors), leading to 11 rewordings, one removed citation and 20 preprints replaced by published versions; the
-human author(s) will check a random sample of five citations before publication. Every numerical result of our analyses in the
+of the same model family, which share its blind spots, informed revisions. Every citing sentence was checked
+against the cited work's abstract or full text by separate AI sessions, in two full passes (some sources only
+through metadata or mirrors); this led to rewordings, one removed citation and published versions replacing
+preprints. Citations were not checked by a human; the human author(s) will read the final paper before release. Every numerical result of our analyses in the
 paper is inserted automatically from the analysis outputs; a few counts and orderings stated in words were read
 from the same outputs. The human author(s) take full responsibility for the content,
 including the citations and the analysis choices. No AI system is listed as an author.

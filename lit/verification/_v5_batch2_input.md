@@ -22,7 +22,7 @@
 ### jiang2023mistral
 - Title: Mistral 7B
 - Link: https://arxiv.org/abs/2310.06825
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
 
 ### jiang2024
 - Title: Detecting {ChatGPT}-generated essays in a large-scale writing assessment: Is there a bias against non-native {English} speakers?
@@ -85,7 +85,7 @@
 - Link: http://dx.doi.org/10.1016/j.patter.2023.100779
 - Paper sentence: "Individual documents are harder: readers are poor at telling human from machine text \citep{clark2021, jakesch2023, casal2023}, detectors can be evaded \citep{sadasivan2025, krishna2023, dugan2024raid}, and some detectors have flagged non-native writers' human text as AI-generated at high rates \citep{liang2023detectors}."
 - Paper sentence: "Zero-shot detectors use token-likelihood statistics \citep{hans2024binoculars, bao2024fastdetectgpt}, need more text as machine and human distributions converge \citep{chakraborty2024}, and have flagged non-native writing \citep{liang2023detectors}, although detectors trained on a large writing assessment showed no such bias \citep{jiang2024} and false-positive rates on non-native manuscripts vary widely \citep{park2026}."
-- Paper sentence: "A GPT-2 perplexity instrument flags \R{essay_liang_perplexity_gpt2.Real TOEFL.mso}\ of US 8th-grade essays, reproducing the bias reported by \citet{liang2023detectors}, while flagging these school learners less than their peers: which learners such a detector penalises depends on how predictable their writing is (Appendix~\ref{app:learners})."
+- Paper sentence: "A GPT-2 perplexity instrument flags \R{essay_liang_perplexity_gpt2.Real TOEFL.mso}\% of TOEFL essays but \R{essay_liang_perplexity_gpt2.Real US 8th grade.mso}\% of US 8th-grade essays, reproducing the bias reported by \citet{liang2023detectors}, while flagging these school learners less than their peers: which learners such a detector penalises depends on how predictable their writing is (Appendix~\ref{app:learners})."
 - Paper sentence: "RAID and the Hugging Face release of \citet{liang2023detectors}, MIT; their US 8th-grade essays come from the authors' GitHub repository, which states no licence, and derive from the Hewlett Foundation ASAP data, so we release only scores, not texts)."
 
 ### liang2024mapping
@@ -95,6 +95,7 @@
 - Paper sentence: "Prevalence estimators report a small ``LLM share'' for text written before ChatGPT, which studies treat as consistent with false positives \citep{liang2024mapping}, subtract as baseline misclassification \citep{lin2025}, or use to calibrate thresholds \citep{brooks2024}."
 - Paper sentence: "\section{Related Work} \paragraph{Prevalence of LLM-assisted writing.} Excess-vocabulary methods compare word frequencies with a counterfactual extrapolated from pre-LLM years \citep{kobak2025, holzwarth2026, lee2026}; distributional methods fit a mixture of human and LLM word distributions \citep{liang2024mapping, liang2024monitoring, liang2025widespread, geng2024}; classifier- and detector-based studies label documents \citep{lin2025, brooks2024, sun2025, khan2026}."
 - Paper sentence: "This is the high-CS, low-mathematics ordering that prevalence studies report \citep{liang2024mapping}."
+- Paper sentence: "Through the mixture identity (\S\ref{sec:mso}), the 2024 values imply that \R{robustness_v4.implied.cs_2024_alpha_cv}\% of computer-science and \R{robustness_v4.implied.math_2024_alpha_cv}\% of mathematics abstracts were LLM output if nothing else had changed (\R{robustness_v4.implied.cs_2024_alpha_lomo}\% and \R{robustness_v4.implied.math_2024_alpha_lomo}\% using held-out-generator recall), against prevalence estimates of 17.5\% and 4.9\% of sentences by February 2024 \citep{liang2024mapping}."
 
 ### liang2024monitoring
 - Title: Monitoring {AI}-Modified Content at Scale: A Case Study on the Impact of {C}hat{GPT} on {AI} Conference Peer Reviews
@@ -118,9 +119,9 @@
 ### llama31card
 - Title: Llama 3.1 Model Card
 - Link: https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/MODEL_CARD.md
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
 
 ### mccarthy2010
 - Title: {MTLD
 - Link: http://dx.doi.org/10.3758/BRM.42.2.381
-- Paper sentence: "\paragraph{Features and instruments.} Features exclude content words to limit topic sensitivity: per-token rates of closed-class words, coarse part-of-speech trigrams, dependency labels and punctuation marks, plus mean and standard deviation of sentence length, mean word length and MTLD lexical diversity \citep{mccarthy2010}, computed with spaCy~3.8 (\texttt{en\_core\_web\_sm}); features present in fewer than 1\ (top features in Appendix~\ref{app:features})."
+- Paper sentence: "\paragraph{Features and instruments.} Features exclude content words to limit topic sensitivity: per-token rates of closed-class words, coarse part-of-speech trigrams, dependency labels and punctuation marks, plus mean and standard deviation of sentence length, mean word length and MTLD lexical diversity \citep{mccarthy2010}, computed with spaCy~3.8 (\texttt{en\_core\_web\_sm}); features present in fewer than 1\% of training documents are dropped (top features in Appendix~\ref{app:features})."
