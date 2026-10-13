@@ -94,7 +94,7 @@ def fig_learners():
             ax.errorbar(100 * r.mso, yy, xerr=[[100 * (r.mso - r.lo)], [100 * (r.hi - r.mso)]], fmt="o", ms=4,
                         color=c, ecolor=c, elinewidth=1, capsize=0, label=g if i == 0 else None)
     ax.set_yticks(range(len(inst)), [n for n, _ in inst[::-1]], fontsize=6.5)
-    ax.set_xlabel("Share of held-out essays flagged as LLM-like (%)", fontsize=7)
+    ax.set_xlabel("Held-out essays flagged as LLM-like (%)", fontsize=7)
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=2, fontsize=6.5)
     fig.tight_layout()
     fig.savefig(FIG / "learners.pdf")
@@ -120,8 +120,8 @@ def fig_gensets():
 
 # generators in release order (year of release; RAID's are 2023 systems)
 VINTAGE = [("raid-cohere-chat", "Cohere chat", 2023), ("raid-mpt-chat", "MPT chat", 2023),
-           ("raid-llama-chat", "Llama 2 chat (RAID)", 2023), ("raid-mistral-chat", "Mistral chat", 2023),
-           ("raid-chatgpt", "ChatGPT", 2023), ("raid-gpt4", "GPT-4", 2023), ("llama2:7b", "Llama 2 chat 7B", 2023),
+           ("raid-llama-chat", "Llama 2 70B chat", 2023), ("raid-mistral-chat", "Mistral chat", 2023),
+           ("raid-chatgpt", "ChatGPT", 2023), ("raid-gpt4", "GPT-4", 2023), ("llama2:7b", "Llama 2 7B chat", 2023),
            ("vicuna:7b", "Vicuna 7B v1.5", 2023), ("mistral:7b", "Mistral 7B v0.3", 2024),
            ("llama3.1:8b", "Llama 3.1 8B", 2024), ("phi4:14b", "Phi-4 14B", 2024), ("gemma3:12b", "Gemma 3 12B", 2025),
            ("qwen3:8b", "Qwen3 8B", 2025), ("granite3.3:8b", "Granite 3.3 8B", 2025), ("gpt-oss:20b", "gpt-oss 20B", 2025),
@@ -143,6 +143,7 @@ def fig_vintage():
     a.axvline(2022.9, color=INK, lw=0.6)
     a.set_ylabel("arXiv MSO (%)")
     a.set_xticks([2015, 2018, 2021, 2024, 2026])
+    a.set_ylim(0, 62)  # headroom so the legend clears the 2026-model line
     a.legend(fontsize=5.6, loc="upper left")
     a.set_title("(a) Region defined by", fontsize=7.5, loc="left")
     rows = [(lab, yr, 100 * (v.loc[f"single:{m}", "y2026"] - v.loc[f"single:{m}", "y2025"]))

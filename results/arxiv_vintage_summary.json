@@ -1,0 +1,8 @@
+{
+  "n_single": 19,
+  "n_fell_2026": 15,
+  "n_rose_2026": 4,
+  "rose": "claude-opus-5.5, gpt-oss:20b, granite4.2:8b, qwen3.5:9b",
+  "n_marker_fell_2026": 17,
+  "n_style_rose_marker_fell": 2
+}

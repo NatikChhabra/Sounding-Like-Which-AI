@@ -107,6 +107,7 @@ def tidy(bib):
         return m.group(1) + "".join(out) + m.group(3)
     # title = {...} with at most one level of nested braces; works for one-line (Crossref) and multi-line entries
     bib = re.sub(r"((?<![a-z])title\s*=\s*\{)((?:[^{}]|\{[^{}]*\})*)(\})", protect, bib)
+    bib = re.sub(r"(?<!\\)&", r"\\&", bib)  # arXiv titles can contain a bare & (e.g. the gpt-oss model card)
     return re.sub(r"(pages\s*=\s*\{\s*\d+)\s*[–—-]+\s*(\d+)", r"\1--\2", bib)
 
 

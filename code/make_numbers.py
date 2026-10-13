@@ -96,7 +96,8 @@ def feature_table(k=10):
     down = pd.read_csv(RES / "arxiv_features_human_typical.csv").head(k)
     rows = [f"{tex_feature(a)} & ${b:.2f}$ & {tex_feature(c)} & ${d:.2f}$ \\\\"
             for a, b, c, d in zip(up.feature, up.coef, down.feature, down.coef)]
-    (RES / "feature_table.tex").write_text("\n".join(rows) + "\n", encoding="utf-8")
+    # \bottomrule must follow the last row directly; after an \input it is a misplaced \noalign
+    (RES / "feature_table.tex").write_text("\n".join(rows) + "\n\\bottomrule\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

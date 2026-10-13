@@ -1,0 +1,3 @@
+model,prompt,n,auc
+raid-gpt4,raid-greedy-rpno,250,0.9969733333333334
+raid-gpt4,raid-sampling-rpno,200,0.9948444444444445

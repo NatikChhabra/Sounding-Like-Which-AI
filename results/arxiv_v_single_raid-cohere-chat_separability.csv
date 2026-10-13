@@ -1,0 +1,3 @@
+model,prompt,n,auc
+raid-cohere-chat,raid-greedy-rpno,250,0.9380355555555555
+raid-cohere-chat,raid-sampling-rpno,200,0.9395388888888889

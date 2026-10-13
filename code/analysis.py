@@ -348,7 +348,7 @@ def dispersion(s, name, per_year=1500, n_boot=300):
             for i, y in enumerate(ys)]
     save(f"{name}_dispersion", pd.DataFrame(rows))
     g = {}
-    for at in (2025, 2026):
+    for at in [y for y in (2025, 2026) if y in ys]:  # Hansard ends in 2025
         bg = [gap(b, at) for b in boot]
         g[f"gap_{at}"] = {"est": gap(point, at), "ci_lo": float(np.percentile(bg, 2.5)),
                           "ci_hi": float(np.percentile(bg, 97.5)), "trend_per_year": float(np.polyfit(pre_y, point[:len(pre_y)], 1)[0])}
@@ -442,6 +442,10 @@ def mined_markers(llm_texts, human_texts, k=20, min_df=0.05):
 def source_texts(data, human):
     """id -> human source text for every generation: our arXiv sample plus RAID's own human abstracts."""
     pool = dict(zip(human.id, human.text))
+    v1 = Path(data) / "arxiv" / "sample.jsonl"  # first sampler: seeds of the original generators, some not in v2
+    if v1.exists():
+        a = pd.read_json(v1, lines=True)
+        pool = dict(zip("arxiv:" + a.id.str.replace(r"v\d+$", "", regex=True), a.abstract)) | pool
     raid = Path(data) / "raid_arxiv_human.jsonl"
     if raid.exists():
         r = pd.read_json(raid, lines=True)
@@ -527,6 +531,17 @@ def vintage(data, markers_only=False):
         its[name] = {"style": r, "markers": rm, "marker_words": words}
     save("arxiv_vintage", pd.DataFrame(rows))
     save("arxiv_vintage_its", its)
+
+
+def vintage_summary():
+    """Counts quoted in the paper: single-generator regions whose 2026 MSO (and mined-marker share) fell vs 2025."""
+    v = pd.read_csv(OUT / "arxiv_vintage.csv").set_index("group")
+    s = v[v.index.str.startswith("single:")]
+    rose = s[s.y2026 > s.y2025].index.str[7:].tolist()
+    save("arxiv_vintage_summary", {
+        "n_single": len(s), "n_fell_2026": int((s.y2026 < s.y2025).sum()), "n_rose_2026": len(rose),
+        "rose": ", ".join(rose), "n_marker_fell_2026": int((s.m2026 < s.m2025).sum()),
+        "n_style_rose_marker_fell": int(((s.y2026 > s.y2025) & (s.m2026 < s.m2025)).sum())})
 
 
 def placebo_grid(m, start="2016-06", end="2021-12", eval_months=12):
@@ -730,7 +745,7 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
-            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "robust3": lambda: robustness_v3(data),
+            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "robust3": lambda: robustness_v3(data),
             "overlap": lambda: revision_overlap(data),
             "control": control}
     for j in (jobs if which == "all" else [which]):

@@ -1,0 +1,2 @@
+model,prompt,n,auc
+granite4.2:8b,P1,150,0.9978222222222222

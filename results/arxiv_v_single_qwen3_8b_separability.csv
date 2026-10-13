@@ -1,0 +1,2 @@
+model,prompt,n,auc
+qwen3:8b,P1,150,0.9963555555555555

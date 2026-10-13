@@ -1,0 +1,2 @@
+model,prompt,n,auc
+qwen3.5:9b,P1,150,0.9996444444444444
