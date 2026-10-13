@@ -575,6 +575,8 @@ def vintage_peak():
     d["peak_x"] = pk.year + (pk.quarter - 1) / 4
     r = sp(d.release, d.peak_x)
     out = {"n": len(d), "rho": float(r.statistic), "rho_p": float(r.pvalue)}
+    tied = d.release.where(~d.group.str.contains("raid-"), 2023.5)  # RAID release months are approximate
+    out["rho_raid_tied"] = float(sp(tied, d.peak_x).statistic)
     late = d[d.release >= 2024]  # without the 2023 models
     out |= {"n_no2023": len(late), "rho_no2023": float(sp(late.release, late.peak_x).statistic)}
     c = d.assign(cutoff=d.group.str[7:].map(PRETRAIN_CUTOFF)).dropna(subset=["cutoff"])
@@ -891,6 +893,7 @@ def vintage_quarterly(data):
     d["peak_boot_share"] = (peaks == pos).mean(0)
     d["peak_boot_lo"] = [quarters[int(v)] for v in np.percentile(peaks, 10, axis=0, method="lower")]
     d["peak_boot_hi"] = [quarters[int(v)] for v in np.percentile(peaks, 90, axis=0, method="higher")]
+    d["peak_boot_range"] = [lo if lo == hi else f"{lo}--{hi}" for lo, hi in zip(d.peak_boot_lo, d.peak_boot_hi)]
     save("arxiv_vintage_quarterly", d)
     save("arxiv_vintage_peak_boot", {"n_boot": 1000, "rho_median": float(np.median(rhos)),
                                      "rho_lo": float(np.percentile(rhos, 2.5)), "rho_hi": float(np.percentile(rhos, 97.5))})

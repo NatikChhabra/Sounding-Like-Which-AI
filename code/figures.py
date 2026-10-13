@@ -122,14 +122,14 @@ def fig_gensets():
 
 
 # generators in release order (year of release; RAID's are 2023 systems)
-VINTAGE = [("raid-cohere-chat", "Cohere chat", 2023), ("raid-mpt-chat", "MPT chat", 2023),
-           ("raid-llama-chat", "Llama 2 70B chat", 2023), ("raid-mistral-chat", "Mistral chat", 2023),
-           ("raid-chatgpt", "ChatGPT", 2023), ("raid-gpt4", "GPT-4", 2023), ("llama2:7b", "Llama 2 7B chat", 2023),
+VINTAGE = [("raid-cohere-chat", "Cohere command", 2023), ("raid-mpt-chat", "MPT-30B-chat", 2023),
+           ("raid-llama-chat", "Llama-2-Chat 70B", 2023), ("raid-mistral-chat", "Mistral-7B-Instr. v0.1", 2023),
+           ("raid-chatgpt", "ChatGPT", 2023), ("raid-gpt4", "GPT-4", 2023), ("llama2:7b", "Llama-2-Chat 7B", 2023),
            ("vicuna:7b", "Vicuna 7B v1.5", 2023), ("mistral:7b", "Mistral 7B v0.3", 2024),
            ("llama3.1:8b", "Llama 3.1 8B", 2024), ("phi4:14b", "Phi-4 14B", 2024), ("gemma3:12b", "Gemma 3 12B", 2025),
            ("granite3.3:8b", "Granite 3.3 8B", 2025), ("qwen3:8b", "Qwen3 8B", 2025), ("gpt-oss:20b", "gpt-oss 20B", 2025),
            ("qwen3.5:9b", "Qwen3.5 9B", 2026), ("gemma4:12b", "Gemma 4 12B", 2026),
-           ("granite4.2:8b", "Granite 4.2 8B", 2026), ("claude-opus-5.5", "Claude (2026 model)", 2026)]
+           ("granite4.2:8b", "Granite 4.2 8B", 2026), ("claude-opus-5.5", "2026 model", 2026)]
 YEAR_COLOR = {2023: "#e87ba4", 2024: "#8b5cf6", 2025: AQUA, 2026: ORANGE}
 
 
@@ -139,10 +139,10 @@ def fig_vintage():
     fig, (a, b) = plt.subplots(1, 2, figsize=(6.6, 2.4), gridspec_kw={"width_ratios": [1, 1.25]})
     sets = [("pre2022data_matched", "Pre-ChatGPT pretraining data", BLUE, "-"),
             ("raid_all", "RAID 2023 chat models", YEAR_COLOR[2023], "-"),
-            ("local_p1", "Open models 2024\u201325", YEAR_COLOR[2025], "-"),
+            ("local_p1", "Open models 2024\u201325 (incl. gpt-oss)", YEAR_COLOR[2025], "-"),
             ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", YEAR_COLOR[2025], "--"),
             ("open2026_p1", "Open models 2026", YEAR_COLOR[2026], "--"),
-            ("frontier_p1", "Claude (2026 model)", YEAR_COLOR[2026], "-")]
+            ("frontier_p1", "2026 model (Claude Opus 5.5)", YEAR_COLOR[2026], "-")]
     for k, label, c, ls in sets:
         if k in v.index:
             a.plot(years, [100 * v.loc[k, f"y{y}"] for y in years], color=c, lw=1.8, ls=ls, marker="o", ms=2.5,
@@ -159,7 +159,7 @@ def fig_vintage():
     pk = pd.PeriodIndex(q.peak, freq="Q")
     q["peak_x"] = pk.year + (pk.quarter - 1) / 4 + 0.125
     label = {m: lab for m, lab, _ in VINTAGE}
-    show = {"raid-gpt4", "raid-cohere-chat", "vicuna:7b", "phi4:14b", "qwen3:8b", "gpt-oss:20b", "qwen3.5:9b", "gemma4:12b", "granite4.2:8b"}
+    show = {"raid-gpt4", "raid-cohere-chat", "vicuna:7b", "phi4:14b", "gpt-oss:20b", "qwen3.5:9b", "gemma4:12b", "granite4.2:8b"}
     seen = {}
     for g, r in q.iterrows():
         m = g[7:]
@@ -172,13 +172,16 @@ def fig_vintage():
             x = analysis.RELEASE[m]
             b.scatter(x, r.peak_x, s=16, color=YEAR_COLOR[yr], zorder=3)
             if m in show:
-                off, ha = {"gemma4:12b": ((3, -6), "left"), "qwen3.5:9b": ((3, 3), "left")}.get(m, ((3, 2), "left"))
-                b.annotate(label[m], (x, r.peak_x), xytext=off, ha=ha,
-                           textcoords="offset points", fontsize=5.2, color=MUTED)
-        else:  # release month not used: drawn in a separate "n/a" column; peak right-censored at the last quarter
+                text = "Gemma 3, Granite 3.3,\nQwen3 (2025Q4)" if m == "qwen3:8b" else label[m]  # one label, three points
+                off, ha, va = {"gemma4:12b": ((3, -7), "left", "baseline"), "qwen3.5:9b": ((-5, -1), "right", "center"),
+                               "qwen3:8b": ((-4, -6), "center", "top"),
+                               "gpt-oss:20b": ((-4, 2), "right", "bottom")}.get(m, ((3, 2), "left", "baseline"))
+                b.annotate(text, (x, r.peak_x), xytext=off, ha=ha, va=va, linespacing=0.95,
+                           textcoords="offset points", fontsize=6, color=MUTED)
+        else:  # release month not public: drawn in a separate "n/a" column; peak right-censored at the last quarter
             b.scatter(2027.0, r.peak_x, s=16, facecolors="none", edgecolors=YEAR_COLOR[yr], zorder=3)
-            b.annotate("2026 model (still rising)", (2027.0, r.peak_x), xytext=(-6, -2), ha="right",
-                       textcoords="offset points", fontsize=5.2, color=MUTED)
+            b.annotate("2026 model\n(still rising)", (2027.0, r.peak_x), xytext=(0, 5), ha="center", va="bottom",
+                       linespacing=0.95, textcoords="offset points", fontsize=6, color=MUTED)
     rho = json.loads((RES / "arxiv_vintage_peak.json").read_text())
     b.text(0.2, 0.34, f"Spearman $\\rho$ = {rho['rho']:.2f} (n = {rho['n']}; 2026 model excluded)",
            transform=b.transAxes, fontsize=6, va="top", color=INK)
@@ -191,7 +194,7 @@ def fig_vintage():
     years = range(int(q.peak_x.min()), 2027)  # every peak on the axis, however early
     ticks = [y + (k - 1) / 4 + 0.125 for y in years for k in (1, 3)]
     b.set_yticks(ticks, [f"{y}Q{k}" for y in years for k in (1, 3)])
-    b.set_ylim(q.peak_x.min() - 0.3, 2026.9)
+    b.set_ylim(q.peak_x.min() - 0.3, 2027.25)
     b.set_title("(b) Single-generator regions", fontsize=7.5, loc="left")
     fig.tight_layout()
     fig.savefig(FIG / "vintage.pdf", metadata=PDF_META)

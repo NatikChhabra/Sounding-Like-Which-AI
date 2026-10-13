@@ -30,7 +30,8 @@ def main(data, out):
     lines = (data / "llm_hansard.jsonl").read_bytes().splitlines(keepends=True)
     p2 = [json.loads(l) for l in lines if json.loads(l)["prompt"] == "P2"]
     gz_write(gen / "llm_hansard.jsonl.gz", b"".join(l for l in lines if json.loads(l)["prompt"] != "P2"))
-    gz_csv(pd.DataFrame(p2)[["src_id", "model", "prompt"]], gen / "hansard_p2_rows.csv.gz")
+    if p2:  # a data folder rebuilt from this release has no P2 rows; keep the released list then
+        gz_csv(pd.DataFrame(p2)[["src_id", "model", "prompt"]], gen / "hansard_p2_rows.csv.gz")
     for name in ("arxiv_v2", "arxiv"):  # the second (v1) sample seeded the original generators
         src = data / name / "sample.jsonl"
         if src.exists():

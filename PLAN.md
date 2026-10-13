@@ -32,7 +32,7 @@ disclosed in `paper/AI_DISCLOSURE.md`. **Field:** computational linguistics. **B
       hallucinated references
 - [ ] Then put the AI-use statements in the past tense (`main.tex`, `AI_DISCLOSURE.md`, README status), rebuild
 - [ ] Release v1.0 on GitHub (Zenodo mints the DOI from `.zenodo.json`); set `date-released` in `CITATION.cff`
-- [ ] Ask the EACL 2027 SRW chairs whether a secondary-school student may be first author (before 2026-11-06)
+- [ ] Ask the EACL 2027 SRW chairs to confirm the author is eligible as first author (before 2026-11-06)
 - [ ] EACL 2027 Student Research Workshop: pre-submission mentorship (deadline 2026-11-06)
 - [ ] Submit: EACL 2027 SRW (2026-12-15) and/or ACL Rolling Review for ACL 2027 (2027-01-04; needs a complete
       OpenReview profile and a qualified "service contributor", or the paper enters a desk-rejection lottery)
