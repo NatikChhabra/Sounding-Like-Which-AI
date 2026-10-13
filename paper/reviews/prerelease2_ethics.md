@@ -1,6 +1,6 @@
 # Pre-release audit, round 2: ethics, policy and licences
 
-Audited 2026-10-13 against commit `5f285c4` (origin/main, public). Files read: `paper/main.tex` (Data, Limitations,
+Audited 2026-10-13 against commit [pre-rewrite commit] (origin/main, public). Files read: `paper/main.tex` (Data, Limitations,
 Ethics Statement, AI Use and Authorship, Appendix A), `paper/AI_DISCLOSURE.md`, `README.md`, `data/README.md`,
 `CITATION.cff`, `LICENSE`, `requirements.txt`, `PLAN.md`, every file in `data/` (decompressed and inspected), the
 `results/` listing, and the git history. Policies were checked on the web on the same day (URLs inline). No file

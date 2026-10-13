@@ -151,7 +151,7 @@ def fig_vintage():
     a.set_ylabel("arXiv MSO (%)")
     a.set_xticks([2015, 2018, 2021, 2024, 2026])
     a.set_ylim(0, 62)  # headroom so the legend clears the 2026-model line
-    a.legend(fontsize=5.6, loc="upper left", framealpha=1)  # opaque: the ChatGPT line runs behind it
+    a.legend(fontsize=5.6, loc="upper left", frameon=True, facecolor="white", edgecolor="none", framealpha=1)  # opaque: the ChatGPT line runs behind it
     a.set_title("(a) MSO by reference set", fontsize=7.5, loc="left")
     # (b) quarter of peak single-generator MSO against the generator's release date
     import analysis  # release months live with the analysis code
@@ -173,7 +173,7 @@ def fig_vintage():
             b.scatter(x, r.peak_x, s=16, color=YEAR_COLOR[yr], zorder=3)
             if m in show:
                 text = "Granite 4.2" if m == "granite4.2:8b" else label[m]  # short: clears the 2026-model circle
-                off, ha, va = {"gemma4:12b": ((3, -7), "left", "baseline"), "qwen3.5:9b": ((4, -1), "left", "center"),
+                off, ha, va = {"gemma4:12b": ((3, -7), "left", "baseline"), "granite4.2:8b": ((4, 0), "left", "center"), "qwen3.5:9b": ((4, -1), "left", "center"),
                                "gpt-oss:20b": ((-4, 2), "right", "bottom")}.get(m, ((3, 2), "left", "baseline"))
                 b.annotate(text, (x, r.peak_x), xytext=off, ha=ha, va=va, linespacing=0.95,
                            textcoords="offset points", fontsize=6, color=MUTED)
@@ -182,8 +182,8 @@ def fig_vintage():
             b.annotate("2026 model\n(still rising)", (2027.0, r.peak_x), xytext=(0, 5), ha="center", va="bottom",
                        linespacing=0.95, textcoords="offset points", fontsize=6, color=MUTED)
     rho = json.loads((RES / "arxiv_vintage_peak.json").read_text())
-    b.text(0.17, 0.34, f"$\\rho$ = {rho['rho']:.2f} (n = {rho['n']}); {rho['rho_no_new']:.2f} without "
-           f"2026 open models (n = {rho['n_no_new']})", transform=b.transAxes, fontsize=6, va="top", color=INK)
+    b.text(0.12, 0.34, f"$\\rho$ = {rho['rho']:.2f} (n = {rho['n']}); {rho['rho_no_new']:.2f} without "
+           f"2026 open models (n = {rho['n_no_new']})", transform=b.transAxes, fontsize=5.6, va="top", color=INK)
     for yr, c in YEAR_COLOR.items():
         b.scatter([], [], s=16, color=c, label=str(yr))
     b.legend(fontsize=5.6, title="Released", title_fontsize=5.6, loc="lower right", ncol=2)

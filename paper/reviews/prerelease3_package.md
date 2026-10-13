@@ -19,8 +19,8 @@ speeches (P2)") and `.zenodo.json` all say these texts are not released. They ar
 
 | Commit (public) | File | Blob | Rows | P2 rows |
 |---|---|---|---|---|
-| `5f285c4` | `data/generated/llm_hansard.jsonl.gz` | `293d047c9aa423eb45d077045cabe020e083d9cb` | 3,630 | **1,202** |
-| `a2372da` | `data/generated/llm_hansard.jsonl.gz` | `3eec9cab9147c81be66983c262f3abe0a2c000d4` | 3,630 | **1,202** |
+| [pre-rewrite commit] | `data/generated/llm_hansard.jsonl.gz` | `[removed blob]` | 3,630 | **1,202** |
+| [pre-rewrite commit] | `data/generated/llm_hansard.jsonl.gz` | `[removed blob]` | 3,630 | **1,202** |
 | `0795e4b` (HEAD) | same file | `f4dbfa60…` | 2,428 | 0 |
 
 The 1,202 rows are by model llama3.1 156, qwen3 155, mistral 150, gpt-oss 150, claude-opus-5.5 150, phi4 150,
@@ -38,7 +38,7 @@ with 0 forks and 0 stars, so rewriting its history now costs little.
 git clone --mirror https://github.com/NatikChhabra/Sounding-Like-Which-AI-.git sl-mirror.git
 cd sl-mirror.git
 py -3.12 -m pip install git-filter-repo
-printf '293d047c9aa423eb45d077045cabe020e083d9cb\n3eec9cab9147c81be66983c262f3abe0a2c000d4\n' > ../p2-blobs.txt
+printf '[removed blob]\n[removed blob]\n' > ../p2-blobs.txt
 # optional, same pass: scrub the Windows username (see M9)
 printf '<user>==>USER\n' > ../names.txt
 git filter-repo --strip-blobs-with-ids ../p2-blobs.txt --replace-text ../names.txt
@@ -49,16 +49,16 @@ git push --force origin main
 # 3. In the working copy: commit or stash local work first, then
 git fetch origin && git reset --hard origin/main
 ```
-Then ask GitHub Support to purge cached views of the old commits `5f285c4` and `a2372da` (GitHub Docs, "Removing
+Then ask GitHub Support to purge cached views of the old commits [pre-rewrite commit] and [pre-rewrite commit] (GitHub Docs, "Removing
 sensitive data from a repository"). Until GitHub runs garbage collection, an old commit stays reachable by its full SHA.
-Only `5f285c4`, `a2372da` and `0795e4b` get new SHAs. `6675865` and every hash cited in `paper/AI_DISCLOSURE.md` are
-older and do not change. `paper/reviews/prerelease2_ethics.md` and `prerelease2_repro.md` cite `5f285c4`, which will
+Only [pre-rewrite commit], [pre-rewrite commit] and `0795e4b` get new SHAs. `6675865` and every hash cited in `paper/AI_DISCLOSURE.md` are
+older and do not change. `paper/reviews/prerelease2_ethics.md` and `prerelease2_repro.md` cite [pre-rewrite commit], which will
 no longer resolve.
 
 The README says "The git history is the complete record of changes to the files". To keep that true, add to README.md
 ("How this was made") and to `paper/AI_DISCLOSURE.md` ("How to audit it"):
 > On 2026-10-13 the public history was rewritten once to remove the LLM revisions of Hansard speeches (P2), which had
-> been committed by mistake in two commits (the former `5f285c4` and `a2372da`). No other content changed. Review
+> been committed by mistake in two commits (the former [pre-rewrite commit] and [pre-rewrite commit]). No other content changed. Review
 > reports written before the rewrite cite the old commit ids.
 
 ### B2. Release gate: no author read-through or HUMAN-EDIT commit yet
