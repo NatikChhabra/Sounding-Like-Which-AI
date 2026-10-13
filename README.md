@@ -19,16 +19,16 @@ after the author's read-through.
   never-revised papers are counted, and it is far larger than any placebo or instrument-drift gap. It is smaller, though still large, when the generators that write closest to
   human abstracts are left out (22.2 pp without the 2026 model, 17.9 pp without revisions of human drafts).
 - Against generators whose pretraining data predate ChatGPT the gap is smaller but clear (**7.5 pp**; 11.9 pp
-  measured nonparametrically, against 22.1 pp for recent open models), so part of the shift is unlikely to come
+  measured nonparametrically, against 22.1 pp for the 2024–2025 open models), so part of the shift is unlikely to come
   from newer models learning from newer abstracts.
-- Measured against one generator at a time, overlap with all but the newest rises and then turns down, and the
-  turn **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; bootstrap
-  0.64–0.86). The three 2026 open models peaked before or as they were released, so authors using them cannot
-  explain it. If the pattern persists, a reference set that is not refreshed, like a fixed list of words such as
+- Measured against one generator at a time, overlap with all but the newest rises and then turns down (for the latest ones only in the final
+  quarter), and the turn **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; bootstrap
+  0.64–0.86). Two of the three 2026 open models peaked before they were released and the third in its release
+  quarter, so authors using them can explain little of it. If the pattern persists, a reference set that is not refreshed, like a fixed list of words such as
   *delve*, will show the shift "fading".
 - A zero-shot detector statistic computed with a small, older scoring model (Fast-DetectGPT criterion with GPT-2)
-  does not see the shift; the larger scoring models of the original method might.
-- In student essays, English learners' writing is *less* machine-like than their peers' (2.3% vs 4.2%), even under
+  does not see the shift (its flag rate falls); the larger scoring models of the original method might.
+- In student essays, English learners' writing is *less* machine-like than their peers' (2.3% vs 4.2%; mostly a proficiency difference), even under
   a GPT-2 perplexity instrument that reproduces a published bias against TOEFL essays (63.7% vs 8.0% flagged).
 
 ## How this was made
@@ -71,11 +71,14 @@ texts, unpack `data/generated/*.gz` into the data folder: the 2026-model texts c
 (no decoding control), and local-model outputs depend on hardware and Ollama version (0.40.3 was used; models
 llama3.1:8b, qwen3:8b, gemma3:12b, mistral:7b, gpt-oss:20b, phi4:14b, granite3.3:8b, and for the vintage analysis
 only llama2:7b, vicuna:7b, qwen3.5:9b, gemma4:12b and granite4.2:8b; temperature 0.8, fixed seeds). The Hansard results are the exception: the LLM revisions of real speeches are not
-released (Hansard text may not be adapted), so those results need the speech revisions regenerated. The paper compiles with
+released (Hansard text may not be adapted), so those results need the speech revisions regenerated: after unpacking, run the stages `data`, `perplexity`,
+`analysis` and `paper`, and run `generate` only to regenerate the withheld local-model speech revisions (it skips
+existing texts; the 2026 model's revisions cannot be regenerated). The paper compiles with
 [Tectonic](https://tectonic-typesetting.github.io): `powershell -File paper\build.ps1`.
 
 ## Licences
-- Code: MIT (`LICENSE`).
+- Code: MIT (`LICENSE`), except the ACL style files in `paper/` (`acl.sty`, `acl_natbib.bst`), which keep the
+  ACL template's licence.
 - Paper text, figures, results, review reports, literature notes and the analysis plan: CC BY 4.0.
 - Data: per file in `data/README.md`. Generated abstracts: CC BY 4.0; speech generations: CC BY-NC 4.0 (the
   revisions of real speeches are not released); essay generations: CC BY-NC-SA 4.0, as they derive from

@@ -127,6 +127,9 @@ def tidy(bib):
     bib = html.unescape(bib)  # Crossref sometimes returns HTML entities (Computers &amp; Education)
     bib = re.sub(r"(?<!\\)&", r"\\&", bib)  # arXiv titles can contain a bare & (e.g. the gpt-oss model card)
     bib = bib.replace("Mcfarland", "McFarland").replace("’", "'")  # PMLR author list; curly apostrophes vanish
+    bib = bib.replace("ő", r"{\H{o}}")  # the Times font has no ő glyph (Emőke would print as "Emke")
+    # Crossref writes month=July/June, which BibTeX does not know (the month is then dropped); use its macros
+    bib = re.sub(r"month\s*=\s*([A-Z][a-z]+)\b", lambda m: "month=" + m.group(1)[:3].lower(), bib)
     # initials need a full stop ("Christopher D Manning" -> "Christopher D. Manning")
     bib = re.sub(r"(author\s*=\s*\{)([^}]*)\}",
                  lambda m: m.group(1) + re.sub(r"(?<=[\s{])([A-Z])(?=\s)", r"\1.", m.group(2)) + "}", bib)

@@ -34,7 +34,8 @@ terms). Some of these restrict using outputs to train other models; check them b
 
 Notes:
 - arXiv ids: the `*_sample_ids` files hold the API's versioned id (e.g. `1501.02046v1`), and
-  `code/fetch_arxiv.py ids` re-fetches exactly that version. Split files and generations use `arxiv:` plus the
-  unversioned id.
+  `code/fetch_arxiv.py ids` re-fetches exactly that version. Split files use `arxiv:` plus the unversioned id; generation `src_id`s use `arxiv:` and some keep the version
+  suffix (e.g. `v1`), which the analysis strips.
 - Hansard: generations made before a bug fix carry the speaker id as `src_id` (2,167 rows, 1,448 of them released) and
-  113 rows (80 released) have none (analysis plan, deviation 5); they are still grouped by speaker. Some speeches have an empty party field.
+  113 rows (80 released) have none (analysis plan, deviation 5); they are still grouped by speaker. Some speeches have an empty party field. `llm_hansard` contains 12 exact-duplicate P1 rows (the same output
+  for the same prompt), kept as generated.
