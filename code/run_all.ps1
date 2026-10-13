@@ -33,7 +33,8 @@ if ($Stage -in "all", "analysis") {
     foreach ($job in "corpus", "essay", "essay_perplexity") { Step $job { & $py analysis.py $Data $job } }
     $env:PPL_MODEL = "gpt2"; Step "essay_perplexity gpt2" { & $py analysis.py $Data essay_perplexity }; Remove-Item Env:\PPL_MODEL
     foreach ($job in "hansard", "arxiv", "gensets", "drift", "nodash", "control", "vintage", "vsummary", "robust3",
-                     "robust4", "vquarter", "vpeak", "genlen", "ablate", "robust5", "fastdetect", "overlap") {
+                     "robust4", "vquarter", "genlen", "vpeak", "ablate", "robust5", "robust6", "robust7", "robust8",
+                     "fastdetect", "overlap") {
         Step $job { & $py analysis.py $Data $job }
     }
 }

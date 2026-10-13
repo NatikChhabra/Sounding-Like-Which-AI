@@ -120,7 +120,7 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
     with peak quarter, the correlation with all RAID release months tied (they are approximate), the correlation without the three 2026
     open models that were added after the pattern was seen (0.66, n = 15), the correlation for each of the five
     human training draws, with abstracts reweighted to the pre-ChatGPT length distribution and with equal field
-    weights, its partial correlation given generator output length, the gradient-boosted-trees trend gap, and a comparison of
+    weights, its partial correlation given generator output length, the same with every region trained on 150 texts (RAID regions otherwise use 450), a permutation p-value, the gradient-boosted-trees trend gap, and a comparison of
     each generator's mined-marker peak with its style peak.
 12. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
 13. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
