@@ -43,7 +43,10 @@ responsible for the content. "The 2026 model" in the paper is that same system, 
 generators. Details, including what has and has not been checked by a human, are in
 [`paper/AI_DISCLOSURE.md`](paper/AI_DISCLOSURE.md). The git history is the complete record of changes to the
 files: AI-written commits say
-so, and any human edit is a separate commit labelled `HUMAN-EDIT:`. Simulated peer-review rounds and the citation
+so, and any human edit is a separate commit labelled `HUMAN-EDIT:`. On 2026-10-13 the public history was rewritten
+once, with the author's approval, to remove the LLM revisions of Hansard speeches (they had been released in two
+earlier commits; Hansard text may not be adapted) and a local Windows username in file paths; nothing else changed,
+and the commit ids cited in the paper and the analysis plan are unchanged. Simulated peer-review rounds and the citation
 verification reports are included (`paper/reviews/`, `lit/verification/`).
 
 ## Layout

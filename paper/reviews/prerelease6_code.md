@@ -132,7 +132,7 @@ or agreement to 1e-16), and the independent re-implementations below agree with 
   runs in its own process.
 - **`robustness_v5` single regions.** Seed min/max and `n_seeds_same_sign` reproduce for all 19 regions from
   independently computed seed 1-4 hits. The 80% generator-subsample refits reproduce `sub_change_min/max` and
-  `n_sub_same_sign`. C7_STATUS
+  `n_sub_same_sign`.
 - **No leakage.** The train and score pools are disjoint (0 shared ids, no duplicate ids), and the train pool ends
   2022-11-29. Every local-model LLM source is a train-pool document (5,401) or a v1 source absent from the human
   table (449). None is a scored document. RAID sources are RAID's own abstracts. Calibration folds group each LLM text
