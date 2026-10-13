@@ -46,6 +46,7 @@ def fig_timeseries():
     fig, axes = plt.subplots(1, 3, figsize=(6.6, 2.3), sharex=True)
     its_panel(axes[0], "arxiv_monthly", BLUE, "arXiv", legend=True)
     axes[0].set_title("(a) MSO, arXiv abstracts", fontsize=8, color=INK, loc="left")
+    axes[0].set_ylim(top=72)  # legend sits above the data
     its_panel(axes[1], "hansard_monthly", ORANGE, "Hansard")
     axes[1].set_title("(b) MSO, parliamentary speech", fontsize=8, color=INK, loc="left")
     its_panel(axes[2], "arxiv_marker_monthly", AQUA, "arXiv", ylabel="Abstracts with marker word (%)")
@@ -70,6 +71,7 @@ def fig_fields():
                      fmt="o", ms=4, color=BLUE, ecolor=BLUE, elinewidth=1, capsize=0)
     axes[0].set_yticks(y, [f"{g} ({n:,})" for g, n in zip(base.group, base.n)])
     axes[0].set_xlabel("Baseline MSO (%)", fontsize=7)
+    axes[0].set_xlim(left=0)
     e = np.array([100 * d[k] for d in ex])
     lo = np.array([100 * d["excess_lo"] for d in ex])
     hi = np.array([100 * d["excess_hi"] for d in ex])
@@ -127,7 +129,7 @@ VINTAGE = [("raid-cohere-chat", "Cohere chat", 2023), ("raid-mpt-chat", "MPT cha
            ("granite3.3:8b", "Granite 3.3 8B", 2025), ("qwen3:8b", "Qwen3 8B", 2025), ("gpt-oss:20b", "gpt-oss 20B", 2025),
            ("qwen3.5:9b", "Qwen3.5 9B", 2026), ("gemma4:12b", "Gemma 4 12B", 2026),
            ("granite4.2:8b", "Granite 4.2 8B", 2026), ("claude-opus-5.5", "Claude (2026 model)", 2026)]
-YEAR_COLOR = {2023: "#e87ba4", 2024: "#eda100", 2025: AQUA, 2026: ORANGE}
+YEAR_COLOR = {2023: "#e87ba4", 2024: "#8b5cf6", 2025: AQUA, 2026: ORANGE}
 
 
 def fig_vintage():
@@ -136,7 +138,7 @@ def fig_vintage():
     fig, (a, b) = plt.subplots(1, 2, figsize=(6.6, 2.4), gridspec_kw={"width_ratios": [1, 1.25]})
     sets = [("pre2022data_matched", "Pre-ChatGPT pretraining data", BLUE, "-"),
             ("raid_all", "RAID 2023 chat models", YEAR_COLOR[2023], "-"),
-            ("local_p1", "Open models 2024-25", YEAR_COLOR[2025], "-"),
+            ("local_p1", "Open models 2024\u201325", YEAR_COLOR[2025], "-"),
             ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", YEAR_COLOR[2025], "--"),
             ("open2026_p1", "Open models 2026", YEAR_COLOR[2026], "--"),
             ("frontier_p1", "Claude (2026 model)", YEAR_COLOR[2026], "-")]
@@ -149,7 +151,7 @@ def fig_vintage():
     a.set_xticks([2015, 2018, 2021, 2024, 2026])
     a.set_ylim(0, 62)  # headroom so the legend clears the 2026-model line
     a.legend(fontsize=5.6, loc="upper left")
-    a.set_title("(a) Region defined by", fontsize=7.5, loc="left")
+    a.set_title("(a) MSO by reference set", fontsize=7.5, loc="left")
     # (b) quarter of peak single-generator MSO against the generator's release date
     import analysis  # release months live with the analysis code
     q = pd.read_csv(RES / "arxiv_vintage_quarterly.csv").set_index("group")
@@ -169,12 +171,12 @@ def fig_vintage():
             x = analysis.RELEASE[m]
             b.scatter(x, r.peak_x, s=16, color=YEAR_COLOR[yr], zorder=3)
             if m in show:
-                off = {"gemma4:12b": (3, -6), "qwen3.5:9b": (-40, 3)}.get(m, (3, 2))
+                off = {"gemma4:12b": (3, -6), "qwen3.5:9b": (3, -8)}.get(m, (3, 2))
                 b.annotate(label[m], (x, r.peak_x), xytext=off,
                            textcoords="offset points", fontsize=5.2, color=MUTED)
         else:  # release month not used: drawn in a separate "n/a" column; peak right-censored at the last quarter
             b.scatter(2027.0, r.peak_x, s=16, facecolors="none", edgecolors=YEAR_COLOR[yr], zorder=3)
-            b.annotate("2026 model\n(still rising)", (2027.0, r.peak_x), xytext=(0, -26), ha="center",
+            b.annotate("2026 model (still rising)", (2027.0, r.peak_x), xytext=(-6, -2), ha="right",
                        textcoords="offset points", fontsize=5.2, color=MUTED)
     rho = json.loads((RES / "arxiv_vintage_peak.json").read_text())
     b.text(0.03, 0.95, f"Spearman $\\rho$ = {rho['rho']:.2f} (n = {rho['n']}; 2026 model excluded)",
@@ -184,8 +186,7 @@ def fig_vintage():
     b.legend(fontsize=5.6, title="Released", title_fontsize=5.6, loc="lower right", ncol=2)
     b.set_xlabel("Generator release date")
     b.set_ylabel("Quarter of peak MSO")
-    b.set_xticks([2023.5, 2024, 2024.5, 2025, 2025.5, 2026, 2026.5, 2027.0],
-                 ["", "2024", "", "2025", "", "2026", "", "n/a"])
+    b.set_xticks([2024, 2025, 2026, 2027.0], ["2024", "2025", "2026", "n/a"])
     ticks = [y + (k - 1) / 4 + 0.125 for y in (2024, 2025, 2026) for k in (1, 3)]
     b.set_yticks(ticks, [f"{y}Q{k}" for y in (2024, 2025, 2026) for k in (1, 3)])
     b.set_ylim(2024.4, 2026.9)

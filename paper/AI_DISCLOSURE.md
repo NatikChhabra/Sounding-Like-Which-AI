@@ -30,6 +30,8 @@ The AI system is Claude Opus 5.5 (Anthropic), used as an agent through Claude Co
   one removed citation and published versions replacing preprints.
 
 ## How to audit it
+- One early commit, `6675865` ("Strip BOM"), was made by the AI system but lacks the "(AI-written)" label and
+  trailer; it only removed byte-order marks and regenerated `results/numbers.tex`.
 - The git history is the complete record. AI-written commits carry "(AI-written)" and a
   `Co-Authored-By: Claude` trailer; any human edit to AI-written text is a separate commit starting `HUMAN-EDIT:`.
 - Every numerical result in the paper is inserted from `results/` by `code/make_numbers.py`; the PDF does not

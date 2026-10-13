@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 paper/*.pdf
+!paper/preprint.pdf
 paper/*.aux
 paper/*.log
 paper/*.bbl
