@@ -5,6 +5,8 @@ authors:
   - family-names: Chhabra
     given-names: Natik
     orcid: "https://orcid.org/0009-0004-8786-7703"
+version: "v1.0"
+date-released: 2026-10-13
 license:
   - MIT
   - CC-BY-4.0
