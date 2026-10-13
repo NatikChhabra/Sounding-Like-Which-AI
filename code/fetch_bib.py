@@ -75,6 +75,7 @@ PROPER = {"Wikipedia", "Australian", "English", "Hansard", "Parliamentary", "Deb
 # Titles whose fetched form loses capitals after "?" or a braced colon under acl_natbib, or has Unicode quotes
 # (wording checked against the source records; lit/verification/batch7_bib.md)
 TITLES = {
+    "sadasivan2025": r"Can {AI}-Generated Text {B}e Reliably Detected? {S}tress Testing {AI} Text Detectors Under Various Attacks",
     "juzek2025": r"Why Does {C}hat{GPT} ``Delve'' So Much? {E}xploring the Sources of Lexical Overrepresentation in Large Language Models",
     "khan2026": r"Who Gets Seen in the Age of {AI}? {A}doption Patterns of Large Language Models in Scholarly Writing and Citation Outcomes",
     "reinhart2025": r"Do {LLMs} Write Like Humans? {V}ariation in Grammatical and Rhetorical Styles",
@@ -94,11 +95,15 @@ TITLES = {
 # Article numbers missing from Crossref's BibTeX (checked on the publisher pages; lit/verification/v5_batch*.md)
 PAGES = {"gao2023": "75", "herbold2023": "18617", "jakesch2023": "e2208839120", "kobak2025": "eadt3813",
          "munozortiz2024": "265", "reinhart2025": "e2422455122"}
+# the arXiv listing reverses this author's names; the PDF title page has Lin William Cong (surname Cong)
+AUTHORS = {"lin2025": "Cong, Lin William and Zhu, Wu"}
 
 
 def retitle(key, bib):
     if key in PAGES and not re.search(r"pages\s*=", bib):
         bib = re.sub(r"^(@\w+\{[^,]+,)", lambda m: m.group(1) + " pages={" + PAGES[key] + "},", bib, count=1)
+    if key in AUTHORS:
+        bib = re.sub(r"(?<![a-z])author\s*=\s*\{[^}]*\}", lambda m: "author = {" + AUTHORS[key] + "}", bib, count=1)
     if key not in TITLES:
         return bib
     # braced (Crossref, arXiv) or quoted (ACL Anthology) title field

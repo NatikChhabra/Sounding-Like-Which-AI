@@ -957,12 +957,47 @@ def robustness_v8(data, n_seeds=5):
     save("robustness_v8", out)
 
 
+def robustness_v9(data, words=100, n=150):
+    """Length-equalised peaks: every text (human training, LLM training, scored) is cut to its first `words`
+    cleaned words, texts shorter than that are dropped, and every single-generator region trains on `n` texts per
+    class, so output length and training size cannot differ by vintage. Then the release-peak correlation."""
+    from scipy.stats import spearmanr as sp
+    human, llm = mso.load(data, "arxiv")
+    llm = load_old(data, llm)
+    cut = lambda t: features.clean(t).split()
+    long_enough = lambda d: d[d.text.map(lambda t: len(cut(t)) >= words)]
+    late = long_enough(human[(human.pool == "score") & (human.date.dt.year >= 2023)])
+    train = long_enough(human[human.pool == "train"]).sample(n=n, random_state=0)
+    sets = {k: long_enough(v).groupby("model").head(n) for k, v in vintage_sets(llm).items() if k.startswith("single:")}
+    feats = lambda d: d.assign(f=features.extract([" ".join(cut(t)[:words]) for t in d.text]))
+    late, train = feats(late), feats(train)
+    q = late.date.dt.to_period("Q").astype(str).values
+    rows = []
+    for name, sub in sets.items():
+        sub = feats(sub)
+        X, y, groups, _ = mso.training_set(train, sub)
+        qs = pd.Series(mso.fit(X, y, groups=groups)[0](list(late.f)) >= 0.5).groupby(q).mean()
+        rows.append({"group": name, "n_llm": len(sub), "peak": qs.idxmax(), **{f"mso_{k}": v for k, v in qs.items()}})
+    d = pd.DataFrame(rows)
+    save("arxiv_vintage_length_equalised", d)
+    d["release"] = d.group.str[7:].map(RELEASE)
+    pk = pd.PeriodIndex(d.peak, freq="Q")
+    d["peak_x"] = pk.year + (pk.quarter - 1) / 4
+    d = d.dropna(subset=["release"])
+    f = d[~d.group.str[7:].isin(NEW)]
+    save("robustness_v9", {"words": words, "n_train": n, "n": len(d), "rho": float(sp(d.release, d.peak_x).statistic),
+                           "rho_p": float(sp(d.release, d.peak_x).pvalue), "n_no_new": len(f),
+                           "rho_no_new": float(sp(f.release, f.peak_x).statistic),
+                           "rho_no_new_p": float(sp(f.release, f.peak_x).pvalue),
+                           "min_llm_texts": int(d.n_llm.min()), "n_scored": int(len(late))})
+
+
 # Release month (decimal year) from developer pages / model cards; RAID's from its model list (2023 snapshots).
 # The 2026 model's release month is not used (not documented in a citable source).
 RELEASE = {"raid-gpt4": 2023.45, "raid-chatgpt": 2023.45, "raid-mpt-chat": 2023.45, "raid-llama-chat": 2023.55,
            "raid-mistral-chat": 2023.7, "raid-cohere-chat": 2023.85, "llama2:7b": 2023.55, "vicuna:7b": 2023.6,
            "mistral:7b": 2024.4, "llama3.1:8b": 2024.55, "phi4:14b": 2024.95, "gemma3:12b": 2025.2,
-           "granite3.3:8b": 2025.29, "qwen3:8b": 2025.32, "gpt-oss:20b": 2025.6, "qwen3.5:9b": 2026.12,
+           "granite3.3:8b": 2025.29, "qwen3:8b": 2025.32, "gpt-oss:20b": 2025.6, "qwen3.5:9b": 2026.17,
            "gemma4:12b": 2026.42, "granite4.2:8b": 2026.65}
 # Pretraining-data cutoff (decimal year, mid-month) where the developer states one (Table 1 of the paper)
 PRETRAIN_CUTOFF = {"raid-gpt4": 2021.71, "raid-llama-chat": 2022.71, "llama2:7b": 2022.71, "vicuna:7b": 2022.71,
@@ -1149,7 +1184,7 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
-            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data), "robust6": robustness_v6, "robust7": lambda: robustness_v7(data), "robust8": lambda: robustness_v8(data),
+            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data), "robust6": robustness_v6, "robust7": lambda: robustness_v7(data), "robust8": lambda: robustness_v8(data), "robust9": lambda: robustness_v9(data),
             "vquarter": lambda: vintage_quarterly(data), "ablate": lambda: ablation(data), "fastdetect": lambda: fastdetect(data), "robust3": lambda: robustness_v3(data),
             "overlap": lambda: revision_overlap(data),
             "control": control}

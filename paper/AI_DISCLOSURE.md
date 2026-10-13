@@ -10,8 +10,9 @@ section is authoritative and this file is out of date.
   several of which the AI system made while working unattended under an instruction to continue; approved
   making the repository public. All of this happened in the working conversation, not in commits.
 - Takes full responsibility for the content, including the citations and the analysis choices.
-- Citations: delegated to the AI system (see below); the author has not checked citations. The author will read
-  the final paper before release; this line will be updated, in a `HUMAN-EDIT:` commit, when that is done.
+- Citations: delegated to the AI system (see below); the author has not checked citations.
+- Read the final paper and approved it for release (2026-10-13), without edits. The author asked the AI system to
+  record this, so this line was written by the AI system on the author's instruction, not in a `HUMAN-EDIT:` commit.
 
 ## What the AI system did
 The AI system is Claude Opus 5.5 (Anthropic), used as an agent through Claude Code on the author's computer. It:

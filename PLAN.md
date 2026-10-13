@@ -24,8 +24,8 @@ disclosed in `paper/AI_DISCLOSURE.md`. **Field:** computational linguistics. **B
 - [x] Five pre-release audit rounds (`paper/reviews/prerelease*.md`); further rounds continue until one comes back clean
 
 ## Remaining (author only; see `paper/reviews/prerelease2_ethics.md`)
-- [ ] Final read-through and critical revision by the author (edits as `HUMAN-EDIT:` commits); ACL authorship
-      requires it
+- [x] Final read-through by the author (2026-10-13; approved without edits). For ACL authorship, a critical revision
+      (own edits as `HUMAN-EDIT:` commits) before submission is still advised
 - [ ] Before any ACL/ARR submission or arXiv post: the author opens every reference and confirms it exists and
       supports its sentence (`lit/HUMAN_CITATION_CHECK.md`, `HUMAN-EDIT:` commit). ACL requires authors to confirm
       every source by hand and desk-rejected 2026 papers citing non-existent work; arXiv can ban authors for

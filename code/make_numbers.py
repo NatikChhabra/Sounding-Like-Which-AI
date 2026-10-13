@@ -24,7 +24,7 @@ def fmt(key, v):
         return f"{v:.1f}"
     if "dispersion" in key or leaf == "logit_gap":  # distances, not shares
         return f"{v:.2f}"
-    if leaf in ("n", "months", "dof", "ell_in_region", "median_words", "n_breaks") or leaf.startswith("n_") or "_n_" in leaf:
+    if leaf in ("n", "months", "dof", "ell_in_region", "median_words", "n_breaks", "words") or leaf.startswith("n_") or "_n_" in leaf:
         return f"{int(v):,}"
     if re.fullmatch(r"[ym]\d{4}", leaf) or leaf in ("in_04", "in_06", "marker") or "alpha" in leaf or \
             leaf.startswith(("change", "gap", "marker_gap", "linear_", "quadratic_", "trend_at", "diff", "resid",
