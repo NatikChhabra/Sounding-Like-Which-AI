@@ -22,16 +22,19 @@ after the author's read-through.
   models run on the paper's own prompts, 13.1 pp with the trend line fitted only to June 2025, against 22.7 pp for
   the 2024–2025 open models), so part of the shift points towards models that could not have learned it from
   recent abstracts.
-- Measured against one generator at a time, overlap with all but the newest rises and then turns down, and the turn
-  **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; bootstrap
-  0.64–0.86; 0.66 without the three 2026 open models, which were added after the pattern was seen). Two of those
-  three peaked before they were released and the third in its release quarter, so authors using them can explain
-  little of it. A fixed reference set, like a fixed list of words such as *delve*, can therefore show the shift
-  "fading" while writing keeps moving.
+- Measured against one generator at a time, overlap with most generators rises and then turns down, and the turn
+  **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; 0.66 for the 15
+  generators chosen before the pattern was seen). The correlation holds across human training draws (0.79–0.85),
+  with abstract length or field mix held fixed (0.84, 0.81) and without the 2023 models (0.82). But newer models
+  also write longer outputs, and output length predicts the peak about as well (0.73), so vintage and output length
+  cannot be separated. Two of the three 2026 open models peaked before they were released and the third in its
+  release quarter, so authors using them can explain little of the timing. A fixed reference set, like a fixed
+  list of words such as *delve*, can therefore show the shift "fading" while overlap with newer models still rises.
 - A zero-shot detector statistic computed with a small, older scoring model (Fast-DetectGPT criterion with GPT-2)
   does not see the shift (its flag rate falls); the larger scoring models of the original method might.
-- In student essays, English learners' writing is *less* machine-like than their peers' (2.3% vs 4.2%; mostly a proficiency difference), even under
-  a GPT-2 perplexity instrument that reproduces a published bias against TOEFL essays (63.7% vs 8.0% flagged).
+- In US school essays (PERSUADE 2.0), English learners' writing falls in the region *less* often than their peers'
+  (2.3% vs 4.2%), largely tracking essay scores, even under a GPT-2 perplexity instrument that reproduces a
+  published bias against TOEFL essays (63.7% vs 8.0% flagged).
 
 ## How this was made
 The study was carried out by an AI system (Claude Opus 5.5, via Claude Code) under the author's direction: it

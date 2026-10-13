@@ -577,6 +577,18 @@ def vintage_peak():
     out = {"n": len(d), "rho": float(r.statistic), "rho_p": float(r.pvalue)}
     tied = d.release.where(~d.group.str.contains("raid-"), 2023.5)  # RAID release months are approximate
     out["rho_raid_tied"] = float(sp(tied, d.peak_x).statistic)
+    # output length: newer generators write longer, and human abstracts lengthened (reviewer 2)
+    ln = pd.read_csv(OUT / "arxiv_generator_lengths.csv").set_index("group").median_words
+    d["length"] = d.group.map(ln)
+
+    def partial(sub):  # Spearman partial correlation of release and peak, given generator output length
+        r = sub[["release", "peak_x", "length"]].rank()
+        res = lambda c: r[c] - np.polyval(np.polyfit(r.length, r[c], 1), r.length)
+        return float(np.corrcoef(res("release"), res("peak_x"))[0, 1])
+    sub15 = d[~d.group.str[7:].isin(NEW)]
+    out |= {"rho_length": float(sp(d.length, d.peak_x).statistic),
+            "rho_release_length": float(sp(d.release, d.length).statistic),
+            "partial_release_given_length": partial(d), "partial_release_given_length_no_new": partial(sub15)}
     fixed = d[~d.group.str[7:].isin(NEW)]  # without the 2026 open models, added after the pattern was seen
     out |= {"n_no_new": len(fixed), "rho_no_new": float(sp(fixed.release, fixed.peak_x).statistic),
             "rho_no_new_p": float(sp(fixed.release, fixed.peak_x).pvalue)}
@@ -840,6 +852,70 @@ def robustness_v6():
     save("robustness_v6", out)
 
 
+def robustness_v7(data, n_seeds=5):
+    """Reviewer-2 checks on the vintage peaks: (1) peaks with each quarter's abstracts reweighted to the
+    pre-ChatGPT length distribution (10-word bins), (2) peaks with equal field weights in every quarter and the
+    count of regions falling in the last quarter, (3) the release-peak correlation for each human training draw,
+    (4) the trend gap of the main region under the gradient-boosted-trees instrument."""
+    from scipy.stats import spearmanr as sp
+    human, llm = mso.load(data, "arxiv")
+    llm = load_old(data, llm)
+    s0 = human[human.pool == "score"]
+    late = s0[s0.date.dt.year >= 2023]
+    q = late.date.dt.to_period("Q").astype(str).values
+    fld = late.group.values
+    nbin = lambda d: np.minimum(d.text.map(lambda t: len(features.clean(t).split())), 250) // 10
+    p_pre = nbin(s0[s0.date < CUTOFF]).value_counts(normalize=True)
+    b = nbin(late).values
+    p_q = pd.Series(b).groupby(q).value_counts(normalize=True)
+    w = np.array([p_pre.get(bb, 0.0) / p_q[(qq, bb)] for qq, bb in zip(q, b)])
+    sets = {k: v for k, v in vintage_sets(llm).items() if k.startswith("single:")}
+    rel = pd.Series({k: RELEASE.get(k[7:], np.nan) for k in sets})
+    qx = lambda p: pd.Period(p, "Q").year + (pd.Period(p, "Q").quarter - 1) / 4
+
+    def rhos(peaks):
+        d = pd.DataFrame({"rel": rel, "pk": pd.Series(peaks).map(qx)}).dropna()
+        f = d[~d.index.str[7:].isin(NEW)]
+        return float(sp(d.rel, d.pk).statistic), float(sp(f.rel, f.pk).statistic)
+
+    out, rows = {}, []
+    for seed in range(n_seeds):
+        mso.SEED = seed
+        try:
+            peaks = {}
+            for name, sub in sets.items():
+                X, y, groups, _ = mso.training_set(human, sub)
+                hit = (mso.fit(X, y, groups=groups)[0](list(late.f)) >= 0.5).astype(float)
+                qs = pd.Series(hit).groupby(q).mean()
+                peaks[name] = qs.idxmax()
+                if seed == 0:
+                    lw = pd.Series(hit * w).groupby(q).sum() / pd.Series(w).groupby(q).sum()
+                    fw = pd.DataFrame({"h": hit, "q": q, "f": fld}).groupby(["q", "f"]).h.mean().groupby("q").mean()
+                    rows.append({"group": name, "peak": qs.idxmax(), "peak_length_weighted": lw.idxmax(),
+                                 "peak_field_weighted": fw.idxmax(),
+                                 "fell_last_quarter_field_weighted": bool(fw["2026Q3"] < fw["2026Q2"])})
+        finally:
+            mso.SEED = 0
+        out[f"seed{seed}"] = dict(zip(("rho", "rho_no_new"), rhos(peaks)))
+    d = pd.DataFrame(rows).set_index("group")
+    save("arxiv_vintage_peak_checks", d.reset_index())
+    out["length_weighted"] = dict(zip(("rho", "rho_no_new"), rhos(d.peak_length_weighted.to_dict())))
+    out["field_weighted"] = dict(zip(("rho", "rho_no_new"), rhos(d.peak_field_weighted.to_dict())))
+    out["field_weighted"]["n_fell_last_quarter"] = int(d.drop(f"single:{FRONTIER}").fell_last_quarter_field_weighted.sum())
+    out["field_weighted"]["n_dated"] = int(len(d) - 1)
+    seeds = [out[f"seed{s}"]["rho"] for s in range(n_seeds)]
+    out["seeds"] = {"rho_min": min(seeds), "rho_max": max(seeds),
+                    "rho_no_new_min": min(out[f"seed{s}"]["rho_no_new"] for s in range(n_seeds)),
+                    "rho_no_new_max": max(out[f"seed{s}"]["rho_no_new"] for s in range(n_seeds))}
+    # main 14-generator region under the gradient-boosted-trees instrument
+    main = llm[llm.model.map(CHAT) & ~llm.model.isin(OLD + NEW)]
+    X, y, groups, _ = mso.training_set(human, main)
+    gb = mso.fit(X, y, kind="gbm", groups=groups)[0]
+    sc = s0.assign(in_region=(gb(list(s0.f)) >= 0.5).astype(int))
+    out["gbm_main"] = segmented(monthly(sc))
+    save("robustness_v7", out)
+
+
 # Release month (decimal year) from developer pages / model cards; RAID's from its model list (2023 snapshots).
 # The 2026 model's release month is not used (not documented in a citable source).
 RELEASE = {"raid-gpt4": 2023.45, "raid-chatgpt": 2023.45, "raid-mpt-chat": 2023.45, "raid-llama-chat": 2023.55,
@@ -1032,7 +1108,7 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
-            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data), "robust6": robustness_v6,
+            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data), "robust6": robustness_v6, "robust7": lambda: robustness_v7(data),
             "vquarter": lambda: vintage_quarterly(data), "ablate": lambda: ablation(data), "fastdetect": lambda: fastdetect(data), "robust3": lambda: robustness_v3(data),
             "overlap": lambda: revision_overlap(data),
             "control": control}

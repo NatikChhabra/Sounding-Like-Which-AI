@@ -21,7 +21,7 @@ disclosed in `paper/AI_DISCLOSURE.md`. **Field:** computational linguistics. **B
 - [x] Paper v5 (8 pages + appendices)
 - [x] Full citation verification of every reference, two passes (`lit/verification/`)
 - [x] Public repository with generated data, exact samples and pinned requirements
-- [ ] Five pre-release audit rounds (`paper/reviews/prerelease_*.md`)
+- [x] Five pre-release audit rounds (`paper/reviews/prerelease*.md`); further rounds continue until one comes back clean
 
 ## Remaining (author only; see `paper/reviews/prerelease2_ethics.md`)
 - [ ] Final read-through and critical revision by the author (edits as `HUMAN-EDIT:` commits); ACL authorship

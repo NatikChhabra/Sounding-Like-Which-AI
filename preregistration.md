@@ -79,7 +79,7 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
 6. **Pilot runs.** An essay analysis was run once on partial generations (3 of 5 models) to test the code;
    no analysis choice was changed after it. An arXiv pilot (RAID plus about 30% of the local generations) tested
    the pipeline at scale; see 7. A preliminary arXiv run (5 local models + RAID) was committed at 15:35 (f586d6c).
-7. **More generators (decided after the arXiv pilot; texts merged after the preliminary run).** Phi-4 14B and Granite 3.3 8B (the generation
+7. **More generators (decided after the arXiv pilot; texts merged nine minutes after the preliminary run, 01ef90f).** Phi-4 14B and Granite 3.3 8B (the generation
    script gained a model-list argument at 15:32, fd8a23b) and the 2026 model Claude Opus 5.5, whose prompt
    batches were committed at 15:37 (c11d3ce), two minutes after the preliminary arXiv results. The decision
    to add all three was stated in the working conversation after the arXiv pilot run on partial data (RAID plus
@@ -118,7 +118,9 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
     with fixed field weights, a joint document bootstrap of each generator's peak quarter and of the release-peak
     rank correlation, refits on 80% subsamples of each set's LLM texts, the rank correlation of pretraining cutoff
     with peak quarter, the correlation with all RAID release months tied (they are approximate), the correlation without the three 2026
-    open models that were added after the pattern was seen (0.66, n = 15), and a comparison of
+    open models that were added after the pattern was seen (0.66, n = 15), the correlation for each of the five
+    human training draws, with abstracts reweighted to the pre-ChatGPT length distribution and with equal field
+    weights, its partial correlation given generator output length, the gradient-boosted-trees trend gap, and a comparison of
     each generator's mined-marker peak with its style peak.
 12. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
 13. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
