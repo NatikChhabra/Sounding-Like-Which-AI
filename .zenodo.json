@@ -1,5 +1,5 @@
 {
-  "upload_type": "software",
+  "upload_type": "publication",
   "title": "Sounding Like Which AI? Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages: code, data and paper",
   "creators": [
     {
@@ -21,5 +21,6 @@
   "language": "eng",
   "notes": "AI use is disclosed in full in paper/AI_DISCLOSURE.md and in the paper's Acknowledgements section.",
   "version": "v1.0",
-  "publication_date": "2026-10-13"
+  "publication_date": "2026-10-13",
+  "publication_type": "preprint"
 }
