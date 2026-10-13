@@ -38,7 +38,8 @@ The AI system is Claude Opus 5.5 (Anthropic), used as an agent through Claude Co
   `Co-Authored-By: Claude` trailer; any human edit to AI-written text is a separate commit starting `HUMAN-EDIT:`.
 - The public history was rewritten once (2026-10-13, approved by the author) to remove the LLM revisions of
   Hansard speeches, which had been released in two earlier commits, and a local Windows username in file paths.
-  The rewrite used `git filter-repo` and changed nothing else; the commit ids cited in the paper are unchanged.
+  The rewrite used `git filter-repo`: the speech-generation file was removed whole from the two commits that held
+  the revisions, the username was replaced, and nothing else changed; the commit ids cited in the paper are unchanged.
 - Every numerical result in the paper is inserted from `results/` by `code/make_numbers.py`; the PDF does not
   compile if one is missing. Design constants (sample sizes, caps, lags) and a few counts and orderings stated
   in words (read from the same result files) are typed.

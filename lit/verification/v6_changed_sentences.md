@@ -2,7 +2,7 @@
 
 Sources were read on 2026-10-13. This was an AI check; no human checked these citations.
 
-**Baseline.** The v5 verification ended at commit `c1a5193`, the follow-up pass that added `v5_followup.md`. The later commit `5f285c4` only added `lit/verification/README.md`. Scope is `git diff c1a5193 HEAD -- paper/main.tex paper/references.bib`, and the working tree is clean for `paper/`.
+**Baseline.** The v5 verification ended at commit `c1a5193`, the follow-up pass that added `v5_followup.md`. The later commit [pre-rewrite commit] only added `lit/verification/README.md`. Scope is `git diff c1a5193 HEAD -- paper/main.tex paper/references.bib`, and the working tree is clean for `paper/`.
 
 **Method.**
 - Every sentence in HEAD `main.tex` that contains `\cite*` and does not appear verbatim in `c1a5193` was extracted. There are 25.

@@ -1,7 +1,7 @@
 # Pre-release audit 2: reproducibility from the public repository
 
 Auditor: AI reproducibility check (Claude Opus 5.5), 2026-10-13. Fresh clone of
-https://github.com/NatikChhabra/Sounding-Like-Which-AI-.git at `5f285c4` in a scratch folder. Packages from the
+https://github.com/NatikChhabra/Sounding-Like-Which-AI-.git at [pre-rewrite commit] in a scratch folder. Packages from the
 existing venv (linked into the clone as `.venv` with a directory junction, removed afterwards; nothing installed).
 `F:\research-data` was used read-only: analysis jobs ran through a wrapper that asserted no feature cache would be
 appended to, and the sizes and mtimes of every `*.jsonl`/`*.parquet` in the data folder were identical before and
@@ -28,9 +28,9 @@ after. Nothing in the working repository was changed except this file.
 ### F1 (minor, fix before tagging): committed `results/numbers.tex` is stale
 Running `make_numbers.py` in a fresh clone changes `results/numbers.tex`:
 `results/numbers.tex | 744 ---` (744 deletions, 0 insertions). The deleted macros all come from results files that
-commit `5f285c4` deleted but that were still present when `numbers.tex` was last generated:
+commit [pre-rewrite commit] deleted but that were still present when `numbers.tex` was last generated:
 `arxiv_nofrontier_*` (11 files, 522 lines), `arxiv_selftest_*` (5 files, 217 lines), `selftest.json` (5 lines).
-`git log --diff-filter=D` confirms the 19 files were deleted in `5f285c4`. No `\R{}` key in `paper/*.tex` uses them,
+`git log --diff-filter=D` confirms the 19 files were deleted in [pre-rewrite commit]. No `\R{}` key in `paper/*.tex` uses them,
 so every number in the PDF is unaffected, and every surviving line is unchanged. The working copy has the same
 stale file (`git status` clean there), so the paper was not rebuilt after the deletion.
 Effect: every newcomer's first build dirties `git status`, and the "determinism" check fails.
