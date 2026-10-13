@@ -5,8 +5,8 @@ How much human writing sounds like AI, how much already did before ChatGPT, and 
 This repository holds the data pipeline, analysis and paper for a study of **Machine-Style Overlap (MSO)**: the
 share of documents that a calibrated classifier on content-word-free style features judges at least as likely
 to come from LLM output as from pre-ChatGPT human writing. The main corpus is a stratified sample of arXiv
-abstracts from eight non-physics archives (2015-2026); Australian parliamentary speech and US student essays
-are secondary. Reference generators range from models whose training data predate ChatGPT to a 2026 model.
+abstracts from eight archives (cs, math, stat, eess, q-bio, econ, astro-ph, cond-mat) (2015-2026); Australian parliamentary speech and US student essays
+are secondary. Reference generators range from models whose pretraining data predate ChatGPT to models released in 2026.
 
 The study was carried out by an AI system (Claude Opus 5.5, via Claude Code) under the human author's
 direction; no human has edited the text so far. See `paper/AI_DISCLOSURE.md` and the git history (AI-written
@@ -38,11 +38,12 @@ python code/claude_prompts.py DATA <genre>                     # 2026-model prom
 python code/perplexity.py DATA                                 # Qwen2.5-0.5B; set PPL_MODEL=gpt2 for GPT-2
 python code/analysis.py DATA <job>                             # corpus, essay, essay_perplexity, arxiv, hansard,
                                                                # gensets, drift, nodash, control, vintage,
-                                                               # robust3, robust4, overlap
+                                                               # vsummary, robust3, robust4, robust5, vquarter,
+                                                               # ablate, fastdetect, overlap
 python code/make_numbers.py && python code/figures.py
 ```
 Local models (Ollama): llama3.1:8b, qwen3:8b, gemma3:12b, mistral:7b, gpt-oss:20b, phi4:14b, granite3.3:8b,
-and for the vintage analysis llama2:7b and vicuna:7b; temperature 0.8, fixed seeds. The paper compiles with
+and for the vintage analysis only llama2:7b, vicuna:7b, qwen3.5:9b, gemma4:12b and granite4.2:8b; temperature 0.8, fixed seeds. The paper compiles with
 Tectonic from `paper/main.tex`.
 
 ## Data sources and licences

@@ -53,7 +53,7 @@ chakraborty2024 bib:https://proceedings.mlr.press/v235/chakraborty24a.html
 katz2023scidata manual:katz2023scidata
 kusumegi2025 doi:10.1126/science.adw3000
 jiang2024 doi:10.1016/j.compedu.2024.105070
-openai2023gpt4 arxiv:2303.08774
+openai2023gpt4 manual:openai2023gpt4
 askitas2025 manual:askitas2025
 touvron2023llama2 arxiv:2307.09288
 zheng2023judging arxiv:2306.05685
@@ -62,10 +62,13 @@ grattafiori2024llama3 arxiv:2407.21783
 abdin2024phi4 arxiv:2412.08905
 gemma2025gemma3 arxiv:2503.19786
 yang2025qwen3 arxiv:2505.09388
-openai2025gptoss arxiv:2508.10925
+openai2025gptoss manual:openai2025gptoss
 llama31card manual:llama31card
 gemma3card manual:gemma3card
 gemma4card manual:gemma4card
 phi4card manual:phi4card
 qwen35card manual:qwen35card
 granitecards manual:granitecards
+pu2023zeroshot bib:https://aclanthology.org/2023.findings-emnlp.318.bib
+li2024mage bib:https://aclanthology.org/2024.acl-long.3.bib
+sun2025idiosyncrasies bib:https://proceedings.mlr.press/v267/sun25z.html

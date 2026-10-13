@@ -1,9 +1,9 @@
 model,prompt,n,auc
-raid-chatgpt,raid-greedy-rpno,250,0.995917037037037
-raid-chatgpt,raid-sampling-rpno,200,0.9930722222222222
-raid-gpt4,raid-greedy-rpno,250,0.9969481481481481
-raid-gpt4,raid-sampling-rpno,200,0.9867037037037037
-raid-llama-chat,raid-greedy-rpno,116,0.9931289910600255
-raid-llama-chat,raid-greedy-rpyes,125,0.9941748148148148
-raid-llama-chat,raid-sampling-rpno,108,0.9865843621399176
-raid-llama-chat,raid-sampling-rpyes,101,0.9784781811514485
+raid-chatgpt,raid-greedy-rpno,250,0.9958903703703704
+raid-chatgpt,raid-sampling-rpno,200,0.9930888888888889
+raid-gpt4,raid-greedy-rpno,250,0.9970577777777778
+raid-gpt4,raid-sampling-rpno,200,0.9868351851851852
+raid-llama-chat,raid-greedy-rpno,116,0.9932694763729246
+raid-llama-chat,raid-greedy-rpyes,125,0.994237037037037
+raid-llama-chat,raid-sampling-rpno,108,0.9863786008230453
+raid-llama-chat,raid-sampling-rpyes,101,0.9786028602860286

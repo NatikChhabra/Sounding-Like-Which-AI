@@ -5,6 +5,6 @@
   "mso_logreg": 0.13097719905259825,
   "mso_gbm": 0.17858741090821773,
   "kappa_logreg_vs_gbm": 0.4467497033532005,
-  "spearman_scores_logreg_vs_gbm": 0.6087918062425144,
+  "spearman_scores_logreg_vs_gbm": 0.6087949241355397,
   "share_flagged_by_both": 0.08208995950621596
 }

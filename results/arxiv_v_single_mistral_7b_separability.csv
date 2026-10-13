@@ -1,2 +1,2 @@
 model,prompt,n,auc
-mistral:7b,P1,150,0.9932222222222222
+mistral:7b,P1,150,0.9938

@@ -1,5 +1,5 @@
 model,prompt,n,auc
-raid-mistral-chat,raid-greedy-rpno,116,0.9809386973180076
-raid-mistral-chat,raid-greedy-rpyes,125,0.9831022222222222
-raid-mistral-chat,raid-sampling-rpno,108,0.9794444444444445
-raid-mistral-chat,raid-sampling-rpyes,101,0.9606270627062707
+raid-mistral-chat,raid-greedy-rpno,116,0.9811206896551724
+raid-mistral-chat,raid-greedy-rpyes,125,0.9831644444444444
+raid-mistral-chat,raid-sampling-rpno,108,0.9790020576131688
+raid-mistral-chat,raid-sampling-rpyes,101,0.9653355335533553
