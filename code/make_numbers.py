@@ -20,10 +20,12 @@ def fmt(key, v):
         return "--"
     if leaf == "p" or leaf.endswith("_p") or leaf == "p_value" or ".field_holm." in key:
         return r"{<}0.001" if v < 0.001 else f"{v:.3f}"
+    if "dispersion" in key or leaf in ("logit_gap", "relative_gap"):  # distances and ratios, not shares
+        return f"{v:.2f}"
     if leaf in ("n", "months", "dof", "ell_in_region", "median_words", "n_breaks") or leaf.startswith("n_") or "_n_" in leaf:
         return f"{int(v):,}"
     if re.fullmatch(r"[ym]\d{4}", leaf) or leaf in ("in_04", "in_06", "marker") or "alpha" in leaf or \
-            leaf.startswith(("gap", "marker_gap", "linear_", "quadratic_", "trend_at", "diff", "resid",
+            leaf.startswith(("change", "gap", "marker_gap", "linear_", "quadratic_", "trend_at", "diff", "resid",
                              "median_abs", "max_abs", "tpr", "fpr", "median_retained")):
         return f"{100 * v:.1f}"
     if leaf.startswith(("or_", "odds", "coef", "ell_coef", "corr")):
@@ -107,5 +109,6 @@ if __name__ == "__main__":
     assert fmt("x.level_shift_p", 0.894) == "0.894" and fmt("x.level_shift", 0.0465) == "4.7"
     assert fmt("x.arxiv_n_fields", 8.0) == "8" and fmt("x.n_generators", 8.0) == "8" and fmt("x.y2025", 0.3644) == "36.4" and fmt("x.excess_p", 0.2) == "0.200"
     assert fmt("robustness_v3.field_holm.cs", 0.0123) == "0.012" and fmt("x.m2016", 0.05) == "5.0"
+    assert fmt("a_dispersion_trend.gap_2025.ci_lo", -0.36) == "-0.36" and fmt("x.logit_gap", 0.28) == "0.28"
     assert fmt("x.cs_2024_alpha_cv", 0.12) == "12.0" and fmt("x.relative_gap", 2.31) == "2.31"
     main()

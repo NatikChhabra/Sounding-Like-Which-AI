@@ -1,7 +1,7 @@
 model,prompt,n,auc
-raid-gpt4,raid-greedy-rpno,250,0.9957022222222222
-raid-gpt4,raid-sampling-rpno,200,0.9866805555555556
-raid-llama-chat,raid-greedy-rpno,116,0.9920258620689655
-raid-llama-chat,raid-greedy-rpyes,125,0.9913955555555556
-raid-llama-chat,raid-sampling-rpno,108,0.9850051440329217
-raid-llama-chat,raid-sampling-rpyes,101,0.9804730473047305
+raid-gpt4,raid-greedy-rpno,250,0.9957311111111111
+raid-gpt4,raid-sampling-rpno,200,0.9866861111111112
+raid-llama-chat,raid-greedy-rpno,116,0.9922653256704981
+raid-llama-chat,raid-greedy-rpyes,125,0.9914888888888889
+raid-llama-chat,raid-sampling-rpno,108,0.9850257201646091
+raid-llama-chat,raid-sampling-rpyes,101,0.9805610561056106

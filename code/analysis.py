@@ -192,6 +192,7 @@ def essay_perplexity(data):
                                        "odds_ratio_prof": float(np.exp(fp.params["ell"])),
                                        "or_lo_prof": float(np.exp(cp[0])), "or_hi_prof": float(np.exp(cp[1])),
                                        "prof_p": float(fp.pvalues["ell"]),
+                                       "heldin_auc": float(roc_auc_score(ytr[ok], -Xtr[ok].ravel())),  # lower NLL = LLM
                                        "mean_logppl_ell": float(s[s.ell == 1].lp.mean()),
                                        "mean_logppl_nonell": float(s[s.ell == 0].lp.mean())})
     # Liang et al. (2023) original contrast, out of genre: TOEFL essays vs US 8th-grade essays
@@ -544,6 +545,18 @@ def vintage_summary():
         "n_style_rose_marker_fell": int(((s.y2026 > s.y2025) & (s.m2026 < s.m2025)).sum())})
 
 
+def vintage_peak():
+    """Exploratory: rank correlation between release date and the quarter of peak single-generator MSO."""
+    from scipy.stats import spearmanr as sp
+    d = pd.read_csv(OUT / "arxiv_vintage_quarterly.csv")
+    d["release"] = d.group.str[7:].map(RELEASE)
+    d = d.dropna(subset=["release"])
+    pk = pd.PeriodIndex(d.peak, freq="Q")
+    d["peak_x"] = pk.year + (pk.quarter - 1) / 4
+    r = sp(d.release, d.peak_x)
+    save("arxiv_vintage_peak", {"n": len(d), "rho": float(r.statistic), "rho_p": float(r.pvalue)})
+
+
 def placebo_grid(m, start="2016-06", end="2021-12", eval_months=12):
     """Every 2 months: fake break; share of fake breaks whose 'gap' (eval_months later) has p < 0.05."""
     pre = m[m.month < T0]
@@ -689,6 +702,183 @@ def robustness_v4(data):
     save("robustness_v4", out)
 
 
+def robustness_v5(data, n_seeds=5):
+    """Round-3 checks: (1) uncertainty of each vintage region's 2025->2026 change (human training draws; document
+    bootstrap); (2) drift placebos for the pre-ChatGPT-data region; (3) placebo grid at the real 30-month horizon;
+    (4) the main series restricted to never-revised papers; (5) field-specific detection rates."""
+    human, llm = mso.load(data, "arxiv")
+    llm = load_old(data, llm)
+    s0 = human[human.pool == "score"]
+    late = s0[s0.date.dt.year >= 2022]
+    yr = late.date.dt.year.values
+    rng = np.random.default_rng(0)
+    sets = vintage_sets(llm)
+    keep = [k for k in sets if k.startswith("single:")] + ["pre2022data_matched", "open2026_p1", "all2026_p1",
+                                                          "local_p1", "raid_all", "old_open_p1", "all"]
+    rows = []
+    for name in keep:
+        ch = []
+        for seed in range(n_seeds):
+            mso.SEED = seed
+            try:
+                X, y, groups, _ = mso.training_set(human, sets[name][sets[name].model.map(CHAT)])
+                score = mso.fit(X, y, groups=groups)[0]
+            finally:
+                mso.SEED = 0
+            hit = score(list(late.f)) >= 0.5
+            y25, y26 = hit[yr == 2025].mean(), hit[yr == 2026].mean()
+            ch.append(y26 - y25)
+            if seed == 0:
+                h25, h26 = hit[yr == 2025], hit[yr == 2026]
+                boot = [rng.choice(h26, len(h26)).mean() - rng.choice(h25, len(h25)).mean() for _ in range(2000)]
+        rows.append({"group": name, "change_seed0": ch[0], "change_lo": float(np.percentile(boot, 2.5)),
+                     "change_hi": float(np.percentile(boot, 97.5)), "change_min": min(ch), "change_max": max(ch),
+                     "n_seeds_same_sign": int(sum(np.sign(c) == np.sign(ch[0]) for c in ch)), "n_seeds": n_seeds})
+    save("arxiv_vintage_uncertainty", pd.DataFrame(rows))
+    out = {}
+    # drift placebos for the pre-ChatGPT-data region (instrument trained on human abstracts up to year Y)
+    sub = sets["pre2022data_matched"]
+    for y in (2016, 2017, 2018):
+        h = human.copy()
+        h.loc[(h.pool == "train") & (h.date >= f"{y + 1}-01-01"), "pool"] = "unused"
+        X, yv, groups, _ = mso.training_set(h, sub)
+        score = mso.fit(X, yv, groups=groups)[0]
+        sc = h[(h.pool == "score") & (h.date < CUTOFF)].copy()
+        sc["in_region"] = (score(list(sc.f)) >= 0.5).astype(int)
+        out[f"pre2022data_drift_to_{y}"] = segmented(monthly(sc), t0=pd.Period(f"{y + 1}-01", "M"),
+                                                    eval_at=pd.Period("2022-06", "M"))
+    # placebo grid with the 30-month horizon of the real gap (fake breaks early enough to allow it)
+    for genre in ("arxiv", "hansard"):
+        m = pd.read_csv(OUT / f"{genre}_monthly.csv")
+        m["month"] = pd.PeriodIndex(m.month, freq="M")
+        out[f"{genre}_placebo_grid_30m"] = placebo_grid(m, start="2016-06", end="2020-04", eval_months=30)
+    # never-revised papers only: is the 2025->2026 pattern driven by later papers having had less time to be revised?
+    a = pd.read_json(Path(data) / "arxiv_v2" / "sample.jsonl", lines=True)
+    a["id"] = "arxiv:" + a.id.str.replace(r"v\d+$", "", regex=True)
+    never = set(a.id[a.published == a.updated])
+    score, _ = region(human, llm[~llm.model.isin(OLD + NEW)], "arxiv_check", lomo_runs=False)
+    s = s0.assign(in_region=(score(list(s0.f)) >= 0.5).astype(int), never=s0.id.isin(never))
+    out["never_revised"] = {f"mso_{k}_y{y}": float(d.in_region.mean())
+                            for y in (2022, 2024, 2025, 2026) for k, d in
+                            (("all", s[s.date.dt.year == y]), ("never", s[(s.date.dt.year == y) & s.never]))}
+    out["never_revised"] |= {f"share_never_y{y}": float(s[s.date.dt.year == y].never.mean()) for y in (2016, 2021, 2022, 2025, 2026)}
+    # field-specific detection rate (cross-validated recall on LLM texts seeded from that field)
+    X, yv, groups, L = mso.training_set(human, llm[llm.model.map(CHAT) & ~llm.model.isin(OLD + NEW)])
+    _, p_cv = mso.cv_auc(X, yv, groups)
+    src_field = dict(zip(human.id, human.group))
+    fld = np.array([src_field.get(i, "other") for i in L.src_id])
+    pl = p_cv[yv == 1]
+    out["tpr_by_field"] = {f"tpr_{f}": float((pl[fld == f] >= 0.5).mean()) for f in ("cs", "math", "stat", "econ")
+                           if (fld == f).sum() >= 30}
+    out["tpr_by_field"] |= {f"n_{f}": int((fld == f).sum()) for f in ("cs", "math", "stat", "econ")}
+    save("robustness_v5", out)
+
+
+# Release month (decimal year) from developer pages / model cards; RAID's from its model list (2023 snapshots).
+# The 2026 model's release month is not used (not documented in a citable source).
+RELEASE = {"raid-gpt4": 2023.45, "raid-chatgpt": 2023.45, "raid-mpt-chat": 2023.45, "raid-llama-chat": 2023.55,
+           "raid-mistral-chat": 2023.7, "raid-cohere-chat": 2023.85, "llama2:7b": 2023.55, "vicuna:7b": 2023.6,
+           "mistral:7b": 2024.4, "llama3.1:8b": 2024.55, "phi4:14b": 2024.95, "gemma3:12b": 2025.2,
+           "granite3.3:8b": 2025.29, "qwen3:8b": 2025.32, "gpt-oss:20b": 2025.6, "qwen3.5:9b": 2026.17,
+           "gemma4:12b": 2026.42, "granite4.2:8b": 2026.65}
+
+
+def vintage_quarterly(data):
+    """Quarterly MSO 2023Q1-2026Q3 for each single-generator region (title-only task), peak quarter, change from
+    2025Q4 to 2026Q1-Q3, and the (exploratory) rank correlation of release date with the 2026 change."""
+    from scipy.stats import spearmanr as sp
+    human, llm = mso.load(data, "arxiv")
+    llm = load_old(data, llm)
+    late = human[(human.pool == "score") & (human.date.dt.year >= 2023)]
+    q = late.date.dt.to_period("Q").astype(str).values
+    rows = []
+    for name, sub in vintage_sets(llm).items():
+        if not name.startswith("single:"):
+            continue
+        X, y, groups, _ = mso.training_set(human, sub)
+        hit = mso.fit(X, y, groups=groups)[0](list(late.f)) >= 0.5
+        qs = pd.Series(hit).groupby(q).mean()
+        r = {"group": name, "peak": qs.idxmax(), "mso_2025q4": qs["2025Q4"],
+             "mso_2026": hit[pd.Series(q).str.startswith("2026").values].mean()}
+        r["change_q4"] = r["mso_2026"] - r["mso_2025q4"]
+        rows.append(r | {f"mso_{k}": v for k, v in qs.items()})
+    d = pd.DataFrame(rows)
+    save("arxiv_vintage_quarterly", d)
+    a = pd.read_csv(OUT / "arxiv_vintage.csv").set_index("group")
+    d["release"] = d.group.str[7:].map(RELEASE)
+    d["change_annual"] = d.group.map(a.y2026 - a.y2025)
+    d = d.dropna(subset=["release"])
+    save("arxiv_vintage_release_corr", {
+        "n": len(d), "rho_annual": float(sp(d.release, d.change_annual).statistic),
+        "rho_annual_p": float(sp(d.release, d.change_annual).pvalue),
+        "rho_q4": float(sp(d.release, d.change_q4).statistic), "rho_q4_p": float(sp(d.release, d.change_q4).pvalue),
+        "n_peak_2026": int(d.peak.str.startswith("2026").sum()), "n_rose_q4": int((d.change_q4 > 0).sum())})
+
+
+def ablation(data):
+    """arXiv trend gap with one feature family (or MTLD alone) removed from the instrument."""
+    human, llm = mso.load(data, "arxiv")
+    llm = llm[llm.model.map(CHAT)]
+    s = human[human.pool == "score"]
+    rows = []
+    for name, ex in [("none", ()), ("mtld", ("s:mtld",)), ("function_words", ("fw:",)), ("pos_trigrams", ("pos:",)),
+                     ("dependencies", ("dep:",)), ("punctuation", ("pun:",)), ("sentence_and_length", ("s:",))]:
+        mso.EXCLUDE = ex
+        try:
+            X, y, groups, _ = mso.training_set(human, llm)
+            auc, _ = mso.cv_auc(X, y, groups)
+            hit = (mso.fit(X, y, groups=groups)[0](list(s.f)) >= 0.5).astype(int)
+        finally:
+            mso.EXCLUDE = ()
+        r = segmented(monthly(s.assign(in_region=hit)))
+        rows.append({"group": name, "cv_auc": auc, "mso_pre": float(hit[(s.date < CUTOFF).values].mean()),
+                     "excess": r["excess"], "excess_lo": r["excess_lo"], "excess_hi": r["excess_hi"]})
+    save("arxiv_ablation", pd.DataFrame(rows))
+
+
+def fastdetect(data, per_year=600, n_train=1500):
+    """Off-the-shelf zero-shot statistic: Fast-DetectGPT's analytic conditional-probability curvature with GPT-2 small
+    as both sampling and scoring model; threshold calibrated (isotonic, 0.5) on pre-ChatGPT human vs LLM abstracts,
+    then the yearly flag rate on a stratified sample of scored abstracts."""
+    import torch
+    from sklearn.calibration import CalibratedClassifierCV
+    from sklearn.linear_model import LogisticRegression
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    torch.set_num_threads(6)
+    tok = AutoTokenizer.from_pretrained("gpt2")
+    lm = AutoModelForCausalLM.from_pretrained("gpt2").eval()
+
+    def crit(t):
+        ids = tok(features.clean(t), return_tensors="pt", truncation=True, max_length=512).input_ids
+        if ids.shape[1] < 10:
+            return np.nan
+        with torch.no_grad():
+            lp = torch.log_softmax(lm(ids).logits[0, :-1], -1)
+        x = ids[0, 1:]
+        ll = lp.gather(-1, x[:, None]).squeeze(-1)
+        p = lp.exp()
+        mu = (p * lp).sum(-1)
+        var = (p * lp ** 2).sum(-1) - mu ** 2
+        return float((ll.sum() - mu.sum()) / var.sum().sqrt())
+    human, llm = mso.load(data, "arxiv")
+    llm = llm[llm.model.map(CHAT)]
+    _, _, _, L = mso.training_set(human, llm)
+    L = L.sample(n=min(n_train, len(L)), random_state=mso.SEED)
+    H = human[human.pool == "train"].sample(n=len(L), random_state=mso.SEED)
+    xtr = np.array([crit(t) for t in list(H.text) + list(L.text)])
+    ytr = np.r_[np.zeros(len(H)), np.ones(len(L))]
+    ok = ~np.isnan(xtr)
+    auc = roc_auc_score(ytr[ok], xtr[ok])
+    clf = CalibratedClassifierCV(LogisticRegression(), method="isotonic", cv=5).fit(xtr[ok, None], ytr[ok])
+    s = human[human.pool == "score"]
+    s = s.groupby(s.date.dt.year, group_keys=False).apply(lambda d: d.sample(n=min(per_year, len(d)), random_state=mso.SEED))
+    xs = np.array([crit(t) for t in s.text])
+    flag = clf.predict_proba(np.nan_to_num(xs)[:, None])[:, 1] >= 0.5
+    yr = pd.DataFrame({"group": s.date.dt.year.astype(str).values, "flag": flag}).groupby("group").flag.agg(["mean", "size"])
+    save("arxiv_fastdetect", yr.reset_index().rename(columns={"mean": "share_flagged", "size": "n"}))
+    save("arxiv_fastdetect_auc", {"heldin_auc": float(auc), "n_train_per_class": int(len(L))})
+
+
 def revision_overlap(data):
     """Share of each generator's revision (P2) outputs that keep >30% of the source's word 6-grams."""
     rows = []
@@ -745,7 +935,8 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
-            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "robust3": lambda: robustness_v3(data),
+            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "robust5": lambda: robustness_v5(data),
+            "vquarter": lambda: vintage_quarterly(data), "ablate": lambda: ablation(data), "fastdetect": lambda: fastdetect(data), "robust3": lambda: robustness_v3(data),
             "overlap": lambda: revision_overlap(data),
             "control": control}
     for j in (jobs if which == "all" else [which]):

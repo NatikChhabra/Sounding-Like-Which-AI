@@ -38,7 +38,7 @@ def its_panel(ax, name, color, label, ylabel="MSO (%)", legend=False):
     ax.text(T0.to_timestamp(), ax.get_ylim()[0], " ChatGPT", color=INK, va="bottom", fontsize=6.5)
     ax.set_ylabel(ylabel)
     if legend:
-        ax.legend(loc="upper left", bbox_to_anchor=(0, 1.02), fontsize=5.6, framealpha=0.9, facecolor="white",
+        ax.legend(loc="center left", bbox_to_anchor=(0, 0.62), fontsize=5.6, framealpha=0.9, facecolor="white",
                   frameon=True, edgecolor="none")
 
 
@@ -69,16 +69,16 @@ def fig_fields():
     axes[0].errorbar(100 * base.mso, y, xerr=[100 * (base.mso - base.lo), 100 * (base.hi - base.mso)],
                      fmt="o", ms=4, color=BLUE, ecolor=BLUE, elinewidth=1, capsize=0)
     axes[0].set_yticks(y, [f"{g} ({n:,})" for g, n in zip(base.group, base.n)])
-    axes[0].set_xlabel("Pre-ChatGPT MSO (%)", fontsize=7)
+    axes[0].set_xlabel("Baseline MSO (%)", fontsize=7)
     e = np.array([100 * d[k] for d in ex])
     lo = np.array([100 * d["excess_lo"] for d in ex])
     hi = np.array([100 * d["excess_hi"] for d in ex])
     axes[1].errorbar(e, y, xerr=[e - lo, hi - e], fmt="o", ms=4, color=BLUE, ecolor=BLUE, elinewidth=1, capsize=0)
     axes[1].axvline(0, color=MUTED, lw=0.6)
-    axes[1].set_xlabel("Trend gap, June 2025 (pp)", fontsize=7)
+    axes[1].set_xlabel("Gap, June 2025 (pp)", fontsize=7)
     for ax in axes:
         ax.tick_params(labelsize=6.5)
-    fig.subplots_adjust(left=0.2, right=0.98, bottom=0.2, top=0.97)
+    fig.subplots_adjust(left=0.29, right=0.98, bottom=0.2, top=0.97)
     fig.savefig(FIG / "fields.pdf")
 
 
@@ -124,9 +124,9 @@ VINTAGE = [("raid-cohere-chat", "Cohere chat", 2023), ("raid-mpt-chat", "MPT cha
            ("raid-chatgpt", "ChatGPT", 2023), ("raid-gpt4", "GPT-4", 2023), ("llama2:7b", "Llama 2 7B chat", 2023),
            ("vicuna:7b", "Vicuna 7B v1.5", 2023), ("mistral:7b", "Mistral 7B v0.3", 2024),
            ("llama3.1:8b", "Llama 3.1 8B", 2024), ("phi4:14b", "Phi-4 14B", 2024), ("gemma3:12b", "Gemma 3 12B", 2025),
-           ("qwen3:8b", "Qwen3 8B", 2025), ("granite3.3:8b", "Granite 3.3 8B", 2025), ("gpt-oss:20b", "gpt-oss 20B", 2025),
-           ("granite4.2:8b", "Granite 4.2 8B", 2026), ("qwen3.5:9b", "Qwen3.5 9B", 2026),
-           ("gemma4:12b", "Gemma 4 12B", 2026), ("claude-opus-5.5", "Claude (2026 model)", 2026)]
+           ("granite3.3:8b", "Granite 3.3 8B", 2025), ("qwen3:8b", "Qwen3 8B", 2025), ("gpt-oss:20b", "gpt-oss 20B", 2025),
+           ("qwen3.5:9b", "Qwen3.5 9B", 2026), ("gemma4:12b", "Gemma 4 12B", 2026),
+           ("granite4.2:8b", "Granite 4.2 8B", 2026), ("claude-opus-5.5", "Claude (2026 model)", 2026)]
 YEAR_COLOR = {2023: "#e87ba4", 2024: "#eda100", 2025: AQUA, 2026: ORANGE}
 
 
@@ -134,7 +134,7 @@ def fig_vintage():
     v = pd.read_csv(RES / "arxiv_vintage.csv").set_index("group")
     years = [int(c[1:]) for c in v.columns if c.startswith("y")]
     fig, (a, b) = plt.subplots(1, 2, figsize=(6.6, 2.4), gridspec_kw={"width_ratios": [1, 1.25]})
-    sets = [("pre2022data_matched", "Pre-ChatGPT training data", BLUE), ("raid_all", "RAID 2023 chat models", "#e87ba4"),
+    sets = [("pre2022data_matched", "Pre-ChatGPT pretraining data", BLUE), ("raid_all", "RAID 2023 chat models", "#e87ba4"),
             ("local_p1", "Open models 2024-25", AQUA), ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", "#eda100"),
             ("open2026_p1", "Open models 2026", "#8b5cf6"), ("frontier_p1", "Claude (2026 model)", ORANGE)]
     for k, label, c in sets:
@@ -146,18 +146,35 @@ def fig_vintage():
     a.set_ylim(0, 62)  # headroom so the legend clears the 2026-model line
     a.legend(fontsize=5.6, loc="upper left")
     a.set_title("(a) Region defined by", fontsize=7.5, loc="left")
-    rows = [(lab, yr, 100 * (v.loc[f"single:{m}", "y2026"] - v.loc[f"single:{m}", "y2025"]))
-            for m, lab, yr in VINTAGE if f"single:{m}" in v.index]
-    x = np.arange(len(rows))
-    b.bar(x, [r[2] for r in rows], color=[YEAR_COLOR[r[1]] for r in rows], width=0.7)
-    b.axhline(0, color=INK, lw=0.6)
-    b.set_xticks(x, [r[0] for r in rows], rotation=60, ha="right", fontsize=5.6)
-    b.set_ylabel("Change 2025 to 2026 (pp)")
-    b.set_title("(b) Single-generator regions, in release order", fontsize=7.5, loc="left")
-    b.grid(axis="x", visible=False)
-    for yr, c in YEAR_COLOR.items():
-        b.bar([0], [0], color=c, label=str(yr))
-    b.legend(fontsize=5.6, title="Released", title_fontsize=5.6, loc="upper left", ncol=2)
+    # (b) quarter of peak single-generator MSO against the generator's release date
+    import analysis  # release months live with the analysis code
+    q = pd.read_csv(RES / "arxiv_vintage_quarterly.csv").set_index("group")
+    pk = pd.PeriodIndex(q.peak, freq="Q")
+    q["peak_x"] = pk.year + (pk.quarter - 1) / 4 + 0.125
+    label = {m: lab for m, lab, _ in VINTAGE}
+    show = {"raid-gpt4", "vicuna:7b", "phi4:14b", "qwen3:8b", "gpt-oss:20b", "qwen3.5:9b", "gemma4:12b", "granite4.2:8b"}
+    for g, r in q.iterrows():
+        m = g[7:]
+        yr = next(y for mm, _, y in VINTAGE if mm == m)
+        if m in analysis.RELEASE:
+            x = analysis.RELEASE[m]
+            b.scatter(x, r.peak_x, s=16, color=YEAR_COLOR[yr], zorder=3)
+            if m in show:
+                b.annotate(label[m], (x, r.peak_x), xytext=(3, -6 if m == "gemma4:12b" else 2),
+                           textcoords="offset points", fontsize=5.2, color=MUTED)
+        else:  # release month not documented: drawn at the right edge, peak right-censored at the last quarter
+            b.scatter(2026.85, r.peak_x, s=16, facecolors="none", edgecolors=YEAR_COLOR[yr], zorder=3)
+            b.annotate("2026 model (still rising)", (2026.85, r.peak_x), xytext=(-78, 4),
+                       textcoords="offset points", fontsize=5.2, color=MUTED)
+    rho = json.loads((RES / "arxiv_vintage_peak.json").read_text())
+    b.text(0.03, 0.95, f"Spearman $\\rho$ = {rho['rho']:.2f}", transform=b.transAxes, fontsize=6.5, va="top", color=INK)
+    b.set_xlabel("Generator release date")
+    b.set_ylabel("Quarter of peak MSO")
+    b.set_xticks([2023.5, 2024, 2024.5, 2025, 2025.5, 2026, 2026.5], ["", "2024", "", "2025", "", "2026", ""])
+    ticks = [y + (k - 1) / 4 + 0.125 for y in (2024, 2025, 2026) for k in (1, 3)]
+    b.set_yticks(ticks, [f"{y}Q{k}" for y in (2024, 2025, 2026) for k in (1, 3)])
+    b.set_ylim(2024.4, 2026.9)
+    b.set_title("(b) Single-generator regions", fontsize=7.5, loc="left")
     fig.tight_layout()
     fig.savefig(FIG / "vintage.pdf")
 

@@ -60,7 +60,7 @@ excluded. Marker-word frequencies are analysed separately, never as an MSO featu
 Honesty note: this plan was committed to the project's git repository (commit ef4fa21, 2026-10-12 07:53 IST)
 before any MSO value was computed. Git timestamps are self-reported, so this is weaker than a third-party registry.
 1. **arXiv sampling.** Full OAI-PMH harvesting was infeasible (~40 h), so abstracts were drawn as a
-   stratified random sample via the arXiv API: one random window per archive-month, 8 non-physics archives,
+   stratified random sample via the arXiv API: one random window per archive-month, 8 archives (cs, math, stat, eess, q-bio, econ, astro-ph, cond-mat),
    2015-01 to 2026-09. The first sampler kept only the first 400 results per window; it was replaced after
    review round 1 by one that fetches every paper in the window and samples 200 at random. The overall series
    therefore weights the eight archives about equally, not by submission volume. Because the API returns the
@@ -93,7 +93,9 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
    dispersion; the self-test (section 6) dropped as circular; Hansard restricted to 2015-2025.
 9. **Review round 2 (2026-10-13) changes:** generator-vintage analysis on a matched title-only task; a region
    from generators whose training data predate ChatGPT (RAID GPT-4 and ChatGPT, and two locally run open
-   models, Llama 2 chat and Vicuna, added for this purpose only); vintage-matched, topic-matched mined marker
+   models, Llama 2 chat and Vicuna, added for this purpose only); three 2026 open models (Qwen3.5 9B, Gemma 4 12B,
+   Granite 4.2 8B), added for the vintage analysis only after the single-generator pattern of the other 16
+   generators had been seen (post hoc); vintage-matched, topic-matched mined marker
    words; placebo grids for both genres; event study; pre-trend shape and window sensitivity; block bootstrap;
    drift placebos at three origins; Holm correction across archives and a cs-minus-math contrast (H4);
    length-standardised baselines and length-fixed dispersion; GPT-2 perplexity to rule out training-data
