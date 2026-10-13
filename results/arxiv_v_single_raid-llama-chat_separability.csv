@@ -1,0 +1,5 @@
+model,prompt,n,auc
+raid-llama-chat,raid-greedy-rpno,116,0.9905076628352489
+raid-llama-chat,raid-greedy-rpyes,125,0.9916977777777778
+raid-llama-chat,raid-sampling-rpno,108,0.9843004115226337
+raid-llama-chat,raid-sampling-rpyes,101,0.9756105610561056

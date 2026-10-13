@@ -63,3 +63,9 @@ abdin2024phi4 arxiv:2412.08905
 gemma2025gemma3 arxiv:2503.19786
 yang2025qwen3 arxiv:2505.09388
 openai2025gptoss arxiv:2508.10925
+llama31card manual:llama31card
+gemma3card manual:gemma3card
+gemma4card manual:gemma4card
+phi4card manual:phi4card
+qwen35card manual:qwen35card
+granitecards manual:granitecards

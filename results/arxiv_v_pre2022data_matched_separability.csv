@@ -1,0 +1,9 @@
+model,prompt,n,auc
+llama2:7b,P1,150,0.9883527777777779
+raid-gpt4,raid-greedy-rpno,231,0.9975198412698413
+raid-gpt4,raid-sampling-rpno,219,0.9858885083713851
+raid-llama-chat,raid-greedy-rpno,112,0.9904650297619048
+raid-llama-chat,raid-greedy-rpyes,112,0.9933296130952382
+raid-llama-chat,raid-sampling-rpno,100,0.9907708333333334
+raid-llama-chat,raid-sampling-rpyes,126,0.9914219576719576
+vicuna:7b,P1,150,0.9904305555555555

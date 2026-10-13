@@ -4,9 +4,10 @@ $d = "F:\research-data"
 $inv = "C:\Users\<user>\AppData\Local\Temp\claude\F--downloads-Outreach-and-other-plans\edfd1841-3fd5-443d-a6f6-04508c35831b\scratchpad\invalidate_title.py"
 Set-Location "F:\downloads\Outreach and other plans\research-paper\code"
 New-Item -ItemType Directory -Force "$d\logs" | Out-Null
-while (Get-CimInstance Win32_Process -Filter "Name='python.exe'" | Where-Object { $_.CommandLine -like "*generate.py*" }) { Start-Sleep 60 }
-"=== generation finished"
-& $py $inv $d
+"=== generate (resumes)"
+& $py generate.py "$d\seed_arxiv.parquet" "$d\llm_arxiv_old.jsonl" 150 "llama2:7b,vicuna:7b,granite4.2:8b,qwen3.5:9b,gemma4:12b" *> "$d\logs\generate_vintage.log"
+"=== invalidate"
+& $py -I $inv $d
 function Run($name, [scriptblock]$cmd) {
     "=== $name"
     & $cmd *> "$d\logs\$name.log"
