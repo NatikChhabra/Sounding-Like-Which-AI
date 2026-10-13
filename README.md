@@ -9,8 +9,7 @@ This repository holds the paper (`paper/preprint.pdf`), its source, every analys
 audit trail for a study of **Machine-Style Overlap (MSO)**: the share of documents that a calibrated classifier on
 content-word-free style features judges at least as likely to be LLM output as pre-ChatGPT human writing.
 
-**Status:** pre-release draft: not yet read or approved by the author, not peer reviewed. v1.0 will be tagged
-after the author's read-through.
+**Status:** preprint, read and approved by the author (citations checked by AI, not by hand); not peer reviewed.
 
 ## Main findings
 - In 131,448 arXiv abstracts from eight fields (2015–2026), MSO was **9.2%** before ChatGPT and stood
@@ -25,9 +24,9 @@ after the author's read-through.
 - Measured against one generator at a time, overlap with most generators rises and then turns down, and the turn
   **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; 0.66 for the 15
   generators chosen before the annual single-generator pattern was seen). The correlation holds across training draws (0.79–0.85; 0.73–0.84 with equal training sizes),
-  with abstract length or field mix held fixed (0.84, 0.81) and without the 2023 models (0.82). But newer models
-  also write longer outputs, and output length predicts the peak about as well (0.73), so vintage and output length
-  cannot be separated. Two of the three 2026 open models peaked before they were released and the third in its
+  with abstract length or field mix held fixed (0.84, 0.81) and without the 2023 models (0.82). Newer models
+  also write longer outputs, but with every text cut to its first 100 words the ordering persists (0.77; 0.60 for the
+  15), so length alone does not explain it. Two of the three 2026 open models peaked before they were released and the third in its
   release quarter, so authors using them can explain little of the timing. A fixed reference set, like a fixed
   list of words such as *delve*, can therefore show the shift "fading" while overlap with newer models still rises.
 - A zero-shot detector statistic computed with a small, older scoring model (Fast-DetectGPT criterion with GPT-2)

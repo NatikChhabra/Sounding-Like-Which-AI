@@ -12,7 +12,7 @@ license:
   - CC-BY-NC-SA-4.0
   - CC-BY-NC-ND-4.0
   - CC0-1.0
-repository-code: "https://github.com/NatikChhabra/Sounding-Like-Which-AI-"
+repository-code: "https://github.com/NatikChhabra/Sounding-Like-Which-AI"
 keywords:
   - machine-style overlap
   - LLM-generated text
@@ -28,4 +28,4 @@ preferred-citation:
       given-names: Natik
       orcid: "https://orcid.org/0009-0004-8786-7703"
   year: 2026
-  url: "https://github.com/NatikChhabra/Sounding-Like-Which-AI-"
+  url: "https://github.com/NatikChhabra/Sounding-Like-Which-AI"
