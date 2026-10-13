@@ -577,6 +577,9 @@ def vintage_peak():
     out = {"n": len(d), "rho": float(r.statistic), "rho_p": float(r.pvalue)}
     tied = d.release.where(~d.group.str.contains("raid-"), 2023.5)  # RAID release months are approximate
     out["rho_raid_tied"] = float(sp(tied, d.peak_x).statistic)
+    fixed = d[~d.group.str[7:].isin(NEW)]  # without the 2026 open models, added after the pattern was seen
+    out |= {"n_no_new": len(fixed), "rho_no_new": float(sp(fixed.release, fixed.peak_x).statistic),
+            "rho_no_new_p": float(sp(fixed.release, fixed.peak_x).pvalue)}
     late = d[d.release >= 2024]  # without the 2023 models
     out |= {"n_no2023": len(late), "rho_no2023": float(sp(late.release, late.peak_x).statistic)}
     c = d.assign(cutoff=d.group.str[7:].map(PRETRAIN_CUTOFF)).dropna(subset=["cutoff"])
@@ -842,7 +845,7 @@ def robustness_v6():
 RELEASE = {"raid-gpt4": 2023.45, "raid-chatgpt": 2023.45, "raid-mpt-chat": 2023.45, "raid-llama-chat": 2023.55,
            "raid-mistral-chat": 2023.7, "raid-cohere-chat": 2023.85, "llama2:7b": 2023.55, "vicuna:7b": 2023.6,
            "mistral:7b": 2024.4, "llama3.1:8b": 2024.55, "phi4:14b": 2024.95, "gemma3:12b": 2025.2,
-           "granite3.3:8b": 2025.29, "qwen3:8b": 2025.32, "gpt-oss:20b": 2025.6, "qwen3.5:9b": 2026.17,
+           "granite3.3:8b": 2025.29, "qwen3:8b": 2025.32, "gpt-oss:20b": 2025.6, "qwen3.5:9b": 2026.12,
            "gemma4:12b": 2026.42, "granite4.2:8b": 2026.65}
 # Pretraining-data cutoff (decimal year, mid-month) where the developer states one (Table 1 of the paper)
 PRETRAIN_CUTOFF = {"raid-gpt4": 2021.71, "raid-llama-chat": 2022.71, "llama2:7b": 2022.71, "vicuna:7b": 2022.71,

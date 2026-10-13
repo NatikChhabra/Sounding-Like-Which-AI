@@ -18,14 +18,16 @@ after the author's read-through.
   trend specifications, thresholds and feature-family ablations, yearly values barely change when only
   never-revised papers are counted, and it is far larger than any placebo or instrument-drift gap. It is smaller, though still large, when the generators that write closest to
   human abstracts are left out (22.2 pp without the 2026 model, 17.9 pp without revisions of human drafts).
-- Against generators whose pretraining data predate ChatGPT the gap is smaller but clear (**7.5 pp**; 11.9 pp
-  measured nonparametrically, against 22.1 pp for the 2024–2025 open models), so part of the shift is unlikely to come
-  from newer models learning from newer abstracts.
-- Measured against one generator at a time, overlap with all but the newest rises and then turns down (for the latest ones only in the final
-  quarter), and the turn **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; bootstrap
-  0.64–0.86). Two of the three 2026 open models peaked before they were released and the third in its release
-  quarter, so authors using them can explain little of it. If the pattern persists, a reference set that is not refreshed, like a fixed list of words such as
-  *delve*, will show the shift "fading".
+- Against generators whose pretraining data predate ChatGPT the gap is smaller (**7.5 pp**; 3.5 pp for the two
+  models run on the paper's own prompts, 13.1 pp with the trend line fitted only to June 2025, against 22.7 pp for
+  the 2024–2025 open models), so part of the shift points towards models that could not have learned it from
+  recent abstracts.
+- Measured against one generator at a time, overlap with all but the newest rises and then turns down, and the turn
+  **tends to come later for later-released models** (exploratory rank correlation 0.79, n = 18; bootstrap
+  0.64–0.86; 0.66 without the three 2026 open models, which were added after the pattern was seen). Two of those
+  three peaked before they were released and the third in its release quarter, so authors using them can explain
+  little of it. A fixed reference set, like a fixed list of words such as *delve*, can therefore show the shift
+  "fading" while writing keeps moving.
 - A zero-shot detector statistic computed with a small, older scoring model (Fast-DetectGPT criterion with GPT-2)
   does not see the shift (its flag rate falls); the larger scoring models of the original method might.
 - In student essays, English learners' writing is *less* machine-like than their peers' (2.3% vs 4.2%; mostly a proficiency difference), even under

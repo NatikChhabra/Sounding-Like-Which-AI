@@ -137,7 +137,7 @@ def fig_vintage():
     v = pd.read_csv(RES / "arxiv_vintage.csv").set_index("group")
     years = [int(c[1:]) for c in v.columns if c.startswith("y")]
     fig, (a, b) = plt.subplots(1, 2, figsize=(6.6, 2.4), gridspec_kw={"width_ratios": [1, 1.25]})
-    sets = [("pre2022data_matched", "Pre-ChatGPT pretraining data", BLUE, "-"),
+    sets = [("pre2022data_matched", "Pre-ChatGPT-data region", BLUE, "-"),
             ("raid_all", "RAID 2023 chat models", YEAR_COLOR[2023], "-"),
             ("local_p1", "Open models 2024\u201325 (incl. gpt-oss)", YEAR_COLOR[2025], "-"),
             ("single:gpt-oss:20b", "gpt-oss (Aug 2025)", YEAR_COLOR[2025], "--"),

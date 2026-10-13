@@ -117,7 +117,8 @@ before any MSO value was computed. Git timestamps are self-reported, so this is 
     analyses were re-run. Added: the trend gap with the post-ChatGPT line fitted only up to June 2025, the main gap
     with fixed field weights, a joint document bootstrap of each generator's peak quarter and of the release-peak
     rank correlation, refits on 80% subsamples of each set's LLM texts, the rank correlation of pretraining cutoff
-    with peak quarter, the correlation with all RAID release months tied (they are approximate), and a comparison of
+    with peak quarter, the correlation with all RAID release months tied (they are approximate), the correlation without the three 2026
+    open models that were added after the pattern was seen (0.66, n = 15), and a comparison of
     each generator's mined-marker peak with its style peak.
 12. **Not run:** the plan's embedding-based classifier for arXiv (run for essays only).
 13. **Outcomes.** H5 not supported (opposite direction). The evaluation month (June 2025) was fixed in code
