@@ -1,13 +1,14 @@
 # AI use and authorship
 
-This file and the paper's "AI Use and Authorship" section say the same thing; if they ever differ, the paper's
+This file and the paper's "Acknowledgements: AI Use and Authorship" section say the same thing; if they ever differ, the paper's
 section is authoritative and this file is out of date.
 
 ## What the human author did
 - Chose the topic (why so much writing "sounds like AI") and the goal of a fully disclosed, AI-conducted study.
 - Set the constraints: public data only, no human participants, no budget, local hardware.
-- Approved the analysis plan, its deviations, every download and every public action, in the working
-  conversation with the AI system (these approvals are not separate commits).
+- Approved the analysis plan; gave standing permission for downloads and setup; was told of the deviations,
+  several of which the AI system made while working unattended under an instruction to continue; approved
+  making the repository public. All of this happened in the working conversation, not in commits.
 - Takes full responsibility for the content, including the citations and the analysis choices.
 - Citations: delegated to the AI system (see below); the author has not checked citations. The author will read
   the final paper before release; this line will be updated, in a `HUMAN-EDIT:` commit, when that is done.
@@ -32,7 +33,8 @@ The AI system is Claude Opus 5.5 (Anthropic), used as an agent through Claude Co
 ## How to audit it
 - One early commit, `6675865` ("Strip BOM"), was made by the AI system but lacks the "(AI-written)" label and
   trailer; it only removed byte-order marks and regenerated `results/numbers.tex`.
-- The git history is the complete record. AI-written commits carry "(AI-written)" and a
+- The git history is the complete record of changes to the files (not of the author's instructions, which stayed
+  in the conversation). AI-written commits carry "(AI-written)" and a
   `Co-Authored-By: Claude` trailer; any human edit to AI-written text is a separate commit starting `HUMAN-EDIT:`.
 - Every numerical result in the paper is inserted from `results/` by `code/make_numbers.py`; the PDF does not
   compile if one is missing. Design constants (sample sizes, caps, lags) and a few counts and orderings stated

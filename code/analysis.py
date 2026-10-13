@@ -408,7 +408,7 @@ PRE2022_DATA = ("raid-gpt4", "raid-llama-chat")
 OLD = ("llama2:7b", "vicuna:7b")
 NEW = ("gemma4:12b", "qwen3.5:9b", "granite4.2:8b")  # 2026 open models with logged decoding (vintage analysis only)
 # RAID chat outputs often summarise the paper instead of writing its abstract ("In the paper titled ...")
-SUMMARY = re.compile(r"\btitled\b|\bthe authors\b|^\s*(in )?the (paper|article|study)\b", re.I)
+SUMMARY = re.compile(r"\btitled\b|\bthe authors\b|^\s*(?:in )?the (?:paper|article|study)\b", re.I)
 
 
 def load_old(data, llm):
@@ -481,7 +481,10 @@ def nonparam_gap(m, start="2025-01", end="2025-06"):
 def vintage_sets(llm):
     chat = llm[llm.model.map(CHAT)]
     p1 = chat[(chat.prompt == "P1") | chat.model.str.startswith("raid-")]
-    sets = {f"single:{g}": p1[p1.model == g] for g in sorted(p1.model.unique())}
+    # single-generator regions: RAID outputs that summarise the paper instead of writing its abstract are dropped,
+    # so every single region is on the abstract-writing task (methods audit 2, m3)
+    p1s = p1[~(p1.model.str.startswith("raid-") & p1.text.str.contains(SUMMARY))]
+    sets = {f"single:{g}": p1s[p1s.model == g] for g in sorted(p1.model.unique())}
     old, raid_pre = chat[chat.model.isin(OLD)], chat[chat.model.isin(PRE2022_DATA)]
     new = chat[~chat.model.isin(OLD + NEW)]  # every set below except the vintage-only ones is as before
     raid_pre_c = chat[chat.model.isin(PRE2022_DATA + ("raid-chatgpt",))]
@@ -524,9 +527,11 @@ def vintage(data, markers_only=False):
             s["in_region"] = (score(list(s.f)) >= 0.5).astype(int)
             m = monthly(s)
             r = segmented(m)
+            re_ = segmented(m, until=EVAL)  # post-trend fitted only up to the evaluation month (methods audit 2, I6)
             yr = s.groupby(s.date.dt.year).in_region.mean()
             row = {"group": name, "n_llm": len(sub), "gap": r["excess"], "gap_lo": r["excess_lo"],
-                   "gap_hi": r["excess_hi"], "gap_nonparam": nonparam_gap(m),
+                   "gap_hi": r["excess_hi"], "gap_nonparam": nonparam_gap(m), "gap_to_eval": re_["excess"],
+                   "gap_to_eval_lo": re_["excess_lo"], "gap_to_eval_hi": re_["excess_hi"],
                    **{f"y{y}": float(v) for y, v in yr.items()}}
         yr_m = s.groupby(s.date.dt.year).mk.mean()
         row |= {"marker_gap": rm["excess"], "marker_gap_lo": rm["excess_lo"], "marker_gap_hi": rm["excess_hi"],
@@ -553,7 +558,9 @@ def generator_lengths(data):
     """Median length (words, after cleaning and the 250-word cut) of each generator's title-only arXiv outputs."""
     _, llm = mso.load(data, "arxiv")
     llm = load_old(data, llm)
-    rows = [{"group": g, "n": len(d), "median_words": float(d.text.map(lambda t: len(features.clean(t).split())).median())}
+    raw = llm[(llm.prompt == "P1") | llm.model.str.startswith("raid-")]
+    rows = [{"group": g, "n": len(d), "median_words": float(d.text.map(lambda t: len(features.clean(t).split())).median()),
+             "summary_share_before_filter": float(raw[raw.model == g[7:]].text.str.contains(SUMMARY).mean())}
             for g, d in vintage_sets(llm).items() if g.startswith("single:")]
     save("arxiv_generator_lengths", pd.DataFrame(rows))
 
@@ -567,7 +574,19 @@ def vintage_peak():
     pk = pd.PeriodIndex(d.peak, freq="Q")
     d["peak_x"] = pk.year + (pk.quarter - 1) / 4
     r = sp(d.release, d.peak_x)
-    save("arxiv_vintage_peak", {"n": len(d), "rho": float(r.statistic), "rho_p": float(r.pvalue)})
+    out = {"n": len(d), "rho": float(r.statistic), "rho_p": float(r.pvalue)}
+    late = d[d.release >= 2024]  # without the 2023 models
+    out |= {"n_no2023": len(late), "rho_no2023": float(sp(late.release, late.peak_x).statistic)}
+    c = d.assign(cutoff=d.group.str[7:].map(PRETRAIN_CUTOFF)).dropna(subset=["cutoff"])
+    out |= {"n_cutoff": len(c), "rho_cutoff": float(sp(c.cutoff, c.peak_x).statistic),
+            "rho_release_on_cutoff_set": float(sp(c.release, c.peak_x).statistic)}
+    before = d[d.peak_x <= d.release]  # peak quarter starts no later than the release month
+    out |= {"n_peak_by_release": len(before), "peak_by_release": ", ".join(before.group.str[7:])}
+    mp = pd.PeriodIndex(d.marker_peak, freq="Q")
+    out |= {"n_marker_earlier": int((mp < pk).sum()), "n_marker_later": int((mp > pk).sum()),
+            "n_marker_same": int((mp == pk).sum())}
+    out |= {"n_fell_last_quarter": int((d.mso_2026Q3 < d.mso_2026Q2).sum())}  # d excludes the 2026 model
+    save("arxiv_vintage_peak", out)
 
 
 def placebo_grid(m, start="2016-06", end="2021-12", eval_months=12):
@@ -715,7 +734,7 @@ def robustness_v4(data):
     save("robustness_v4", out)
 
 
-def robustness_v5(data, n_seeds=5):
+def robustness_v5(data, n_seeds=5, n_sub=10):
     """Round-3 checks: (1) uncertainty of each vintage region's 2025->2026 change (human training draws; document
     bootstrap); (2) drift placebos for the pre-ChatGPT-data region; (3) placebo grid at the real 30-month horizon;
     (4) the main series restricted to never-revised papers; (5) field-specific detection rates."""
@@ -744,9 +763,18 @@ def robustness_v5(data, n_seeds=5):
             if seed == 0:
                 h25, h26 = hit[yr == 2025], hit[yr == 2026]
                 boot = [rng.choice(h26, len(h26)).mean() - rng.choice(h25, len(h25)).mean() for _ in range(2000)]
+        # generator side: refit on 80% subsamples of the set's LLM texts (methods audit 2, m2)
+        sub_ch = []
+        for k in range(n_sub):
+            part = sets[name][sets[name].model.map(CHAT)].sample(frac=0.8, random_state=k)
+            X, y, groups, _ = mso.training_set(human, part)
+            hit = mso.fit(X, y, groups=groups)[0](list(late.f)) >= 0.5
+            sub_ch.append(hit[yr == 2026].mean() - hit[yr == 2025].mean())
         rows.append({"group": name, "change_seed0": ch[0], "change_lo": float(np.percentile(boot, 2.5)),
                      "change_hi": float(np.percentile(boot, 97.5)), "change_min": min(ch), "change_max": max(ch),
-                     "n_seeds_same_sign": int(sum(np.sign(c) == np.sign(ch[0]) for c in ch)), "n_seeds": n_seeds})
+                     "n_seeds_same_sign": int(sum(np.sign(c) == np.sign(ch[0]) for c in ch)), "n_seeds": n_seeds,
+                     "sub_change_min": min(sub_ch), "sub_change_max": max(sub_ch), "n_sub": n_sub,
+                     "n_sub_same_sign": int(sum(np.sign(c) == np.sign(ch[0]) for c in sub_ch))})
     save("arxiv_vintage_uncertainty", pd.DataFrame(rows))
     out = {}
     # drift placebos for the pre-ChatGPT-data region (instrument trained on human abstracts up to year Y)
@@ -787,6 +815,26 @@ def robustness_v5(data, n_seeds=5):
     save("robustness_v5", out)
 
 
+def robustness_v6():
+    """Methods audit 2: main arXiv gap with the post-trend fitted only up to the evaluation month (I6), with the
+    field mix held fixed (equal or pre-ChatGPT field weights in every month; m7), and the field mix by year."""
+    m = pd.read_csv(OUT / "arxiv_monthly.csv")
+    m["month"] = pd.PeriodIndex(m.month, freq="M")
+    out = {"to_eval": segmented(m, until=EVAL)}
+    f = pd.read_csv(OUT / "arxiv_monthly_by_field.csv")
+    mso_, n = f.pivot(index="month", columns="group", values="mso"), f.pivot(index="month", columns="group", values="n")
+    pre = n[n.index < str(T0)].sum()
+    for tag, w in (("equal_fields", pd.Series(1.0, index=n.columns)), ("pre_weights", pre / pre.sum())):
+        ww = n.notna() * w  # renormalise over the fields present in a month
+        mf = pd.DataFrame({"month": pd.PeriodIndex(n.index, freq="M"), "n": n.sum(1).values,
+                           "mso": ((mso_ * ww).sum(1) / ww.sum(1)).values})
+        out[tag] = segmented(mf)
+    share = n.groupby(n.index.str[:4]).sum()
+    share = share.div(share.sum(1), axis=0)
+    out["field_share"] = {f"{g}_{y}": float(share.loc[y, g]) for g in n.columns for y in ("2015", "2022", "2026")}
+    save("robustness_v6", out)
+
+
 # Release month (decimal year) from developer pages / model cards; RAID's from its model list (2023 snapshots).
 # The 2026 model's release month is not used (not documented in a citable source).
 RELEASE = {"raid-gpt4": 2023.45, "raid-chatgpt": 2023.45, "raid-mpt-chat": 2023.45, "raid-llama-chat": 2023.55,
@@ -794,6 +842,10 @@ RELEASE = {"raid-gpt4": 2023.45, "raid-chatgpt": 2023.45, "raid-mpt-chat": 2023.
            "mistral:7b": 2024.4, "llama3.1:8b": 2024.55, "phi4:14b": 2024.95, "gemma3:12b": 2025.2,
            "granite3.3:8b": 2025.29, "qwen3:8b": 2025.32, "gpt-oss:20b": 2025.6, "qwen3.5:9b": 2026.17,
            "gemma4:12b": 2026.42, "granite4.2:8b": 2026.65}
+# Pretraining-data cutoff (decimal year, mid-month) where the developer states one (Table 1 of the paper)
+PRETRAIN_CUTOFF = {"raid-gpt4": 2021.71, "raid-llama-chat": 2022.71, "llama2:7b": 2022.71, "vicuna:7b": 2022.71,
+                   "llama3.1:8b": 2023.96, "phi4:14b": 2024.46, "gemma3:12b": 2024.62, "gpt-oss:20b": 2024.46,
+                   "gemma4:12b": 2025.04}
 
 
 def vintage_quarterly(data):
@@ -804,19 +856,44 @@ def vintage_quarterly(data):
     llm = load_old(data, llm)
     late = human[(human.pool == "score") & (human.date.dt.year >= 2023)]
     q = late.date.dt.to_period("Q").astype(str).values
-    rows = []
+    words = {k: v["marker_words"] for k, v in json.loads((OUT / "arxiv_vintage_its.json").read_text()).items()}
+    rows, hits = [], {}
     for name, sub in vintage_sets(llm).items():
         if not name.startswith("single:"):
             continue
         X, y, groups, _ = mso.training_set(human, sub)
         hit = mso.fit(X, y, groups=groups)[0](list(late.f)) >= 0.5
+        hits[name] = hit
         qs = pd.Series(hit).groupby(q).mean()
-        r = {"group": name, "peak": qs.idxmax(), "mso_2025q4": qs["2025Q4"],
+        pat = re.compile(r"\b(?:" + "|".join(map(re.escape, words[name])) + r")\b", re.I)
+        mk = late.text.map(lambda t: bool(pat.search(t))).groupby(q).mean()
+        r = {"group": name, "peak": qs.idxmax(), "marker_peak": mk.idxmax(), "mso_2025q4": qs["2025Q4"],
              "mso_2026": hit[pd.Series(q).str.startswith("2026").values].mean()}
         r["change_q4"] = r["mso_2026"] - r["mso_2025q4"]
         rows.append(r | {f"mso_{k}": v for k, v in qs.items()})
     d = pd.DataFrame(rows)
+    # joint document bootstrap within quarters (every region scores the same resampled documents): how stable
+    # each peak quarter is, and the interval of the release-peak rank correlation (methods audit 2, I4-I5)
+    quarters = sorted(set(q))
+    H = np.array([hits[g] for g in d.group], dtype=float)
+    idx = [np.flatnonzero(q == k) for k in quarters]
+    rel = d.group.str[7:].map(RELEASE).values
+    has = ~np.isnan(rel)
+    rng = np.random.default_rng(0)
+    peaks, rhos = [], []
+    for _ in range(1000):
+        means = np.stack([H[:, rng.choice(i, len(i))].mean(1) for i in idx], 1)
+        pk = means.argmax(1)
+        peaks.append(pk)
+        rhos.append(sp(rel[has], pk[has]).statistic)
+    peaks = np.array(peaks)
+    pos = np.array([quarters.index(p) for p in d.peak])
+    d["peak_boot_share"] = (peaks == pos).mean(0)
+    d["peak_boot_lo"] = [quarters[int(v)] for v in np.percentile(peaks, 10, axis=0, method="lower")]
+    d["peak_boot_hi"] = [quarters[int(v)] for v in np.percentile(peaks, 90, axis=0, method="higher")]
     save("arxiv_vintage_quarterly", d)
+    save("arxiv_vintage_peak_boot", {"n_boot": 1000, "rho_median": float(np.median(rhos)),
+                                     "rho_lo": float(np.percentile(rhos, 2.5)), "rho_hi": float(np.percentile(rhos, 97.5))})
     a = pd.read_csv(OUT / "arxiv_vintage.csv").set_index("group")
     d["release"] = d.group.str[7:].map(RELEASE)
     d["change_annual"] = d.group.map(a.y2026 - a.y2025)
@@ -949,7 +1026,7 @@ if __name__ == "__main__":
             "essay_perplexity": lambda: essay_perplexity(data),
             "arxiv": lambda: timeseries(data, "arxiv", by_field=True), "hansard": lambda: timeseries(data, "hansard"),
             "gensets": lambda: gensets(data), "drift": lambda: drift_placebo(data), "nodash": lambda: nodash(data),
-            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data),
+            "vintage": lambda: vintage(data), "vmarkers": lambda: vintage(data, markers_only=True), "robust4": lambda: robustness_v4(data), "vsummary": vintage_summary, "vpeak": vintage_peak, "genlen": lambda: generator_lengths(data), "robust5": lambda: robustness_v5(data), "robust6": robustness_v6,
             "vquarter": lambda: vintage_quarterly(data), "ablate": lambda: ablation(data), "fastdetect": lambda: fastdetect(data), "robust3": lambda: robustness_v3(data),
             "overlap": lambda: revision_overlap(data),
             "control": control}

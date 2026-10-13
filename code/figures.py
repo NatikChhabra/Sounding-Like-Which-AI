@@ -159,7 +159,7 @@ def fig_vintage():
     pk = pd.PeriodIndex(q.peak, freq="Q")
     q["peak_x"] = pk.year + (pk.quarter - 1) / 4 + 0.125
     label = {m: lab for m, lab, _ in VINTAGE}
-    show = {"raid-gpt4", "vicuna:7b", "phi4:14b", "qwen3:8b", "gpt-oss:20b", "qwen3.5:9b", "gemma4:12b", "granite4.2:8b"}
+    show = {"raid-gpt4", "raid-cohere-chat", "vicuna:7b", "phi4:14b", "qwen3:8b", "gpt-oss:20b", "qwen3.5:9b", "gemma4:12b", "granite4.2:8b"}
     seen = {}
     for g, r in q.iterrows():
         m = g[7:]
@@ -172,15 +172,15 @@ def fig_vintage():
             x = analysis.RELEASE[m]
             b.scatter(x, r.peak_x, s=16, color=YEAR_COLOR[yr], zorder=3)
             if m in show:
-                off = {"gemma4:12b": (3, -6), "qwen3.5:9b": (3, -8)}.get(m, (3, 2))
-                b.annotate(label[m], (x, r.peak_x), xytext=off,
+                off, ha = {"gemma4:12b": ((3, -6), "left"), "qwen3.5:9b": ((3, 3), "left")}.get(m, ((3, 2), "left"))
+                b.annotate(label[m], (x, r.peak_x), xytext=off, ha=ha,
                            textcoords="offset points", fontsize=5.2, color=MUTED)
         else:  # release month not used: drawn in a separate "n/a" column; peak right-censored at the last quarter
             b.scatter(2027.0, r.peak_x, s=16, facecolors="none", edgecolors=YEAR_COLOR[yr], zorder=3)
             b.annotate("2026 model (still rising)", (2027.0, r.peak_x), xytext=(-6, -2), ha="right",
                        textcoords="offset points", fontsize=5.2, color=MUTED)
     rho = json.loads((RES / "arxiv_vintage_peak.json").read_text())
-    b.text(0.03, 0.95, f"Spearman $\\rho$ = {rho['rho']:.2f} (n = {rho['n']}; 2026 model excluded)",
+    b.text(0.2, 0.34, f"Spearman $\\rho$ = {rho['rho']:.2f} (n = {rho['n']}; 2026 model excluded)",
            transform=b.transAxes, fontsize=6, va="top", color=INK)
     for yr, c in YEAR_COLOR.items():
         b.scatter([], [], s=16, color=c, label=str(yr))
@@ -188,9 +188,10 @@ def fig_vintage():
     b.set_xlabel("Generator release date")
     b.set_ylabel("Quarter of peak MSO")
     b.set_xticks([2024, 2025, 2026, 2027.0], ["2024", "2025", "2026", "n/a"])
-    ticks = [y + (k - 1) / 4 + 0.125 for y in (2024, 2025, 2026) for k in (1, 3)]
-    b.set_yticks(ticks, [f"{y}Q{k}" for y in (2024, 2025, 2026) for k in (1, 3)])
-    b.set_ylim(2024.4, 2026.9)
+    years = range(int(q.peak_x.min()), 2027)  # every peak on the axis, however early
+    ticks = [y + (k - 1) / 4 + 0.125 for y in years for k in (1, 3)]
+    b.set_yticks(ticks, [f"{y}Q{k}" for y in years for k in (1, 3)])
+    b.set_ylim(q.peak_x.min() - 0.3, 2026.9)
     b.set_title("(b) Single-generator regions", fontsize=7.5, loc="left")
     fig.tight_layout()
     fig.savefig(FIG / "vintage.pdf", metadata=PDF_META)

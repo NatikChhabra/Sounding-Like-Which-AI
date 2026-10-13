@@ -1,0 +1,23 @@
+{
+  "upload_type": "software",
+  "title": "Sounding Like Which AI? Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages: code, data and paper",
+  "creators": [
+    {
+      "name": "Chhabra, Natik",
+      "affiliation": "Independent researcher",
+      "orcid": "0009-0004-8786-7703"
+    }
+  ],
+  "description": "<p>Code, released data, results and paper (preprint, not peer reviewed) for a study of Machine-Style Overlap (MSO): the share of documents that a calibrated classifier on content-word-free style features judges at least as likely to be LLM output as pre-ChatGPT human writing. It measures MSO in arXiv abstracts from 2015 to 2026 against reference generators of different vintages, with Australian parliamentary speech and student essays as secondary genres.</p><p><strong>How it was made:</strong> the study was carried out by an AI system (Claude Opus 5.5, Anthropic, via Claude Code) under the author's direction. The AI system wrote the code, ran the analyses and drafted the paper; the author chose the topic and constraints and is responsible for the content. See paper/AI_DISCLOSURE.md.</p><p><strong>Licences (per part):</strong> code MIT; paper text, figures, results, review reports, literature notes and the analysis plan CC BY 4.0; generated abstracts CC BY 4.0; generated speeches CC BY-NC 4.0 (LLM revisions of real speeches are not released); generated essays and essay split CC BY-NC-SA 4.0 (derived from PERSUADE 2.0); Hansard opening sentences in data/samples/hansard_split.csv.gz are Parliament of Australia text under CC BY-NC-ND 4.0; arXiv ids, titles and abstracts CC0. Details in README.md and data/README.md. The record-level licence below applies only where no other licence is stated.</p>",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "machine-style overlap",
+    "LLM-generated text",
+    "stylometry",
+    "scientific writing",
+    "arXiv",
+    "computational linguistics"
+  ],
+  "language": "eng",
+  "notes": "AI use is disclosed in full in paper/AI_DISCLOSURE.md and in the paper's Acknowledgements section."
+}

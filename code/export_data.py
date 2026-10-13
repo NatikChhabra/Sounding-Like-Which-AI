@@ -3,7 +3,7 @@ splits (ids only for most human documents, so third-party texts are not redistri
 (gzip timestamps fixed), so re-running it does not change the committed files.
 Usage: python export_data.py DATA_DIR OUT_DIR
 """
-import gzip, io, shutil, sys
+import gzip, json, sys
 from pathlib import Path
 
 import pandas as pd
@@ -23,8 +23,14 @@ def main(data, out):
     gen, ids = out / "generated", out / "samples"
     gen.mkdir(parents=True, exist_ok=True)
     ids.mkdir(parents=True, exist_ok=True)
-    for f in ("llm_arxiv.jsonl", "llm_arxiv_old.jsonl", "llm_hansard.jsonl", "llm_essay.jsonl"):
+    for f in ("llm_arxiv.jsonl", "llm_arxiv_old.jsonl", "llm_essay.jsonl"):
         gz_write(gen / (f + ".gz"), (data / f).read_bytes())
+    # Hansard text (aph.gov.au) is CC BY-NC-ND: revisions of real speeches (P2) are adaptations, so only their
+    # keys are released; the line-level filter keeps the other rows byte-identical
+    lines = (data / "llm_hansard.jsonl").read_bytes().splitlines(keepends=True)
+    p2 = [json.loads(l) for l in lines if json.loads(l)["prompt"] == "P2"]
+    gz_write(gen / "llm_hansard.jsonl.gz", b"".join(l for l in lines if json.loads(l)["prompt"] != "P2"))
+    gz_csv(pd.DataFrame(p2)[["src_id", "model", "prompt"]], gen / "hansard_p2_rows.csv.gz")
     for name in ("arxiv_v2", "arxiv"):  # the second (v1) sample seeded the original generators
         src = data / name / "sample.jsonl"
         if src.exists():
