@@ -90,7 +90,14 @@ TITLES = {
 }
 
 
+# Article numbers missing from Crossref's BibTeX (checked on the publisher pages; lit/verification/v5_batch*.md)
+PAGES = {"gao2023": "75", "herbold2023": "18617", "jakesch2023": "e2208839120", "kobak2025": "eadt3813",
+         "munozortiz2024": "265", "reinhart2025": "e2422455122"}
+
+
 def retitle(key, bib):
+    if key in PAGES and not re.search(r"pages\s*=", bib):
+        bib = re.sub(r"^(@\w+\{[^,]+,)", lambda m: m.group(1) + " pages={" + PAGES[key] + "},", bib, count=1)
     if key not in TITLES:
         return bib
     # braced (Crossref, arXiv) or quoted (ACL Anthology) title field

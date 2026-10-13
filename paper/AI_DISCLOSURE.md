@@ -9,8 +9,8 @@ section is authoritative and this file is out of date.
 - Approved the analysis plan, its deviations, every download and every public action, in the working
   conversation with the AI system (these approvals are not separate commits).
 - Takes full responsibility for the content, including the citations and the analysis choices.
-- Citation spot-check: the author **has not yet** checked the random sample of five citations in
-  `lit/SPOT_CHECK.md`. This line will be changed, in a `HUMAN-EDIT:` commit, only after the check is done.
+- Citations: delegated to the AI system (see below); the author has not checked citations. The author will read
+  the final paper before release; this line will be updated, in a `HUMAN-EDIT:` commit, when that is done.
 
 ## What the AI system did
 The AI system is Claude Opus 5.5 (Anthropic), used as an agent through Claude Code on the author's computer. It:
@@ -24,10 +24,10 @@ The AI system is Claude Opus 5.5 (Anthropic), used as an agent through Claude Co
 - drafted every sentence of the paper; no human has edited the text so far (zero `HUMAN-EDIT:` commits);
 - ran simulated peer review and citation verification in separate sessions **of the same model family**
   (`paper/reviews/`, `lit/verification/`), which share its blind spots, and revised the paper in response.
-  Citation verification compared each claim with the cited work's abstract or full text where accessible;
-  some publisher pages were blocked, and those sources were checked through metadata, institutional mirrors or
-  secondary copies (details in `lit/verification/`). It led to 11 rewordings, 1 removed citation and 20
-  preprints replaced by published versions.
+  Citation verification: every citing sentence was compared with the cited work's abstract or full text, in two
+  full passes by separate sessions (`lit/verification/`, latest `v5_*.md`); some publisher pages were blocked and
+  those sources were checked through metadata, institutional mirrors or secondary copies. This led to rewordings,
+  one removed citation and published versions replacing preprints.
 
 ## How to audit it
 - The git history is the complete record. AI-written commits carry "(AI-written)" and a

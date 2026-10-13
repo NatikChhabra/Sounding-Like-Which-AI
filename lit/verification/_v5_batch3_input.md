@@ -6,12 +6,12 @@
 ### openai2023gpt4
 - Title: {GPT-4} Technical Report
 - Link: https://arxiv.org/abs/2303.08774
-- Paper sentence: "Qwen3 8B & 2025-04 & \\ gpt-oss 20B & 2025-08 & Jun 2024 \\ Claude Opus 5.5 (2026 model) & 2026 & \\ \midrule \multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \\ Llama-2-Chat 7B & 2023-07 & Sep 2022$^b$ \\ Vicuna 7B v1.5$^d$ & 2023-08 & Sep 2022$^b$ \\ Qwen3.5 9B & 2026-03 & \\ Gemma 4 12B & 2026-06 & Jan 2025 \\ Granite 4.2 8B & 2026-08 & \\ \bottomrule \end{tabular} \caption{Reference generators, with release month and pretraining-data cutoff where the developer states one. $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in secondary"
+- Paper sentence: "Qwen3 8B & 2025-04 & \\ gpt-oss 20B & 2025-08 & Jun 2024 \\ Claude Opus 5.5 (2026 model) & 2026 & \\ \midrule \multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \\ Llama-2-Chat 7B & 2023-07 & Sep 2022$^b$ \\ Vicuna 7B v1.5$^d$ & 2023-08 & Sep 2022$^b$ \\ Qwen3.5 9B & 2026-02/03 & \\ Gemma 4 12B & 2026-06 & Jan 2025 \\ Granite 4.2 8B & 2026-08 & \\ \bottomrule \end{tabular} \caption{Reference generators, with release month and pretraining-data cutoff where the developer states one. $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in second"
 
 ### openai2025gptoss
 - Title: gpt-oss-120b \& gpt-oss-20b Model Card
 - Link: https://arxiv.org/abs/2508.10925
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
 
 ### padmakumar2024
 - Title: Does Writing with Language Models Reduce Content Diversity?
@@ -26,7 +26,7 @@
 ### phi4card
 - Title: Phi-4 Model Card
 - Link: https://huggingface.co/microsoft/phi-4
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
 
 ### pillutla2021
 - Title: {MAUVE}: {M}easuring the Gap Between Neural Text and Human Text using Divergence Frontiers
@@ -41,7 +41,12 @@
 ### qwen35card
 - Title: Qwen3.5-9{B} Model Card
 - Link: https://huggingface.co/Qwen/Qwen3.5-9B
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
+
+### qwen3card
+- Title: ?
+- Link: ?
+- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, qwen3card, granitecards, openai2025gptoss, qwen35card, gemmareleases, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
 
 ### rallapalli2026
 - Title: Interpretable Stylistic Variation in Human and {LLM} Writing Across Genres, Models, and Decoding Strategies
@@ -87,7 +92,12 @@
 ### touvron2023llama2
 - Title: Llama 2: Open Foundation and Fine-Tuned Chat Models
 - Link: https://arxiv.org/abs/2307.09288
-- Paper sentence: "Qwen3 8B & 2025-04 & \\ gpt-oss 20B & 2025-08 & Jun 2024 \\ Claude Opus 5.5 (2026 model) & 2026 & \\ \midrule \multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \\ Llama-2-Chat 7B & 2023-07 & Sep 2022$^b$ \\ Vicuna 7B v1.5$^d$ & 2023-08 & Sep 2022$^b$ \\ Qwen3.5 9B & 2026-03 & \\ Gemma 4 12B & 2026-06 & Jan 2025 \\ Granite 4.2 8B & 2026-08 & \\ \bottomrule \end{tabular} \caption{Reference generators, with release month and pretraining-data cutoff where the developer states one. $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in secondary"
+- Paper sentence: "Qwen3 8B & 2025-04 & \\ gpt-oss 20B & 2025-08 & Jun 2024 \\ Claude Opus 5.5 (2026 model) & 2026 & \\ \midrule \multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \\ Llama-2-Chat 7B & 2023-07 & Sep 2022$^b$ \\ Vicuna 7B v1.5$^d$ & 2023-08 & Sep 2022$^b$ \\ Qwen3.5 9B & 2026-02/03 & \\ Gemma 4 12B & 2026-06 & Jan 2025 \\ Granite 4.2 8B & 2026-08 & \\ \bottomrule \end{tabular} \caption{Reference generators, with release month and pretraining-data cutoff where the developer states one. $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in second"
+
+### vicuna15card
+- Title: ?
+- Link: ?
+- Paper sentence: "Qwen3 8B & 2025-04 & \\ gpt-oss 20B & 2025-08 & Jun 2024 \\ Claude Opus 5.5 (2026 model) & 2026 & \\ \midrule \multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \\ Llama-2-Chat 7B & 2023-07 & Sep 2022$^b$ \\ Vicuna 7B v1.5$^d$ & 2023-08 & Sep 2022$^b$ \\ Qwen3.5 9B & 2026-02/03 & \\ Gemma 4 12B & 2026-06 & Jan 2025 \\ Granite 4.2 8B & 2026-08 & \\ \bottomrule \end{tabular} \caption{Reference generators, with release month and pretraining-data cutoff where the developer states one. $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in second"
 
 ### wu2025monoculture
 - Title: Generative Monoculture in Large Language Models
@@ -100,11 +110,6 @@
 - Paper sentence: "\end{abstract} \section{Introduction} Corpus studies find traces of LLM-assisted writing in abstracts, peer reviews, press releases and encyclopedias \citep{kobak2025, liang2024mapping, liang2024monitoring, liang2025widespread, brooks2024}, and LLM-associated words have become more frequent in unscripted speech \citep{yakura2024, anderson2025spoken}."
 - Paper sentence: "LLM-associated vocabulary has grown in human speech \citep{yakura2024, anderson2025spoken}, academic authors adapt their LLM use once overused words are publicised \citep{geng2025}, and adoption of LLM revision varies across disciplines and author groups \citep{lin2025}."
 
-### yang2025qwen3
-- Title: Qwen3 Technical Report
-- Link: https://arxiv.org/abs/2505.09388
-- Paper sentence: "Other dates: \citet{jiang2023mistral, llama31card, phi4card, gemma3card, yang2025qwen3, granitecards, openai2025gptoss, qwen35card, gemma4card}.} \label{tab:gens} \end{table} \section{Method} \label{sec:method} \paragraph{Cleaning.} All texts pass through the same normalisation: chat wrappers (``Here's the abstract:''), lines echoing the prompt's title, markdown and trailing notes are removed; typographic variants and mis-decoded characters are mapped to plain equivalents;"
-
 ### yang2026coverage
 - Title: Where Models Converge and Humans Diverge: A Coverage Framework for Distributional Pluralism in Open-Ended Generation
 - Link: https://arxiv.org/abs/2608.05576
@@ -113,4 +118,4 @@
 ### zheng2023judging
 - Title: Judging {LLM}-as-a-Judge with {MT}-Bench and Chatbot Arena
 - Link: https://arxiv.org/abs/2306.05685
-- Paper sentence: "Qwen3 8B & 2025-04 & \\ gpt-oss 20B & 2025-08 & Jun 2024 \\ Claude Opus 5.5 (2026 model) & 2026 & \\ \midrule \multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \\ Llama-2-Chat 7B & 2023-07 & Sep 2022$^b$ \\ Vicuna 7B v1.5$^d$ & 2023-08 & Sep 2022$^b$ \\ Qwen3.5 9B & 2026-03 & \\ Gemma 4 12B & 2026-06 & Jan 2025 \\ Granite 4.2 8B & 2026-08 & \\ \bottomrule \end{tabular} \caption{Reference generators, with release month and pretraining-data cutoff where the developer states one. $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in secondary"
+- Paper sentence: "Qwen3 8B & 2025-04 & \\ gpt-oss 20B & 2025-08 & Jun 2024 \\ Claude Opus 5.5 (2026 model) & 2026 & \\ \midrule \multicolumn{3}{@{}l}{\emph{Local; vintage analysis only (abstracts, P1--P3)}} \\ Llama-2-Chat 7B & 2023-07 & Sep 2022$^b$ \\ Vicuna 7B v1.5$^d$ & 2023-08 & Sep 2022$^b$ \\ Qwen3.5 9B & 2026-02/03 & \\ Gemma 4 12B & 2026-06 & Jan 2025 \\ Granite 4.2 8B & 2026-08 & \\ \bottomrule \end{tabular} \caption{Reference generators, with release month and pretraining-data cutoff where the developer states one. $^a$\citet{openai2023gpt4}; $^b$\citet{touvron2023llama2}; $^c$reported only in second"

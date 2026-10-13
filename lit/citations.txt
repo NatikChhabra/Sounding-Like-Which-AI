@@ -56,7 +56,7 @@ jiang2024 doi:10.1016/j.compedu.2024.105070
 openai2023gpt4 manual:openai2023gpt4
 askitas2025 manual:askitas2025
 touvron2023llama2 arxiv:2307.09288
-zheng2023judging arxiv:2306.05685
+zheng2023judging bib:https://proceedings.neurips.cc/paper_files/paper/19631-/bibtex
 jiang2023mistral arxiv:2310.06825
 grattafiori2024llama3 arxiv:2407.21783
 abdin2024phi4 arxiv:2412.08905
@@ -72,3 +72,7 @@ granitecards manual:granitecards
 pu2023zeroshot bib:https://aclanthology.org/2023.findings-emnlp.318.bib
 li2024mage bib:https://aclanthology.org/2024.acl-long.3.bib
 sun2025idiosyncrasies bib:https://proceedings.mlr.press/v267/sun25z.html
+vicuna15card manual:vicuna15card
+qwen3card manual:qwen3card
+gemmareleases manual:gemmareleases
+mistralv03card manual:mistralv03card

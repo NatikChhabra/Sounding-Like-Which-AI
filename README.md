@@ -64,7 +64,8 @@ powershell -File code\run_all.ps1 -Data D:\research-data            # or -Stage 
 - Australian Hansard 1998–2025, Zenodo record 17351233 (CC BY 4.0)
 - PERSUADE 2.0, Crossley et al. 2024 (CC BY-NC-SA 4.0; share-alike applies to derived data)
 - Liang et al. 2023 TOEFL and US college essays, HF `WxWx/ChatGPT-Detector-Bias` (MIT); their US 8th-grade essays
-  come from the authors' GitHub repository (no licence stated; texts are not redistributed here)
+  come from the authors' GitHub repository (no licence file; its README shows an MIT badge; texts are not
+  redistributed here)
 - RAID, Dugan et al. 2024, HF `liamdugan/raid` (MIT)
 
 Code is MIT-licensed (`LICENSE`). Cite via `CITATION.cff` (GitHub's "Cite this repository" button).
