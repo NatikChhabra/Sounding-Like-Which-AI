@@ -1,10 +1,17 @@
 cff-version: 1.2.0
-message: "If you use this code or data, please cite it as below."
-title: "Sounding Like AI Before AI: Machine-Style Overlap in Human Writing"
+message: "If you use this code or these results, please cite the paper as below."
+title: "Sounding Like Which AI? Machine-Style Overlap of arXiv Abstracts with Language Models of Different Vintages"
 authors:
   - family-names: Chhabra
     given-names: Natik
     orcid: "https://orcid.org/0009-0004-8786-7703"
-date-released: 2026-10-12
+date-released: 2026-10-13
+version: "v5"
 license: MIT
-repository-code: "https://github.com/NatikChhabra/machine-style-overlap"
+repository-code: "https://github.com/NatikChhabra/Sounding-Like-Which-AI-"
+keywords:
+  - machine-style overlap
+  - LLM-generated text
+  - stylometry
+  - scientific writing
+  - arXiv
