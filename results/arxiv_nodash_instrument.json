@@ -1,10 +1,10 @@
 {
-  "cv_auc_all": 0.9389118417737464,
+  "cv_auc_all": 0.9389355001259764,
   "n_train_per_class": 6300,
   "n_generators": 14,
-  "mso_logreg": 0.22737641755531057,
-  "mso_gbm": 0.22218098865955752,
-  "kappa_logreg_vs_gbm": 0.6449850680585997,
-  "spearman_scores_logreg_vs_gbm": 0.8056322883083481,
-  "share_flagged_by_both": 0.1629138060882568
+  "mso_logreg": 0.23322673244632663,
+  "mso_gbm": 0.22834783178161736,
+  "kappa_logreg_vs_gbm": 0.6525396139174504,
+  "spearman_scores_logreg_vs_gbm": 0.8094909455355006,
+  "share_flagged_by_both": 0.16910247874349207
 }
