@@ -44,21 +44,21 @@ the gap is smaller (\R{arxiv_vintage.pre2022data_matched.gap}--\R{arxiv_vintage.
 
 \section{Introduction}
 
-Corpus studies find traces of LLM-assisted writing in abstracts, peer reviews, press releases and
-encyclopedias \citep{kobak2025, liang2024monitoring, liang2024mapping, liang2025widespread,
-brooks2024}, and LLM-associated words have become more frequent in unscripted speech \citep{yakura2024,
-anderson2025spoken}. We find that by mid-2025 the share of arXiv abstracts on the LLM side of a calibrated style
-boundary stood \R{arxiv_its.all.excess}\,pp above its pre-ChatGPT trend, and that whether it was still rising in
-2026 depends on which LLMs define the boundary.
-
-Existing measurements answer a \emph{prevalence} question: what fraction of a corpus was produced or modified
-with an LLM? We ask an \emph{overlap} question: what fraction of a genre's writing, by any author, is stylistically closer to LLM output than to pre-ChatGPT human writing? The two differ in how they handle text written before ChatGPT. Prevalence estimators report a small ``LLM share'' for it, which studies read as consistent with false positives \citep{liang2024mapping}, subtract as baseline misclassification
-\citep{lin2025}, or use to calibrate thresholds \citep{brooks2024}. For a fixed feature map and reference set,
-we regard that share as a property of the two text distributions and study how it changes over time.
-
-Both questions share a complication that prevalence studies seldom discuss: ``LLM style'' is defined by whichever models serve as the reference. Recent models are trained on recent text, so a rising overlap with them may mean that writing moved towards the models or that the models
-learned from the writing. We therefore compare reference generators by \emph{vintage} on a fixed task: models
-whose pretraining data predate ChatGPT, other models released in 2023--2025, and models released in 2026.
+% Written by the human author from their own explanations (Acknowledgements); the AI system fixed facts and grammar.
+Since ChatGPT was released, AI-generated text has become part of everyday reading, and people tend to take on what
+they see often, usually without noticing \citep{yakura2024, anderson2025spoken}. At the same time, AI models learn
+from human writing. Earlier studies measured how much writing was produced with AI \citep{kobak2025,
+liang2024monitoring, liang2024mapping, liang2025widespread, brooks2024}, and treated the small share of pre-ChatGPT
+writing that their tools already judged AI-like as an error to ignore, subtract or calibrate away
+\citep{liang2024mapping, lin2025, brooks2024}. We instead treat such a share as a baseline
+(\R{arxiv_baseline_pre2022.all.mso}\% of arXiv abstracts under our measure): human writing that sounded like AI
+before ChatGPT existed. We measure how far writing has moved above its pre-ChatGPT trend. Which AI is used for the
+comparison matters, because every model is shaped by its own data and design, and newer models were trained on
+writing from after ChatGPT: if human writing resembles them, either people copied the AI or the AI learned from
+people. Models whose pretraining data predate ChatGPT are unlikely to have learned from later writing, so movement
+towards them more likely comes from people. This matters beyond research. AI style may separate people from their
+own way of thinking and writing, and because some human writing has always sounded like AI, a ``sounds like AI''
+score cannot prove that a particular person, such as a student, used AI.
 
 \paragraph{Contributions.}
 (1)~We define Machine-Style Overlap (\mso{}), a classify-and-count quantity \citep{forman2008} that, on
@@ -367,15 +367,15 @@ $\R{robustness_v5.pre2022data_drift_to_2018.excess}$\pp. In 2026 its \mso{} fell
 \R{arxiv_vintage.pre2022data_matched.y2026}\%. Because overlap with these generators peaked in 2025, a straight post-ChatGPT line fitted through 2026 understates their June 2025 gap: fitted only to June 2025, the gap is \R{arxiv_vintage.pre2022data_matched.gap_to_eval}\pp{} (two small local models: \R{arxiv_vintage.old_open_p1.gap_to_eval}\pp), against \R{arxiv_vintage.local_p1.gap_to_eval}\pp{} for the 2024--2025 open models.
 
 \emph{One generator at a time.} With the region defined by a single generator on the title-only task, \mso{} rose
-from 2022 to 2025 under every generator except Cohere's chat model, whose overlap peaked in 2023Q2. Quarter by quarter, overlap with each other generator but the 2026 model rose and then fell, and the turn tended to come later for newer generators (Figure~\ref{fig:vintage}b; peak quarters in Appendix~\ref{app:peaks}); under the 2026 model it was still rising in 2026Q3. From 2026Q2 to 2026Q3 overlap fell under every other generator, with or without equal field weights, so the 2026Q2 peaks of gpt-oss and Granite~4.2 may mark a shared fluctuation rather than a turn. Release date and peak quarter have rank correlation \R{arxiv_vintage_peak.rho} ($n=\R{arxiv_vintage_peak.n}$; the 2026 model is excluded because its release month is not public). All generators score the same abstracts, so their errors are correlated; a document bootstrap within quarters gives \R{arxiv_vintage_peak_boot.rho_lo}--\R{arxiv_vintage_peak_boot.rho_hi} and five training draws \R{robustness_v7.seeds.rho_min}--\R{robustness_v7.seeds.rho_max}. The correlation is \R{robustness_v7.length_weighted.rho} with each quarter's abstracts reweighted to the pre-ChatGPT length distribution, \R{robustness_v7.field_weighted.rho} with equal field weights, \R{arxiv_vintage_peak.rho_no2023} without the 2023 models. Newer generators also write longer (rank correlation \R{arxiv_vintage_peak.rho_release_length} with release date), and length predicts the peak about as well (\R{arxiv_vintage_peak.rho_length}; partial correlation of release date given length \R{arxiv_vintage_peak.partial_release_given_length}). With every text cut to its first \R{robustness_v9.words} words and every region trained on \R{robustness_v9.n_train} texts, the correlation is still \R{robustness_v9.rho} (\R{robustness_v9.rho_no_new} without the 2026 open models, $p=\R{robustness_v9.rho_no_new_p}$). The analysis is exploratory. A first test, release date against the 2025-to-2026 change, gave \R{arxiv_vintage_release_corr.rho_annual} on annual means but \R{arxiv_vintage_release_corr.rho_q4} from 2025Q4 (Appendix~\ref{app:deviations}). Without the three 2026 open models, added after the annual single-generator pattern was seen, the correlation is \R{arxiv_vintage_peak.rho_no_new} ($n=\R{arxiv_vintage_peak.n_no_new}$, permutation $p=\R{arxiv_vintage_peak.rho_no_new_perm_p}$; \R{robustness_v7.seeds.rho_no_new_min}--\R{robustness_v7.seeds.rho_no_new_max} across training draws), or \R{arxiv_vintage_peak.partial_release_given_length_no_new} given length. Individual peaks are uncertain by one or two quarters (Appendix~\ref{app:peaks}). Gemma~4 12B (released June 2026) and Granite~4.2 peaked before their release and Qwen3.5 in its release quarter, so authors' use of these models can explain little of the timing. On annual means, \mso{} fell from 2025 to 2026 under \R{arxiv_vintage_summary.n_fell_2026} of the
+from 2022 to 2025 under every generator except Cohere's chat model, whose overlap peaked in 2023Q2. Quarter by quarter, overlap with each other generator but the 2026 model rose and then fell, and the turn tended to come later for newer generators (Figure~\ref{fig:vintage}b; peak quarters in Appendix~\ref{app:peaks}); under the 2026 model it was still rising in 2026Q3. From 2026Q2 to 2026Q3 overlap fell under every other generator, with or without equal field weights, so the 2026Q2 peaks of gpt-oss and Granite~4.2 may mark a shared fluctuation rather than a turn. Release date and peak quarter have rank correlation \R{arxiv_vintage_peak.rho} ($n=\R{arxiv_vintage_peak.n}$; the 2026 model is excluded because its release month is not public). All generators score the same abstracts, so their errors are correlated; a document bootstrap within quarters gives \R{arxiv_vintage_peak_boot.rho_lo}--\R{arxiv_vintage_peak_boot.rho_hi} and five training draws \R{robustness_v7.seeds.rho_min}--\R{robustness_v7.seeds.rho_max}. The correlation is \R{robustness_v7.length_weighted.rho} with each quarter's abstracts reweighted to the pre-ChatGPT length distribution, \R{robustness_v7.field_weighted.rho} with equal field weights, \R{arxiv_vintage_peak.rho_no2023} without the 2023 models. Newer generators also write longer (rank correlation \R{arxiv_vintage_peak.rho_release_length} with release date), and length predicts the peak about as well (\R{arxiv_vintage_peak.rho_length}; partial correlation of release date given length \R{arxiv_vintage_peak.partial_release_given_length}). With every text cut to its first \R{robustness_v9.words} words and every region trained on \R{robustness_v9.n_train} texts, the correlation is still \R{robustness_v9.rho} (\R{robustness_v9.rho_no_new} without the 2026 open models, $p=\R{robustness_v9.rho_no_new_p}$). The analysis is exploratory. Without the three 2026 open models, added after the annual single-generator pattern was seen, the correlation is \R{arxiv_vintage_peak.rho_no_new} ($n=\R{arxiv_vintage_peak.n_no_new}$, permutation $p=\R{arxiv_vintage_peak.rho_no_new_perm_p}$; \R{robustness_v7.seeds.rho_no_new_min}--\R{robustness_v7.seeds.rho_no_new_max} across training draws), or \R{arxiv_vintage_peak.partial_release_given_length_no_new} given length. Individual peaks are uncertain by one or two quarters (Appendix~\ref{app:peaks}). Gemma~4 12B (released June 2026) and Granite~4.2 peaked before their release and Qwen3.5 in its release quarter, so authors' use of these models can explain little of the timing. On annual means, \mso{} fell from 2025 to 2026 under \R{arxiv_vintage_summary.n_fell_2026} of the
 \R{arxiv_vintage_summary.n_single} generators and rose under gpt-oss
 (\R{arxiv_vintage.single:gpt-oss:20b.y2025}\% to \R{arxiv_vintage.single:gpt-oss:20b.y2026}\%), Qwen3.5, Granite~4.2
 and the 2026 model (\R{arxiv_vintage.single:claude-opus-5.5.y2025}\% to
-\R{arxiv_vintage.single:claude-opus-5.5.y2026}\%); every change but Gemma~4's is stable across bootstrap, training draws and generator subsamples (Appendix~\ref{app:peaks}). In the three 2025--2026 same-family pairs the newer model's change was higher; for Gemma the two intervals overlap. Pretraining cutoff orders the peaks about as well as release date (Appendix~\ref{app:peaks}). A region pooling
+\R{arxiv_vintage.single:claude-opus-5.5.y2026}\%); every change but Gemma~4's is stable across bootstrap, training draws and generator subsamples (Appendix~\ref{app:peaks}). In the three 2025--2026 same-family pairs the newer model's change was higher; for Gemma the two intervals overlap. A region pooling
 the three 2026 open models, run with logged decoding, also rose (\R{arxiv_vintage.open2026_p1.y2025}\% to
 \R{arxiv_vintage.open2026_p1.y2026}\% on annual means), so the late peak does not rest on the uncontrolled generator.
 
-The aggregate 14-generator series (Figure~\ref{fig:ts}a) still rose in 2026, although 12 of its 14 single-generator regions fell. Without the 2026 model it did not (\R{arxiv_gensets.no_frontier.y2025}\% to \R{arxiv_gensets.no_frontier.y2026}\%). Pooled regions also need not follow their members: the seven local models pooled on title-only prompts went from \R{arxiv_vintage.local_p1.y2025}\% to \R{arxiv_vintage.local_p1.y2026}\% (not a stable change), and over all three prompts from \R{arxiv_gensets.local.y2025}\% to \R{arxiv_gensets.local.y2026}\%. If newer generators keep peaking later, any fixed reference set will eventually show the shift receding. Only the pre-ChatGPT-data region largely sidesteps the question of who learned from whom.
+The aggregate 14-generator series (Figure~\ref{fig:ts}a) still rose in 2026, although 12 of its 14 single-generator regions fell. Without the 2026 model it did not (\R{arxiv_gensets.no_frontier.y2025}\% to \R{arxiv_gensets.no_frontier.y2026}\%). If newer generators keep peaking later, any fixed reference set will eventually show the shift receding. Only the pre-ChatGPT-data region largely sidesteps the question of who learned from whom.
 
 \begin{figure*}[t]
 \centering
@@ -423,21 +423,53 @@ sentence-embedding and perplexity instruments agree in direction. A \gptii{} per
 
 \section{Discussion}
 
-Whether abstracts were still moving towards LLM style in 2026 depends on the reference LLM. Overlap tended to peak later for more recent generators, and under three of the four 2026 generators it peaked in
-2026 or was still rising. Words mined from most generators fell meanwhile, so the decline of \emph{delve} need not mean that writing stopped moving. Detectors, prevalence estimators and marker lists built on a
-fixed set of models may therefore understate recent change; refreshed ones may mistake models' learning from writing for a shift in writing. Authors' use of the 2026 open models can explain little of those models' peaks: the models may have learned from recent writing, or they and the authors may share the style of commercial models used in 2024--2026, which, apart from the 2026 model, we did not run. Either way, recent LLMs and recent scientific writing may no longer be independent references for each other, a precondition for the recursive dynamics studied in model-collapse work \citep{shumailov2024, gerstgrasser2024} but not evidence of them.
+% Written by the human author from their own explanations (Acknowledgements); the AI system fixed facts and grammar.
+After ChatGPT was released, scientific writing moved towards the style of AI models. Part of this may be because
+each AI model has a style shaped by its developers' choices of what an AI should sound like; ChatGPT's refined
+punctuation, for example, may have become a norm that people now see everywhere. Older models, whose pretraining
+data predate ChatGPT, are unlikely to have seen post-ChatGPT text, yet human writing still moved towards them (by
+less than towards newer models), so at least part of the change likely came from humans themselves: people use AI
+so much that they learn from it and adapt to it, the way people adapt to their environment. A possible weakness is
+text length: longer texts naturally contain more commas and punctuation, which a style classifier could mistake for
+AI style. To check this, every text was cut to its first \R{robustness_v9.words} words, and the pattern of newer
+models peaking later remained (rank correlation \R{robustness_v9.rho}). As future models are increasingly trained
+on AI-assisted text, AI and human writing may influence each other in a domino effect \citep{shumailov2024,
+gerstgrasser2024}, which future work should study.
+
+A possible explanation for why overlap with each model rises and then falls is that people now edit AI output to
+make it look human, removing the most recognisable patterns (such as heavy, polished punctuation) once they become
+common \citep[as with publicised marker words;][]{geng2025}, while newer models bring new patterns. The line between
+human and AI writing is becoming very thin: people use AI tools so much that they adopt their language while also
+refining it away from the most obvious AI style.
 
 \section{Conclusion}
-In arXiv abstracts, Machine-Style Overlap rose from \R{arxiv_baseline_pre2022.all.mso}\% before ChatGPT to \R{arxiv_yearly.2025.mso}\% in 2025, well above its pre-ChatGPT trend; overlap with generators whose pretraining data predate ChatGPT rose less. Single-generator overlap tended to peak later for more recent generators, so studies of LLM influence on writing should report and vary their reference models' vintage.
+% Written by the human author from their own explanations; the AI system fixed facts and grammar.
+After ChatGPT, AI-generated text spread quickly, and arXiv abstracts moved towards AI style: the share that sounds
+like AI rose from \R{arxiv_baseline_pre2022.all.mso}\% before ChatGPT to \R{arxiv_yearly.2025.mso}\% in 2025. Older
+models were trained on human writing from before ChatGPT, while newer models may also have learned from recent
+writing that already contains AI-assisted text; overlap with the older models rose less, and overlap with each
+newer model tended to peak later. This is an incremental system. If it continues, human and AI writing may become
+very hard to tell apart, or each AI may keep a recognisable style of its own, as each person has. This study cannot
+tell which, and future work should follow it.
 
 \section*{Limitations}
+% First paragraph written by the human author from their own explanations; the AI system fixed facts and grammar.
+One of the comparison models, Claude, is also the AI system that carried out much of this study, so it may carry a
+bias that is not visible to the \theauthor{}. It is one of the \R{arxiv_gensets.all.n_generators} models pooled in
+the main comparison: without it, writing is still \R{arxiv_gensets_its.no_frontier.excess}\pp{} above its
+pre-ChatGPT trend (\R{arxiv_gensets_its.all.excess}\pp{} with it), but the finding that the pooled overlap was still
+rising in 2026 depends on it. The measure also cannot separate people who used AI from people who learned to write
+like it. AI style is no longer only a matter of particular punctuation or marker words; it is becoming part of how
+people write, as phrases common in AI output enter their own writing. The paper therefore claims that writing moved
+towards AI style, not how many people used AI, and makes no causal claim. Finally, the data are English arXiv
+abstracts only. Languages differ in grammar, so writing in other languages, and other kinds of text, may change
+differently; in this study, Australian parliamentary speech showed no clear shift.
+
 \mso{} is defined relative to a feature map and a researcher-chosen generator set, and its trajectory after 2025
 depends on that set's vintage (\S\ref{sec:vintage}). Four generators are from 2026; one of them was run without
 decoding control in batches of 50 prompts and is the system that drafted this paper. The pre-ChatGPT-data region rests
 on four generators, three of them built on Llama~2, and their instruction tuning used data from 2023. The vintage comparison holds the task (an abstract from a title) fixed, but not the prompt wording or decoding for RAID, decoding for the 2026 model, or output length. Median lengths are \R{arxiv_generator_lengths.single:vicuna:7b.median_words} (Vicuna) to \R{arxiv_generator_lengths.single:raid-llama-chat.median_words} words (Llama-2-Chat 70B, at the truncation limit) within the pre-ChatGPT-data region, \R{arxiv_generator_lengths.single:raid-mpt-chat.median_words} to \R{arxiv_generator_lengths.single:raid-mistral-chat.median_words} for the other RAID models and \R{arxiv_generator_lengths.single:granite3.3:8b.median_words} to \R{arxiv_generator_lengths.single:granite4.2:8b.median_words} for the local 2024--2026 models. Output length rises with release date; with all texts cut to equal length the ordering persists, but other properties that change with vintage are not controlled. GPT-4's report places most, not all, of its pretraining data before September 2021. The single-generator regions of the local models share one human training sample. The 2026 model's single region is the least distinct from human abstracts: \R{arxiv_vintage.single:claude-opus-5.5.y2015}\% of 2015 abstracts fall in it, against at most \R{arxiv_vintage.single:raid-cohere-chat.y2015}\% for any other generator. The three 2026 open models were added after the annual 2025-to-2026 pattern of the other generators had been seen, before the quarterly analysis.
-Single-generator regions rest on 150 texts each (up to 450 for RAID models), so instrument precision differs by vintage. Cross-validation grouped the 2026 model's outputs by source document, not by session, which may flatter its held-in recall. Mined marker lists contain some topic and register words. Post-ChatGPT
-``human'' documents may be partly LLM-written, so \mso{} cannot separate LLM use from human adoption of LLM
-style, and no causal claim is made. The overall arXiv series averages a stratified sample of eight fields
+Single-generator regions rest on 150 texts each (up to 450 for RAID models), so instrument precision differs by vintage. Cross-validation grouped the 2026 model's outputs by source document, not by session, which may flatter its held-in recall. Mined marker lists contain some topic and register words. The overall arXiv series averages a stratified sample of eight fields
 (two of them in physics). Changes in authorship, subfields and submission volume may contribute despite
 stratified sampling and topic and length checks, and excluding papers revised after ChatGPT makes the late
 pre-period sample more selected. Confidence intervals ignore instrument variation and clustering by field-month. Classifier families agree on population-level \mso{} for abstracts (\R{arxiv_instrument.mso_logreg}\% vs
@@ -456,15 +488,24 @@ caution against using any overlap or detector score to judge an individual write
 \section*{Acknowledgements: AI Use and Authorship}
 An AI system (Claude Opus~5.5, Anthropic, used as an agent through Claude Code) carried out most of this study.
 The human \theauthor{} chose the topic, the goal of a fully disclosed AI-conducted study, and the constraints
-(public data only, no human participants, local compute), and approved the analysis plan in the working
-conversation; deviations (Appendix~\ref{app:deviations}) were made by the AI system and reported to the \theauthor{}. The AI system proposed the research question, the term ``Machine-Style Overlap'' and
-the hypotheses, wrote the analysis plan and all code, generated the local-model texts, ran the analyses, made the
-figures and drafted all text; no human has edited the text. The same system produced the 2026-model texts
-(\S\ref{sec:data}), so its own outputs are part of the reference set. Simulated peer review by separate sessions
-of the same model family, which share its blind spots, informed revisions. Separate AI sessions checked every citing sentence against the cited work's abstract or full text in two full passes (some sources only through metadata or mirrors), with later re-checks of changed sentences. The checks led to rewordings, one removed citation and the replacement of preprints by published versions. Citations were not checked by a human; the human \theauthor{} read the final paper and approved it for release. Every numerical result of our analyses in the
-paper is inserted automatically from the analysis outputs; a few counts and orderings stated in words were read
-from the same outputs. Full responsibility for the content, including the
-citations and the analysis choices, lies with the human \theauthor{}. No AI system is listed as an author.
+(public data only, no human participants, local compute), approved the analysis plan in the working conversation
+and oversaw the work; deviations (Appendix~\ref{app:deviations}) were made by the AI system and reported to the
+\theauthor{}. The AI system proposed the research question, the term ``Machine-Style Overlap'' and the hypotheses,
+wrote the analysis plan and all code, generated the local-model texts, ran the analyses, made the figures and
+drafted the first version of the text. The same system produced the 2026-model texts (\S\ref{sec:data}), so its own
+outputs are part of the reference set. After the first version was complete, the human \theauthor{} studied the
+methods and results, with the AI system as a tutor asking questions, and wrote the opening of the Introduction, the
+Discussion (including two hypotheses of the \theauthor{}'s own: the domino effect and the editing of AI output),
+the first paragraph of the Limitations and the Conclusion from the \theauthor{}'s own explanations; the AI system
+corrected only facts and grammar. Simulated peer review by separate sessions of the same model family, which share
+its blind spots, informed revisions. Separate AI sessions checked every citing sentence against the cited work's
+abstract or full text in two full passes (some sources only through metadata or mirrors), with later re-checks of
+changed sentences; the checks led to rewordings, one removed citation and the replacement of preprints by
+published versions. The human \theauthor{} then checked every citation by hand and read and approved the paper.
+Every numerical result of our analyses in the paper is inserted automatically from the analysis outputs; a few
+counts and orderings stated in words were read from the same outputs. Full responsibility for the content,
+including the citations and the analysis choices, lies with the human \theauthor{}. No AI system is listed as an
+author.
 
 \bibliography{references}
 
@@ -558,7 +599,7 @@ of the original method might do better.
 \label{app:peaks}
 Table~\ref{tab:peaks} gives each single-generator region's peak quarter with its bootstrap range, and the stability
 of its 2025-to-2026 change. Overlap peaked between 2024Q3 and 2025Q3 under the 2023 models other than Cohere's, in 2025Q2--Q3 under the 2024 models, in 2025Q4 under Gemma~3, Granite~3.3, Qwen3 and Gemma~4, and in 2026Q1--Q2 under gpt-oss, Qwen3.5 and Granite~4.2; under the 2026 model it was still rising in the last observed quarter, 2026Q3. Peak quarters are least certain for Cohere's model (up to five quarters). With every region trained on 150 full-length texts (RAID regions otherwise use 450), the release-peak correlation is \R{robustness_v8.rho_min}--\R{robustness_v8.rho_max} across five training draws (\R{robustness_v8.rho_no_new_min}--\R{robustness_v8.rho_no_new_max} without the 2026 open models). With all six RAID models dated mid-2023, since their release months are approximate, the release-peak correlation is \R{arxiv_vintage_peak.rho_raid_tied}. Each annual change has a document-bootstrap interval that excludes zero and keeps its sign across all training draws and subsamples, except under Gemma~4. On the \R{arxiv_vintage_peak.n_cutoff} generators with a stated pretraining cutoff, cutoff and release date order the peaks about equally well (rank correlations \R{arxiv_vintage_peak.rho_cutoff} and \R{arxiv_vintage_peak.rho_release_on_cutoff_set}), so we cannot separate the recency of post-training from that of pretraining data. Subsets of the pre-ChatGPT-data region point the same way as the region but differ in size: the RAID models alone give \R{arxiv_vintage.pre2022data_abstract_register.gap}\pp{} (\R{arxiv_vintage.pre2022data.gap} with summary-style outputs kept, \R{arxiv_vintage.pre2022data_plus_chatgpt.gap} with ChatGPT added and summaries kept). Measured from 2025Q4 instead of on annual means, only gpt-oss, Granite~4.2, the 2026 model and, barely, Qwen3.5
-($+$\R{arxiv_vintage_quarterly.single:qwen3.5:9b.change_q4}\pp) rose.
+($+$\R{arxiv_vintage_quarterly.single:qwen3.5:9b.change_q4}\pp) rose. Pooled regions also need not follow their members: the seven local models pooled on title-only prompts went from \R{arxiv_vintage.local_p1.y2025}\% to \R{arxiv_vintage.local_p1.y2026}\% (not a stable change), and over all three prompts from \R{arxiv_gensets.local.y2025}\% to \R{arxiv_gensets.local.y2026}\%.
 \begin{table*}[t]
 \centering\footnotesize
 \setlength{\tabcolsep}{6pt}
