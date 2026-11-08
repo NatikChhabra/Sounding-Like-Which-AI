@@ -10,7 +10,8 @@ section is authoritative and this file is out of date.
   several of which the AI system made while working unattended under an instruction to continue; approved
   making the repository public. All of this happened in the working conversation, not in commits.
 - Takes full responsibility for the content, including the citations and the analysis choices.
-- Citations: delegated to the AI system (see below); the author has not checked citations.
+- Citations: first delegated to the AI system (see below); the author then checked every citation by hand
+  (2026-10-14; `lit/HUMAN_CITATION_CHECK.md`).
 - Read the final paper and approved it for release (2026-10-13), without edits. The author asked the AI system to
   record this, so this line was written by the AI system on the author's instruction, not in a `HUMAN-EDIT:` commit.
 
@@ -23,13 +24,24 @@ The AI system is Claude Opus 5.5 (Anthropic), used as an agent through Claude Co
   control), so its own outputs are part of the LLM reference set (the paper reports results with and without
   them);
 - ran all analyses and made all figures;
-- drafted every sentence of the paper; no human has edited the text so far (zero `HUMAN-EDIT:` commits);
+- drafted every sentence of the first version of the paper (zero `HUMAN-EDIT:` commits);
 - ran simulated peer review and citation verification in separate sessions **of the same model family**
   (`paper/reviews/`, `lit/verification/`), which share its blind spots, and revised the paper in response.
   Citation verification: every citing sentence was compared with the cited work's abstract or full text, in two
   full passes by separate sessions (`lit/verification/`, latest `v5_*.md`); some publisher pages were blocked and
   those sources were checked through metadata, institutional mirrors or secondary copies. This led to rewordings,
   one removed citation and published versions replacing preprints.
+
+## The author's own sections (October and November 2026)
+After the first release, three venues asked that the paper reflect the student author's own understanding and
+writing. In two study sessions (2026-10-27 and 2026-11-08) the AI system asked the author questions about the
+methods and results; the author answered in their own words. From those answers the AI system wrote the opening
+paragraph of the Introduction, the Discussion (including two hypotheses the author proposed: a "domino effect" of
+AI and human writing influencing each other, and people editing AI output away from its most recognisable
+patterns), the first paragraph of the Limitations and the Conclusion, correcting only facts and grammar, and
+marked each correction. The author confirmed every paragraph. The working notes are kept outside this repository.
+Commits that add these sections are described as written "from the author's explanations" rather than labelled
+"(AI-written)"; the first, `84981e4`, has no label in its subject line.
 
 ## How to audit it
 - One early commit, `6675865` ("Strip BOM"), was made by the AI system but lacks the "(AI-written)" label and
